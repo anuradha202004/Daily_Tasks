@@ -1,0 +1,85 @@
+<!-- Forms, input types, labels, select, textarea, validation attributes -->
+<!-- Registration form creation -->
+
+<! DOCTYPE Html>
+<Html lang="en">
+<head>
+    <title>Registration Form</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="container">
+    <h1><center>Registration Form</center></h1>
+
+    <form action="submit.html" method="post">
+        <!-- Full Name -->
+        <label for="name">Full Name: </label>
+        <input type="text" id="name" placeholder="Enter your name" required>
+
+        <!-- Email Address -->
+        <label for="email">Email: </label>
+        <input type="text" id="email" placeholder="Enter your email" required>
+        
+        <!-- Mobile Number -->
+        <label for="number">Mobile Number: </label>
+        <input type="tel" id="number" pattern="[0-9]{10}" placeholder="Enter your number" required>
+
+         <!-- Education -->
+        <label>College Name</label>
+        <input type="text" placeholder="College name" required>
+
+        <label>Course / Degree</label>
+        <input type="text" placeholder="BE / BCA / MCA" required>
+
+        <label>Current Semester</label>
+        <select required>
+            <option value="">Select Semester</option>
+            <option>5th</option>
+            <option>6th</option>
+            <option>7th</option>
+            <option>8th</option>
+        </select>
+
+        <!-- Internship Details -->
+        <label>Internship Role</label>
+        <select required>
+            <option value="">Select Role</option>
+            <option>Full Stack Development</option>
+            <option>Frontend Developer</option>
+            <option>Backend Developer</option>
+            <option>Data Analyst</option>
+        </select>
+
+        <label>Internship Duration</label>
+        <select required>
+            <option value="">Select Duration</option>
+            <option>1 Month</option>
+            <option>2 Months</option>
+            <option>3 Months</option>
+            <option>6 Months</option>
+        </select>
+
+        <!-- Skills -->
+        <label>Technical Skills</label>
+        <textarea rows="1" placeholder="HTML, CSS, JavaScript, Java..."></textarea>
+
+         <!-- Skills -->
+        <label>Technical Skills</label>
+        <textbox rows="1" placeholder="HTML, CSS, JavaScript, Java..."></textbox>
+
+        <!-- Resume -->
+        <label>Upload Resume</label>
+        <input type="file" required>
+
+        <!-- Declaration -->
+        <div class="checkbox-group">
+            <input type="checkbox" required>
+            I confirm that the above information is correct.
+        </div>
+
+        <!-- Submit -->
+        <button type="submit">Submit</button>
+
+    </form>
+</div>
+</body>
