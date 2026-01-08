@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>HTML Navigation & Links Demo</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+
+        nav a {
+            margin-right: 15px;
+            font-weight: bold;
+            text-decoration: none;
+            color: rgb(122, 122, 175);
+        }
+
+        nav a:hover {
+            color: rgb(224, 217, 217);
+        }
+
+        section {
+            margin-top: 40px;
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- ================= NAVIGATION ================= -->
+<h1>Multi-Page Website Navigation</h1>
+
+<nav>
+    <!-- Relative paths (same folder) -->
+    <a href="index.html">Home</a>
+    <a href="about.html">About</a>
+    <a href="contact.html">Contact</a>
+
+    <!-- Absolute path -->
+    <a href="https://www.google.com" target="_blank">Google</a>
+</nav>
+
+<!-- ================= TEXT FORMATTING ================= -->
+<section>
+    <h2>1. Text Formatting</h2>
+
+    <p>
+        <b>Bold text</b><br>
+        <strong>Important text</strong><br>
+        <i>Italic text</i><br>
+        <u>Underlined text</u><br>
+        <mark>Highlighted text</mark><br>
+        H<sub>2</sub>O (Subscript)<br>
+        10<sup>2</sup> (Superscript)
+    </p>
+</section>
+
+<!-- ================= ANCHOR TAGS ================= -->
+<section>
+    <h2>2. Anchor Tags</h2>
+
+    <!-- Internal link -->
+    <a href="#contact">Go to Contact Section</a><br><br>
+
+    <!-- Email link -->
+    <a href="mailto:test@gmail.com">Send Email</a><br>
+
+    <!-- Phone link -->
+    <a href="tel:+919999999999">Call Us</a>
+</section>
+
+<!-- ================= HYPERLINKS ================= -->
+<section>
+    <h2>3. Hyperlinks</h2>
+
+    <p>
+        <a href="https://www.wikipedia.org" target="_blank">
+            Open Wikipedia (External Website)
+        </a>
+    </p>
+</section>
+
+<!-- ================= RELATIVE & ABSOLUTE PATHS ================= -->
+<section>
+    <h2>4. Relative & Absolute Paths</h2>
+
+    <p><strong>Relative Path:</strong></p>
+    <code>href="about.html"</code><br>
+    <code>src="images/photo.jpg"</code>
+
+    <p><strong>Absolute Path:</strong></p>
+    <code>href="https://www.google.com"</code>
+</section>
+
+<!-- ================= COMMENTS ================= -->
+<section>
+    <h2>5. Comments</h2>
+
+    <!-- This is an HTML comment -->
+    <p>Comments are not visible on the web page.</p>
+</section>
+
+<!-- ================= CONTACT SECTION ================= -->
+<section id="contact">
+    <h2>Contact Section</h2>
+    <p>This section is linked using anchor tag.</p>
+</section>
+
+</body>
+</html>

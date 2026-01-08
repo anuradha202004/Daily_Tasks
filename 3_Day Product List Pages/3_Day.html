@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"> <!-- Attribute -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lists, images, tables, attributes, accessibility basics</title>
+
+    <!-- External CSS (attribute usage) -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f8;
+            padding: 20px;
+        }
+
+        h1, h2 {
+            color: #333;
+        }
+
+        img {
+            width: 200px;
+            border-radius: 8px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th, td {
+            border: 1px solid #aaa;
+            padding: 10px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- Heading -->
+<h1 tabindex="0">Lists, images, tables, attributes, accessibility basics</h1>
+<!-- tabindex helps keyboard users (Accessibility) -->
+
+<hr>
+
+<!-- LISTS -->
+<h2>1. Lists</h2>
+
+<!-- Ordered List -->
+<h3>Ordered List (Steps)</h3>
+<ol>
+    <li>Open Browser</li>
+    <li>Write HTML Code</li>
+    <li>Save File</li>
+</ol>
+
+<!-- Unordered List -->
+<h3>Unordered List (Skills)</h3>
+<ul>
+    <li>HTML</li>
+    <li>CSS</li>
+    <li>JavaScript</li>
+</ul>
+
+<!-- Description List -->
+<h3>Description List</h3>
+<dl>
+    <dt>HTML</dt>
+    <dd>Markup language for web pages</dd>
+
+    <dt>CSS</dt>
+    <dd>Used for styling</dd>
+</dl>
+
+<hr>
+
+<!-- IMAGES -->
+<h2>2. Images</h2>
+
+<img 
+    src="im1.png"
+    alt="Sample placeholder image"
+    title="This is a demo image"
+    loading="lazy"
+>
+
+<!-- Accessibility: alt text helps screen readers -->
+
+<hr>
+
+<!-- TABLE -->
+<h2>3. Table</h2>
+
+<table aria-label="Student Information Table">
+    <thead>
+        <tr>
+            <th scope="col">Roll No</th>
+            <th scope="col">Name</th>
+            <th scope="col">Course</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        <tr>
+            <td>1</td>
+            <td>Anuradha</td>
+            <td>Computer Engineering</td>
+        </tr>
+        <tr>
+            <td>2</td>
+            <td>Rahul</td>
+            <td>IT</td>
+        </tr>
+    </tbody>
+</table>
+
+<!-- aria-label improves accessibility -->
+
+<hr>
+
+<!-- ATTRIBUTES -->
+<h2>4. Attributes Examples</h2>
+
+<a 
+    href="https://www.google.com"
+    target="_blank"
+    title="Go to Google website"
+>
+    Visit Google 
+</a>
+<p>Using here target, title, href attributes</p>
+<br>
+
+<input 
+    type="text"
+    placeholder="Enter your name"
+    required
+    aria-label="Name input field"
+>
+<p>Using here type, placeholder, aria-label attributes</p>
+<hr>
+
+<!-- ACCESSIBILITY BASICS -->
+<h2>5. Accessibility Basics</h2>
+
+<ul>
+    <li>✔ <strong>alt</strong> attribute for images</li>
+    <li>✔ <strong>aria-label</strong> for screen readers</li>
+    <li>✔ Proper heading order (h1 → h2)</li>
+    <li>✔ Keyboard navigation using <strong>tabindex</strong></li>
+    <li>✔ Semantic HTML (table, list, headings)</li>
+</ul>
+
+<hr>
+
+<footer>
+    <p>Cover all topic Lists, images, tables, attributes, accessibility basics Done.</p>
+</footer>
+
+</body>
+</html>
