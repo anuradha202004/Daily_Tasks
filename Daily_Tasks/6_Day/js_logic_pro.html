@@ -1,0 +1,102 @@
+<!-- Operators, if-else, switch case, truthy & falsy values  -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>JavaScript Conditional Logic Demo</title>
+</head>
+<body>
+
+<h2>JavaScript Operators & Conditions</h2>
+<p>Open Console → Right click → Inspect → Console</p>
+
+<script>
+    // =========================
+    // VARIABLES
+    // =========================
+    let a = 10;
+    let b = 5;
+    let marks = 72;
+    let day = 3;
+    let userName = "";   // empty string (falsy)
+    let isLoggedIn = true;
+
+    // =========================
+    // OPERATORS
+    // =========================
+
+    console.log("Addition:", a + b);       // Arithmetic
+    console.log("Subtraction:", a - b);
+    console.log("Multiplication:", a * b);
+    console.log("Division:", a / b);
+
+    console.log("Is a > b:", a > b);       // Comparison
+    console.log("Is a == b:", a == b);
+    console.log("Is a === b:", a === b);
+
+    console.log("Logical AND:", a > 5 && b > 2); // Logical
+    console.log("Logical OR:", a > 20 || b > 2);
+    console.log("Logical NOT:", !isLoggedIn);
+
+    // =========================
+    // IF - ELSE CONDITIONAL
+    // =========================
+
+    if (marks >= 80) {
+        console.log("Grade: A");
+    } else if (marks >= 60) {
+        console.log("Grade: B");
+    } else if (marks >= 40) {
+        console.log("Grade: C");
+    } else {
+        console.log("Grade: Fail");
+    }
+
+    // =========================
+    // SWITCH CASE
+    // =========================
+
+    switch (day) {
+        case 1:
+            console.log("Monday");
+            break;
+        case 2:
+            console.log("Tuesday");
+            break;
+        case 3:
+            console.log("Wednesday");
+            break;
+        case 4:
+            console.log("Thursday");
+            break;
+        default:
+            console.log("Invalid day");
+    }
+
+    // =========================
+    // TRUTHY & FALSY VALUES
+    // =========================
+
+    if (userName) {
+        console.log("Username exists:", userName);
+    } else {
+        console.log("Username is empty (Falsy value)");
+    }
+
+    // =========================
+    // CONDITIONAL LOGIC PROGRAM
+    // =========================
+
+    if (isLoggedIn && marks >= 60) {
+        console.log("Access granted: Eligible student");
+    } else {
+        console.log("Access denied");
+    }
+
+</script>
+
+</body>
+</html>
+
+
