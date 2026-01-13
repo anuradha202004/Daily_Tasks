@@ -4,99 +4,144 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>JavaScript Conditional Logic Demo</title>
+    <title>JavaScript Operators & Conditions</title>
+    <style>
+        body {
+            font-family: Arial;
+        }
+        .box {
+            border: 1px solid #333;
+            padding: 10px;
+            margin-bottom: 15px;
+        }
+        h3 {
+            color: darkgreen;
+            margin-bottom: 5px;
+        }
+    </style>
 </head>
 <body>
 
-<h2>JavaScript Operators & Conditions</h2>
-<p>Open Console → Right click → Inspect → Console</p>
+<h2>JavaScript: Operators & Conditional Statements</h2>
+
+<!-- Operators -->
+<div class="box">
+    <h3>1. Operators Example</h3>
+    <p id="operators"></p>
+</div>
+
+<!-- if-else -->
+<div class="box">
+    <h3>2. if–else Statement</h3>
+    <p id="ifelse"></p>
+</div>
+
+<!-- switch-case -->
+<div class="box">
+    <h3>3. switch–case Statement</h3>
+    <p id="switch"></p>
+</div>
+
+<!-- Truthy & Falsy -->
+<div class="box">
+    <h3>4. Truthy & Falsy Values</h3>
+    <p id="truthy"></p>
+</div>
+
+<!-- Conditional Logic -->
+<div class="box">
+    <h3>5. Conditional Logic Program</h3>
+    <p id="logic"></p>
+</div>
 
 <script>
-    // =========================
-    // VARIABLES
-    // =========================
+    // =====================================
+    // OPERATORS
+    // =====================================
     let a = 10;
     let b = 5;
+
+    let operatorOutput = "";
+    operatorOutput += "Addition: " + (a + b) + "<br>";
+    operatorOutput += "Subtraction: " + (a - b) + "<br>";
+    operatorOutput += "Multiplication: " + (a * b) + "<br>";
+    operatorOutput += "Is a > b: " + (a > b) + "<br>";
+    operatorOutput += "Logical AND (a>5 && b>2): " + (a > 5 && b > 2);
+
+    document.getElementById("operators").innerHTML = operatorOutput;
+
+    // =====================================
+    // IF - ELSE
+    // =====================================
     let marks = 72;
-    let day = 3;
-    let userName = "";   // empty string (falsy)
-    let isLoggedIn = true;
+    let grade = "";
 
-    // =========================
-    // OPERATORS
-    // =========================
-
-    console.log("Addition:", a + b);       // Arithmetic
-    console.log("Subtraction:", a - b);
-    console.log("Multiplication:", a * b);
-    console.log("Division:", a / b);
-
-    console.log("Is a > b:", a > b);       // Comparison
-    console.log("Is a == b:", a == b);
-    console.log("Is a === b:", a === b);
-
-    console.log("Logical AND:", a > 5 && b > 2); // Logical
-    console.log("Logical OR:", a > 20 || b > 2);
-    console.log("Logical NOT:", !isLoggedIn);
-
-    // =========================
-    // IF - ELSE CONDITIONAL
-    // =========================
-
-    if (marks >= 80) {
-        console.log("Grade: A");
-    } else if (marks >= 60) {
-        console.log("Grade: B");
-    } else if (marks >= 40) {
-        console.log("Grade: C");
+    if (marks >= 60) {
+        grade = "Pass";
     } else {
-        console.log("Grade: Fail");
+        grade = "Fail";
     }
 
-    // =========================
-    // SWITCH CASE
-    // =========================
+    document.getElementById("ifelse").innerHTML =
+        "Marks: " + marks + " → Result: " + grade;
+
+    // =====================================
+    // SWITCH - CASE
+    // =====================================
+    let day = 3;
+    let dayName = "";
 
     switch (day) {
         case 1:
-            console.log("Monday");
+            dayName = "Monday";
             break;
         case 2:
-            console.log("Tuesday");
+            dayName = "Tuesday";
             break;
         case 3:
-            console.log("Wednesday");
-            break;
-        case 4:
-            console.log("Thursday");
+            dayName = "Wednesday";
             break;
         default:
-            console.log("Invalid day");
+            dayName = "Invalid Day";
     }
 
-    // =========================
-    // TRUTHY & FALSY VALUES
-    // =========================
+    document.getElementById("switch").innerHTML =
+        "Day Number: " + day + " → " + dayName;
+
+    // =====================================
+    // TRUTHY & FALSY
+    // =====================================
+    let userName = "";   // falsy value
+    let truthyResult = "";
 
     if (userName) {
-        console.log("Username exists:", userName);
+        truthyResult = "Username exists";
     } else {
-        console.log("Username is empty (Falsy value)");
+        truthyResult = "Username is empty (Falsy value)";
     }
 
-    // =========================
-    // CONDITIONAL LOGIC PROGRAM
-    // =========================
+    document.getElementById("truthy").innerHTML = truthyResult;
 
-    if (isLoggedIn && marks >= 60) {
-        console.log("Access granted: Eligible student");
+    // =====================================
+    // CONDITIONAL LOGIC
+    // =====================================
+    let isLoggedIn = true;
+    let attendance = 80;
+    let permission = "";
+
+    if (isLoggedIn && attendance >= 75) {
+        permission = "Access Granted";
     } else {
-        console.log("Access denied");
+        permission = "Access Denied";
     }
 
+    document.getElementById("logic").innerHTML =
+        "Login: " + isLoggedIn +
+        ", Attendance: " + attendance + "% → " + permission;
 </script>
 
 </body>
 </html>
+
 
 

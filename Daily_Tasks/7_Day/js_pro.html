@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Loops Pro</title>
+    </head>
+    <body>
+        <h1>Loops in JavaScript</h1>
+        <h2>For Loop</h2>
+        <script>
+            // This program demonstrates a for loop in JavaScript
+            for(let i=0; i<10; i++){
+                document.write("The number is " + i + "</br>");
+            }
+
+            // while loop in JavaScript
+            document.write("<h2>While Loop</h2>");
+            let j=0;
+            while(j<10){
+                document.write("The number is " + j + "</br>");
+                j++;
+            }
+
+            // do-while loop in JavaScript
+            document.write("<h2>Do-While Loop</h2>");
+            let k=0;
+            do{
+                document.write("The number is " + k + "</br>");
+                k++;
+            }while(k<10);
+
+
+            for(let n=0; n<5; n++){
+                if(n === 3){
+                    document.write("Skipping number 3" + "</br>");
+                    continue; // Skip the rest of the loop when n is 3
+                }
+                document.write("Current number: " + n + "</br>");
+            }
+            
+
+            const a = ["Anuradha" , "Aryan", "Sai"];
+            const a2 = a.map((s) => s.length);
+            console.log(a2);
+        </script>
+    </body>
+</html>
+
+
+           
