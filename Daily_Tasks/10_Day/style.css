@@ -1,0 +1,21 @@
+body {
+    font-family: Arial;
+    padding: 20px;
+}
+
+.form input {
+    padding: 8px;
+    margin-right: 5px;
+}
+
+button {
+    padding: 6px 10px;
+    margin-left: 5px;
+    cursor: pointer;
+}
+
+.product {
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin-top: 10px;
+}
