@@ -1,4 +1,4 @@
- const Renderer = {
+const Renderer = {
             showAlert(message, type = 'success') {
                 const container = document.getElementById('alert-container');
                 const icon = type === 'success' ? '✓' : '✕';
@@ -151,6 +151,8 @@
                                         `<button class="btn btn-small btn-primary" onclick="App.startTask('${task.id}')">Start</button>` : ''}
                                     ${task.status === 'IN_PROGRESS' ? 
                                         `<button class="btn btn-small btn-success" onclick="App.completeTask('${task.id}')">Complete</button>` : ''}
+                                    ${task.status === 'PENDING' ? 
+                                        `<button class="btn btn-small btn-secondary" onclick="App.reassignTask('${task.id}')">Reassign</button>` : ''}
                                 </div>
                             </td>
                         </tr>
@@ -182,5 +184,54 @@
                         <td>${log.details}</td>
                     </tr>
                 `).join('') : '<tr><td colspan="3" style="text-align:center; color: var(--text-secondary);">No logs available</td></tr>';
-            }
+            },
+
+            showReassignmentModal(task, matchingInterns) {
+                const modalHTML = `
+                    <div class="modal-overlay" onclick="Renderer.hideReassignmentModal()">
+                        <div class="modal-content" onclick="event.stopPropagation()">
+                            <div class="modal-header">
+                                <h2 class="modal-title">Reassign Task</h2>
+                                <button class="modal-close" onclick="Renderer.hideReassignmentModal()">✕</button>
+                            </div>
+                            
+                            <div class="modal-body">
+                                <p><strong>Task:</strong> ${task.title}</p>
+                                <p><strong>Current Assignee:</strong> ${task.assignedTo ? 
+                                    AppState.interns.find(i => i.id === task.assignedTo)?.name || 'Unknown' : 
+                                    'Unassigned'}</p>
+                                
+                                <p><strong>Reassign to:</strong></p>
+                                <div class="reassign-options">
+                                    ${matchingInterns.map(intern => `
+                                        <div class="reassign-option" onclick="App.confirmReassignment('${intern.id}')">
+                                            <div class="option-name">${intern.name}</div>
+                                            <div class="option-skills">${intern.skills.join(', ')}</div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                            
+                            <div class="modal-footer">
+                                <button class="btn btn-secondary" onclick="Renderer.hideReassignmentModal()">Cancel</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                let modalContainer = document.getElementById('modal-container');
+                if (!modalContainer) {
+                    modalContainer = document.createElement('div');
+                    modalContainer.id = 'modal-container';
+                    document.body.appendChild(modalContainer);
+                }
+                modalContainer.innerHTML = modalHTML;
+            },
+
+            hideReassignmentModal() {
+                const modalContainer = document.getElementById('modal-container');
+                if (modalContainer) {
+                    modalContainer.innerHTML = '';
+                }
+            },
         };

@@ -1,4 +1,4 @@
- /* === LAYOUT === */
+/* === LAYOUT === */
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             background: var(--bg-primary);
@@ -566,6 +566,118 @@
         .loading-text {
             color: var(--text-secondary);
             font-size: 14px;
+        }
+
+        /* === MODAL === */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(10, 14, 39, 0.8);
+            backdrop-filter: blur(4px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: var(--bg-card);
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .modal-header {
+            padding: 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--accent-1);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--text-secondary);
+            transition: color 0.2s ease;
+        }
+
+        .modal-close:hover {
+            color: var(--accent-1);
+        }
+
+        .modal-body {
+            padding: 24px;
+        }
+
+        .modal-body p {
+            margin-bottom: 16px;
+            font-size: 14px;
+        }
+
+        .reassign-options {
+            display: grid;
+            gap: 12px;
+            margin: 16px 0;
+        }
+
+        .reassign-option {
+            background: var(--bg-secondary);
+            padding: 16px;
+            border-radius: 10px;
+            border: 2px solid var(--border);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .reassign-option:hover {
+            border-color: var(--accent-1);
+            background: rgba(0, 212, 255, 0.1);
+        }
+
+        .option-name {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .option-skills {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .modal-footer {
+            padding: 16px 24px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
         }
 
         /* === UTILITIES === */
