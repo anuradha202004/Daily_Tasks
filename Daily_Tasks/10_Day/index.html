@@ -1,24 +1,79 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Furniture Manager</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <title>Todo List CRUD</title>
+  <style>
+    body {
+      font-family: Arial;
+      background: #f4f4f4;
+      padding: 30px;
+    }
+
+    .container {
+      max-width: 400px;
+      margin: auto;
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+    }
+
+    input {
+      width: 70%;
+      padding: 8px;
+    }
+
+    button {
+      padding: 8px 10px;
+      margin: 5px;
+      cursor: pointer;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    li {
+      background: #eee;
+      padding: 8px;
+      margin: 5px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+  </style>
 </head>
+
 <body>
 
-    <h1>Furniture Store</h1>
+<div class="container">
+  <h2>📝 Todo List (CRUD)</h2>
 
-    <div class="form">
-        <input type="text" id="name" placeholder="Furniture Name">
-        <input type="number" id="price" placeholder="Price">
-        <button id="addBtn">Add Product</button>
-        <button id="updateBtn" style="display:none;">Update</button>
-    </div>
+  <input type="text" id="taskInput" placeholder="Enter task">
+  <button onclick="addTask()">Add</button>
 
-    <h2>Product List</h2>
-    <div id="productList"></div>
+  <ul id="taskList"></ul>
+</div>
 
-    <script src="script.js"></script>
+<script src="script.js"></script>
 </body>
+</html> -->
+
+<html>
+    <head>
+        <title>To Do List</title>
+    </head>
+    <body>
+        <div class="container">
+            <h2>Todo List</h2>
+            <input type="text" id="taskInput" placeholder="Enter the tasks here">
+            <button onclick="addTask()">Add</button>
+
+            <ul id="taskList"></ul>
+        </div>
+         <script src="script.js"></script>
+    </body>
 </html>
+
+

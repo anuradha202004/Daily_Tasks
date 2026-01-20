@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Intern Operations Hub</title>
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/components.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo-section">
+                <div class="logo">⚡ InternHub</div>
+                <div class="logo-subtitle">Operations Center</div>
+            </div>
+
+            <nav>
+                <ul class="nav-menu">
+                    <li class="nav-item">
+                        <a class="nav-link active" data-view="dashboard">
+                            <span class="nav-icon">📊</span>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-view="interns">
+                            <span class="nav-icon">👥</span>
+                            <span>Manage Interns</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-view="tasks">
+                            <span class="nav-icon">✅</span>
+                            <span>Task Center</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-view="logs">
+                            <span class="nav-icon">📝</span>
+                            <span>Activity Logs</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+            <div class="stats-sidebar">
+                <div class="stat-mini">
+                    <div class="stat-mini-label">Active Now</div>
+                    <div class="stat-mini-value" id="sidebar-active">0</div>
+                </div>
+                <div class="stat-mini">
+                    <div class="stat-mini-label">Total Tasks</div>
+                    <div class="stat-mini-value" id="sidebar-tasks">0</div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div id="alert-container"></div>
+
+            <!-- Dashboard View -->
+            <section id="dashboard" class="view-section active">
+                <div class="content-header">
+                    <h1 class="page-title">System Overview</h1>
+                </div>
+
+                <div class="cards-grid" id="dashboard-stats"></div>
+
+                <div class="table-card">
+                    <div class="table-wrapper">
+                        <h3 style="padding: 20px; font-size: 18px; color: var(--accent-1);">Recent Activity</h3>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Timestamp</th>
+                                    <th>Event</th>
+                                    <th>Details</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dashboard-logs"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Interns View -->
+            <section id="interns" class="view-section">
+                <div class="content-header">
+                    <h1 class="page-title">Intern Management</h1>
+                </div>
+
+                <div class="form-card">
+                    <h3 class="form-title">➕ Add New Intern</h3>
+                    <form id="intern-form">
+                        <div class="form-row">
+                            <div class="form-field">
+                                <label class="form-label">Full Name *</label>
+                                <input type="text" class="form-input" name="name" placeholder="Enter intern name" required>
+                            </div>
+                            <div class="form-field">
+                                <label class="form-label">Email Address *</label>
+                                <input type="email" class="form-input" name="email" placeholder="intern@company.com" required>
+                            </div>
+                        </div>
+
+                        <div class="form-field mb-20">
+                            <label class="form-label">Technical Skills *</label>
+                            <div class="checkbox-grid">
+                                <div class="checkbox-item">
+                                    <input type="checkbox" name="skills" value="JavaScript" id="skill-js">
+                                    <label for="skill-js">JavaScript</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" name="skills" value="React" id="skill-react">
+                                    <label for="skill-react">React</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" name="skills" value="CSS" id="skill-css">
+                                    <label for="skill-css">CSS</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" name="skills" value="HTML" id="skill-html">
+                                    <label for="skill-html">HTML</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" name="skills" value="Node.js" id="skill-node">
+                                    <label for="skill-node">Node.js</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" name="skills" value="Git" id="skill-git">
+                                    <label for="skill-git">Git</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">Create Intern Profile</button>
+                    </form>
+                </div>
+
+                <div class="filters-bar">
+                    <div class="filter-item">
+                        <label class="form-label">Filter by Status</label>
+                        <select class="form-select" id="status-filter">
+                            <option value="">All Statuses</option>
+                            <option value="ONBOARDING">Onboarding</option>
+                            <option value="ACTIVE">Active</option>
+                            <option value="EXITED">Exited</option>
+                        </select>
+                    </div>
+                    <div class="filter-item">
+                        <label class="form-label">Filter by Skill</label>
+                        <select class="form-select" id="skill-filter">
+                            <option value="">All Skills</option>
+                            <option value="JavaScript">JavaScript</option>
+                            <option value="React">React</option>
+                            <option value="CSS">CSS</option>
+                            <option value="HTML">HTML</option>
+                            <option value="Node.js">Node.js</option>
+                            <option value="Git">Git</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="table-card">
+                    <div class="table-wrapper">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Intern ID</th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Skills</th>
+                                    <th>Status</th>
+                                    <th>Assigned Tasks</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="interns-table"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tasks View -->
+            <section id="tasks" class="view-section">
+                <div class="content-header">
+                    <h1 class="page-title">Task Center</h1>
+                </div>
+
+                <div class="form-card">
+                    <h3 class="form-title">➕ Create New Task</h3>
+                    <form id="task-form">
+                        <div class="form-row">
+                            <div class="form-field">
+                                <label class="form-label">Task Title *</label>
+                                <input type="text" class="form-input" name="title" placeholder="Enter task title" required>
+                            </div>
+                            <div class="form-field">
+                                <label class="form-label">Estimated Hours *</label>
+                                <input type="number" class="form-input" name="estimatedHours" min="1" placeholder="8" required>
+                            </div>
+                        </div>
+
+                        <div class="form-field mb-20">
+                            <label class="form-label">Description</label>
+                            <textarea class="form-textarea" name="description" placeholder="Describe the task..."></textarea>
+                        </div>
+
+                        <div class="form-field mb-20">
+                            <label class="form-label">Required Skills *</label>
+                            <div class="checkbox-grid">
+                                <div class="checkbox-item">
+                                    <input type="checkbox" name="requiredSkills" value="JavaScript" id="task-skill-js">
+                                    <label for="task-skill-js">JavaScript</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" name="requiredSkills" value="React" id="task-skill-react">
+                                    <label for="task-skill-react">React</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" name="requiredSkills" value="CSS" id="task-skill-css">
+                                    <label for="task-skill-css">CSS</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" name="requiredSkills" value="HTML" id="task-skill-html">
+                                    <label for="task-skill-html">HTML</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" name="requiredSkills" value="Node.js" id="task-skill-node">
+                                    <label for="task-skill-node">Node.js</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" name="requiredSkills" value="Git" id="task-skill-git">
+                                    <label for="task-skill-git">Git</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-field">
+                                <label class="form-label">Assign To Intern</label>
+                                <select class="form-select" name="assignedTo" id="assign-select">
+                                    <option value="">Unassigned</option>
+                                </select>
+                            </div>
+                            <div class="form-field">
+                                <label class="form-label">Task Dependencies</label>
+                                <select class="form-select" name="dependencies" id="dependencies-select" multiple>
+                                    <option value="">No dependencies</option>
+                                </select>
+                                <small class="text-muted">Hold Ctrl/Cmd to select multiple</small>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">Create Task</button>
+                    </form>
+                </div>
+
+                <div class="table-card">
+                    <div class="table-wrapper">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Task ID</th>
+                                    <th>Title</th>
+                                    <th>Required Skills</th>
+                                    <th>Assigned To</th>
+                                    <th>Status</th>
+                                    <th>Est. Hours</th>
+                                    <th>Dependencies</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tasks-table"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Logs View -->
+            <section id="logs" class="view-section">
+                <div class="content-header">
+                    <h1 class="page-title">Activity Logs</h1>
+                </div>
+
+                <div class="table-card">
+                    <div class="table-wrapper">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Timestamp</th>
+                                    <th>Action Type</th>
+                                    <th>Details</th>
+                                </tr>
+                            </thead>
+                            <tbody id="logs-table"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    <!-- <script type="module" src="js/app.js"></script> -->
+    <script src="js/state.js"></script>
+    <script src="js/fake-server.js"></script>
+    <script src="js/rules-engine.js"></script>
+    <script src="js/validators.js"></script>
+    <script src="js/renderer.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

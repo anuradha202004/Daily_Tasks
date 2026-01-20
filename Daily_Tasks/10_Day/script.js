@@ -1,150 +1,104 @@
-// // DATA STORAGE - ARRAY OF OBJECTS
-// let products = [];
-// let editIndex = null;
+// let tasks = [];       // Store all tasks
+// let editIndex = null; // Track editing task index
 
-// // ELEMENT SELECTION
-// const nameInput = document.getElementById("name");
-// const priceInput = document.getElementById("price");
-// const addBtn = document.getElementById("addBtn");
-// const updateBtn = document.getElementById("updateBtn");
-// const productList = document.getElementById("productList");
+// // CREATE & UPDATE
+// function addTask() {
+//   const taskInput = document.getElementById("taskInput");
+//   const taskValue = taskInput.value.trim();
 
-// // ADD PRODUCT
-// addBtn.addEventListener("click", function () {
-//     let product = {
-//         name: nameInput.value,
-//         price: priceInput.value
-//     };
+//   if (taskValue === "") {
+//     alert("Please enter a task");
+//     return;
+//   }
 
-//     products.push(product);
-//     clearForm();
-//     displayProducts();
-// });
+//   if (editIndex === null) {
+//     // CREATE
+//     tasks.push({ task: taskValue });
+//   } else {
+//     // UPDATE
+//     tasks[editIndex].task = taskValue;
+//     editIndex = null;
+//   }
 
-// // UPDATE PRODUCT
-// updateBtn.addEventListener("click", function () {
-//     products[editIndex].name = nameInput.value;
-//     products[editIndex].price = priceInput.value;
-
-//     clearForm();
-//     displayProducts();
-
-//     addBtn.style.display = "inline";
-//     updateBtn.style.display = "none";
-// });
-
-// // DISPLAY PRODUCTS
-// function displayProducts() {
-//     productList.innerHTML = "";
-
-//     products.forEach(function (item, index) {
-//         let div = document.createElement("div");
-//         div.className = "product";
-
-//         div.innerHTML = `
-//             ${index + 1}. ${item.name} - ₹${item.price}
-//             <button onclick="editProduct(${index})">Edit</button>
-//             <button onclick="deleteProduct(${index})">Delete</button>
-//         `;
-
-//         productList.appendChild(div);
-//     });
+//   taskInput.value = "";
+//   displayTasks();
 // }
 
-// // DELETE PRODUCT
-// function deleteProduct(index) {
-//     products.splice(index, 1);
-//     displayProducts();
+// // READ
+// function displayTasks() {
+//   const taskList = document.getElementById("taskList");
+//   taskList.innerHTML = "";
+
+//   tasks.forEach((item, index) => {
+//     taskList.innerHTML += `
+//       <li>
+//         ${item.task}
+//         <div>
+//           <button onclick="editTask(${index})">Edit</button>
+//           <button onclick="deleteTask(${index})">Delete</button>
+//         </div>
+//       </li>
+//     `;
+//   });
 // }
 
-// // EDIT PRODUCT
-// function editProduct(index) {
-//     nameInput.value = products[index].name;
-//     priceInput.value = products[index].price;
-
-//     editIndex = index;
-//     addBtn.style.display = "none";
-//     updateBtn.style.display = "inline";
+// // DELETE
+// function deleteTask(index) {
+//   tasks.splice(index, 1);
+//   displayTasks();
 // }
 
-// // CLEAR FORM
-// function clearForm() {
-//     nameInput.value = "";
-//     priceInput.value = "";
+// // EDIT
+// function editTask(index) {
+//   document.getElementById("taskInput").value = tasks[index].task;
+//   editIndex = index;
 // }
 
 
-let products = [];
-let editIndex = null;
 
-const nameInput=document.getElementById("name");
-const priceInput=document.getElementById("price");
-const addBtn=document.getElementById("addBtn");
-const updateBtn=document.getElementById("updateBtn")
-const productList=document.getElementById("productList");
+let tasks=[];
+let editIndex=null;
 
-//Add Product
-addBtn.addEventListener("click" , function(){
-    let product={ 
-        name: nameInput.value,
-        price: priceInput.value
-    };
+function addTask(){
+    const taskInput=document.getElementById("taskInput");
+    const taskValue=taskInput.value.trim();
 
-    products.push(product);
-    clearForm();
-    displayProducts();
-});
-
-//Update Product
-updateBtn.addEventListener("click", function(){
-    products[editIndex].name=nameInput.value;
-    products[editIndex].price=priceInput.value;
-
-    clearForm();
-    displayProducts();
-
-    addBtn.style.display= "inline";
-    updateBtn.style.display= "none";
-});
-
-//Display product
-
-function displayProducts() {
-    productList.innerHTML="";
-
-    products.forEach(function (item, index){
-        let div=document.createElement("div");
-        div.className="product";
-
-        div.innerHTML= `${index + 1}. ${item.name} = ₹${item.price}
-        <button onclick="editProduct(${index})">Edit</button>
-        <button onclick="deleteProduct(${index})">Delete</button>
-         `;
- 
-         productList.appendChild(div);
-    });
+    if(taskValue===""){
+        alert("Please enter the task");
+        return;
+    }
+    if(editIndex===null){
+        tasks.push({task: taskValue});
+    }else{
+        tasks[editIndex].task=taskValue;
+        editIndex=null;
+    }
+    taskInput.value="";
+    displayTasks();
 }
+    function displayTasks(){
+        const taskList=document.getElementById("taskList");
+        taskList.innerHTML="";
 
-//Delete
+        tasks.forEach((item,index) => {
+            taskList.innerHTML += `
+            <li>
+            ${item.task}
+                <div>
+                    <button onClick="editTask(${index})">Edit</button>
+                    <button onClick="deleteTask(${index})">Delete</button>
+                </div>
+            </li>
+            `;
+        });
+    }
 
- function deleteProduct(index){
-    products.splice(index ,1);
-    displayProducts();
- }
+        function editTask(index){
+           document.getElementById("taskInput").value=tasks[index].task;
+           editIndex=index;
+        }
 
- //Edit
- function editProduct(index){
-    nameInput.value=products[index].name;
-    priceInput.value=products[index].price;
-
-    editIndex=index;
-
-    addBtn.style.display="none";
-    updateBtn.style.display="inline";
-}
-
-//clear form
-function clearForm(){
-    nameInput.value="";
-    priceInput.value="";
-}
+        function deleteTask(index){
+            tasks.splice(index,1);
+            displayTasks();
+        }
