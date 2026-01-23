@@ -57,7 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             <?php endif; ?>
 
             <!-- Sign In Form -->
-            <form method="POST" action="">
+            <form method="POST" action="" id="loginForm" onsubmit="return validateLoginForm()">
                 <input type="hidden" name="action" value="login">
 
                 <!-- Email Field -->
@@ -66,6 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                     <input type="email" id="email" name="email" placeholder="you@example.com" required 
                            value="<?php echo htmlspecialchars($_POST['email'] ?? ''); ?>"
                            style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px; transition: border-color 0.3s;">
+                    <small id="emailError" style="color: #dc2626; display: none; margin-top: 5px; display: block;"></small>
                 </div>
 
                 <!-- Password Field -->
@@ -73,6 +74,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                     <label for="password" style="display: block; margin-bottom: 8px; font-weight: 500; color: #333;">Password</label>
                     <input type="password" id="password" name="password" placeholder="••••••••" required 
                            style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px; transition: border-color 0.3s;">
+                    <small id="passwordError" style="color: #dc2626; display: none; margin-top: 5px; display: block;"></small>
                     <small style="color: #999; display: block; margin-top: 5px;">
                         Demo: password123
                     </small>
@@ -89,6 +91,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                     Sign In
                 </button>
             </form>
+
+            <script>
+                function validateLoginForm() {
+                    let isValid = true;
+                    
+                    // Clear previous errors
+                    document.getElementById('emailError').style.display = 'none';
+                    document.getElementById('passwordError').style.display = 'none';
+                    
+                    // Email validation
+                    const email = document.getElementById('email').value.trim();
+                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    
+                    if (!email) {
+                        showError('emailError', 'Email address is required');
+                        isValid = false;
+                    } else if (!emailRegex.test(email)) {
+                        showError('emailError', 'Please enter a valid email address');
+                        isValid = false;
+                    }
+                    
+                    // Password validation
+                    const password = document.getElementById('password').value;
+                    
+                    if (!password) {
+                        showError('passwordError', 'Password is required');
+                        isValid = false;
+                    } else if (password.length < 6) {
+                        showError('passwordError', 'Password must be at least 6 characters');
+                        isValid = false;
+                    }
+                    
+                    return isValid;
+                }
+                
+                function showError(elementId, message) {
+                    const errorElement = document.getElementById(elementId);
+                    errorElement.textContent = message;
+                    errorElement.style.display = 'block';
+                }
+            </script>
 
             <!-- Divider -->
             <div style="text-align: center; margin: 30px 0; color: #999;">

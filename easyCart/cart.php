@@ -80,7 +80,7 @@ $total = $subtotal + $tax;
 
                         <!-- Cart Items List -->
                         <?php foreach ($cartItemsWithDetails as $index => $item): ?>
-                            <div style="padding: 20px; border-bottom: 1px solid #dee2e6; display: flex; gap: 20px; align-items: center;">
+                            <div class="cart-item" style="padding: 20px; border-bottom: 1px solid #dee2e6; display: flex; gap: 20px; align-items: center;" data-product-id="<?php echo $item['product']['id']; ?>" data-product-price="<?php echo $item['product']['price']; ?>">
                                 <!-- Product Image -->
                                 <div style="font-size: 50px; flex-shrink: 0;">
                                     <?php echo $item['product']['emoji']; ?>
@@ -100,26 +100,21 @@ $total = $subtotal + $tax;
 
                                 <!-- Quantity & Price -->
                                 <div style="text-align: right;">
-                                    <form method="POST" style="display: flex; gap: 10px; align-items: center; margin-bottom: 10px;">
-                                        <input type="hidden" name="action" value="update">
-                                        <input type="hidden" name="product_id" value="<?php echo $item['product']['id']; ?>">
-                                        <input type="number" name="quantity" value="<?php echo $item['quantity']; ?>" min="1" max="<?php echo $item['product']['stock']; ?>" 
-                                               style="width: 60px; padding: 5px; border: 1px solid #ddd; border-radius: 4px;">
-                                        <button type="submit" style="padding: 5px 10px; background: #2563eb; color: white; border: none; border-radius: 4px; cursor: pointer;">Update</button>
-                                    </form>
-                                    <p style="margin: 0; font-weight: bold; font-size: 16px;">
+                                    <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 10px; justify-content: flex-end;">
+                                        <button type="button" onclick="decreaseQuantity(this)" style="width: 32px; height: 32px; border-radius: 50%; border: 1px solid #ddd; background: #f8f9fa; cursor: pointer; font-weight: bold;">−</button>
+                                        <input type="number" class="quantity-input" value="<?php echo $item['quantity']; ?>" min="1" max="<?php echo $item['product']['stock']; ?>" 
+                                               style="width: 50px; padding: 8px; border: 1px solid #ddd; border-radius: 4px; text-align: center;" readonly>
+                                        <button type="button" onclick="increaseQuantity(this)" style="width: 32px; height: 32px; border-radius: 50%; border: 1px solid #ddd; background: #f8f9fa; cursor: pointer; font-weight: bold;">+</button>
+                                    </div>
+                                    <p class="item-total" style="margin: 0; font-weight: bold; font-size: 16px;">
                                         <?php echo formatPrice($item['itemTotal']); ?>
                                     </p>
                                 </div>
 
                                 <!-- Remove Button -->
-                                <form method="POST" style="display: inline;">
-                                    <input type="hidden" name="action" value="remove">
-                                    <input type="hidden" name="product_id" value="<?php echo $item['product']['id']; ?>">
-                                    <button type="submit" style="background: #dc3545; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer;">
-                                        Remove
-                                    </button>
-                                </form>
+                                <button type="button" onclick="removeCartItem(this)" style="background: #dc3545; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer;">
+                                    Remove
+                                </button>
                             </div>
                         <?php endforeach; ?>
 
@@ -200,5 +195,87 @@ $total = $subtotal + $tax;
             </div>
         <?php endif; ?>
     </section>
+
+    <script>
+        function increaseQuantity(btn) {
+            const cartItem = btn.closest('.cart-item');
+            const quantityInput = cartItem.querySelector('.quantity-input');
+            const maxStock = parseInt(quantityInput.max);
+            const currentQty = parseInt(quantityInput.value);
+            
+            if (currentQty < maxStock) {
+                quantityInput.value = currentQty + 1;
+                updateCartItemTotal(cartItem);
+                updateOrderSummary();
+            }
+        }
+        
+        function decreaseQuantity(btn) {
+            const cartItem = btn.closest('.cart-item');
+            const quantityInput = cartItem.querySelector('.quantity-input');
+            const currentQty = parseInt(quantityInput.value);
+            
+            if (currentQty > 1) {
+                quantityInput.value = currentQty - 1;
+                updateCartItemTotal(cartItem);
+                updateOrderSummary();
+            }
+        }
+        
+        function updateCartItemTotal(cartItem) {
+            const price = parseFloat(cartItem.dataset.productPrice);
+            const quantity = parseInt(cartItem.querySelector('.quantity-input').value);
+            const total = price * quantity;
+            
+            cartItem.querySelector('.item-total').textContent = '$' + total.toFixed(2);
+        }
+        
+        function removeCartItem(btn) {
+            const cartItem = btn.closest('.cart-item');
+            const productId = cartItem.dataset.productId;
+            
+            if (confirm('Are you sure you want to remove this item from your cart?')) {
+                // Create and submit hidden form
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '';
+                
+                const actionInput = document.createElement('input');
+                actionInput.type = 'hidden';
+                actionInput.name = 'action';
+                actionInput.value = 'remove';
+                
+                const productInput = document.createElement('input');
+                productInput.type = 'hidden';
+                productInput.name = 'product_id';
+                productInput.value = productId;
+                
+                form.appendChild(actionInput);
+                form.appendChild(productInput);
+                document.body.appendChild(form);
+                form.submit();
+            }
+        }
+        
+        function updateOrderSummary() {
+            // Calculate new subtotal
+            let newSubtotal = 0;
+            document.querySelectorAll('.cart-item').forEach(item => {
+                const price = parseFloat(item.dataset.productPrice);
+                const quantity = parseInt(item.querySelector('.quantity-input').value);
+                newSubtotal += price * quantity;
+            });
+            
+            const tax = newSubtotal * 0.10;
+            
+            // Update the summary section
+            const summaryItems = document.querySelectorAll('div[style*="Subtotal"]');
+            if (summaryItems.length > 0) {
+                // Re-render or update the summary (this would ideally be done via AJAX)
+                // For now, we'll just update the display values
+                location.reload(); // Reload to sync with server
+            }
+        }
+    </script>
 
 <?php include 'footer.php'; ?>

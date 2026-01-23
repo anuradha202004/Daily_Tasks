@@ -54,7 +54,8 @@ if (!isset($_SESSION['last_order']['status'])) {
                 'Processing' => '#f59e0b',
                 'Shipped' => '#3b82f6',
                 'Delivered' => '#10b981',
-                'Completed' => '#6b7280'
+                'Completed' => '#6b7280',
+                'Cancelled' => '#dc2626'
             ];
             $currentStatus = $_SESSION['last_order']['status'];
             $currentIndex = array_search($currentStatus, $statuses);
@@ -179,6 +180,100 @@ if (!isset($_SESSION['last_order']['status'])) {
                     " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
                         ❌ Cancel Order
                     </button>
+                </div>
+            <?php endif; ?>
+
+            <!-- Order Status Simulation (Demo Feature) -->
+            <?php if ($currentStatus !== 'Cancelled' && $currentStatus !== 'Completed'): ?>
+                <div style="margin-top: 30px; padding: 20px; background: #f0f4f8; border-radius: 8px; border: 2px dashed #cbd5e1;">
+                    <h4 style="margin: 0 0 15px 0; color: #475569; font-size: 14px;">
+                        🎮 Demo Controls - Simulate Order Progress
+                    </h4>
+                    <p style="margin: 0 0 15px 0; font-size: 12px; color: #64748b;">
+                        Use these buttons to simulate order status changes for demonstration purposes.
+                    </p>
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                        <?php if ($currentStatus === 'Processing'): ?>
+                            <form method="POST" style="display: inline;">
+                                <input type="hidden" name="action" value="simulate_status">
+                                <input type="hidden" name="new_status" value="Shipped">
+                                <button type="submit" style="
+                                    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+                                    color: white;
+                                    border: none;
+                                    padding: 10px 20px;
+                                    border-radius: 6px;
+                                    cursor: pointer;
+                                    font-weight: 500;
+                                    font-size: 13px;
+                                    transition: transform 0.2s ease;
+                                " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                                    📦 Ship Order
+                                </button>
+                            </form>
+                        <?php endif; ?>
+
+                        <?php if ($currentStatus === 'Shipped'): ?>
+                            <form method="POST" style="display: inline;">
+                                <input type="hidden" name="action" value="simulate_status">
+                                <input type="hidden" name="new_status" value="Delivered">
+                                <button type="submit" style="
+                                    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+                                    color: white;
+                                    border: none;
+                                    padding: 10px 20px;
+                                    border-radius: 6px;
+                                    cursor: pointer;
+                                    font-weight: 500;
+                                    font-size: 13px;
+                                    transition: transform 0.2s ease;
+                                " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                                    ✓ Mark as Delivered
+                                </button>
+                            </form>
+                        <?php endif; ?>
+
+                        <?php if ($currentStatus === 'Delivered'): ?>
+                            <form method="POST" style="display: inline;">
+                                <input type="hidden" name="action" value="simulate_status">
+                                <input type="hidden" name="new_status" value="Completed">
+                                <button type="submit" style="
+                                    background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+                                    color: white;
+                                    border: none;
+                                    padding: 10px 20px;
+                                    border-radius: 6px;
+                                    cursor: pointer;
+                                    font-weight: 500;
+                                    font-size: 13px;
+                                    transition: transform 0.2s ease;
+                                " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                                    ✓ Complete Order
+                                </button>
+                            </form>
+                        <?php endif; ?>
+
+                        <!-- Reset to Processing -->
+                        <?php if ($currentStatus !== 'Processing'): ?>
+                            <form method="POST" style="display: inline;">
+                                <input type="hidden" name="action" value="simulate_status">
+                                <input type="hidden" name="new_status" value="Processing">
+                                <button type="submit" style="
+                                    background: #e5e7eb;
+                                    color: #374151;
+                                    border: 1px solid #d1d5db;
+                                    padding: 10px 20px;
+                                    border-radius: 6px;
+                                    cursor: pointer;
+                                    font-weight: 500;
+                                    font-size: 13px;
+                                    transition: transform 0.2s ease;
+                                " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                                    🔄 Reset to Processing
+                                </button>
+                            </form>
+                        <?php endif; ?>
+                    </div>
                 </div>
             <?php endif; ?>
         </div>

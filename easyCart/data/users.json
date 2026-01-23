@@ -1,0 +1,14 @@
+{
+    "demo@example.com": {
+        "email": "demo@example.com",
+        "password": "password123",
+        "name": "Demo User",
+        "created": "2026-01-01"
+    },
+    "patilanuradha978@gmail.com": {
+        "email": "patilanuradha978@gmail.com",
+        "password": "anuradha1234",
+        "name": "Anuradha Patil",
+        "created": "2026-01-23 06:47:59"
+    }
+}

@@ -51,7 +51,7 @@ $brands = [
 $products = [
     1 => [
         'id' => 1,
-        'name' => 'Wireless Headphones',
+        'name' => 'wireless headphone',
         'description' => 'Premium wireless headphones with noise cancellation',
         'price' => 89.99,
         'category_id' => 1,
@@ -431,6 +431,14 @@ function searchProducts($query) {
 // Helper function to format price
 function formatPrice($price) {
     return '$' . number_format($price, 2);
+}
+
+// Helper function to check if product is in wishlist
+function isProductInWishlist($productId) {
+    if (!isset($_SESSION['wishlist'])) {
+        $_SESSION['wishlist'] = [];
+    }
+    return in_array($productId, $_SESSION['wishlist']);
 }
 
 // Helper function to render star rating

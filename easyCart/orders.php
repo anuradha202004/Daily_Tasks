@@ -85,7 +85,7 @@ if (isset($_SESSION['last_order'])) {
                             <div style="text-align: right;">
                                 <label style="color: #999; font-size: 12px; text-transform: uppercase;">Total</label>
                                 <p style="margin: 5px 0 0 0; font-weight: bold; color: #d32f2f; font-size: 18px;">
-                                    $<?php echo number_format($order['subtotal'] + $order['tax'] + $order['shipping'], 2); ?>
+                                    $<?php echo number_format($order['subtotal'] + ($order['tax'] ?? 0) + ($order['shipping'] ?? 0), 2); ?>
                                 </p>
                             </div>
                         </div>
@@ -150,7 +150,7 @@ if (isset($_SESSION['last_order'])) {
                             
                             <?php if (isset($order['items']) && count($order['items']) > 0): ?>
                                 <?php foreach ($order['items'] as $item): ?>
-                                    <?php $product = getProductById($item['product_id']); ?>
+                                    <?php $product = getProductById($item['product_id'] ?? null); ?>
                                     <?php if ($product): ?>
                                         <div style="display: flex; padding: 15px; background: #f8f9fa; border-radius: 8px; margin-bottom: 10px; align-items: center;">
                                             <div style="font-size: 40px; margin-right: 20px;">
@@ -235,180 +235,20 @@ if (isset($_SESSION['last_order'])) {
                                     </div>
                                     <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 14px;">
                                         <span>Tax:</span>
-                                        <span>$<?php echo number_format($order['tax'], 2); ?></span>
+                                        <span>$<?php echo number_format($order['tax'] ?? 0, 2); ?></span>
                                     </div>
                                     <div style="display: flex; justify-content: space-between; margin-bottom: 15px; font-size: 14px;">
                                         <span>Shipping:</span>
-                                        <span><?php echo $order['shipping'] === 0 ? 'Free' : '$' . number_format($order['shipping'], 2); ?></span>
+                                        <span><?php echo ($order['shipping'] ?? 0) === 0 ? 'Free' : '$' . number_format($order['shipping'], 2); ?></span>
                                     </div>
                                     <div style="display: flex; justify-content: space-between; font-size: 18px; font-weight: bold; padding-top: 15px; border-top: 2px solid #eee;">
                                         <span>Total:</span>
                                         <span style="color: #d32f2f;">
-                                            $<?php echo number_format($order['subtotal'] + $order['tax'] + $order['shipping'], 2); ?>
+                                            $<?php echo number_format($order['subtotal'] + ($order['tax'] ?? 0) + ($order['shipping'] ?? 0), 2); ?>
                                         </span>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                <?php endforeach; ?>
-            </div>
-
-            <!-- Additional Actions -->
-            <div style="margin-top: 40px; padding: 20px; background: #e8f4f8; border-radius: 8px; text-align: center;">
-                <p style="margin: 0; color: #555;">
-                    Have questions about your order?
-                </p>
-                <a href="#" style="color: #2563eb; text-decoration: none; font-weight: 500;">
-                    Contact Customer Support
-                </a>
-                <span style="margin: 0 10px; color: #999;">•</span>
-                <a href="products.php" style="color: #2563eb; text-decoration: none; font-weight: 500;">
-                    Continue Shopping
-                </a>
-            </div>
-
-        <?php else: ?>
-            <!-- No Orders Message -->
-            <div style="text-align: center; padding: 60px 20px;">
-                <div style="font-size: 60px; margin-bottom: 20px;">📦</div>
-                <h2 style="color: #666; margin-bottom: 10px;">No Orders Yet</h2>
-                <p style="color: #999; margin-bottom: 30px;">You haven't placed any orders yet. Start shopping now!</p>
-                <a href="products.php" class="btn btn-primary" style="display: inline-block; padding: 12px 30px; text-decoration: none;">
-                    Shop Now
-                </a>
-            </div>
-        <?php endif; ?>
-    </section>
-
-<?php include 'footer.php'; ?>
-<?php include 'header.php'; ?>
-
-    <!-- My Orders Page -->
-    <section class="container" style="padding: 40px 0;">
-        <h1 class="section-title">My Orders</h1>
-
-        <?php if (count($orders) > 0): ?>
-            <div>
-                <?php foreach ($orders as $order): ?>
-                    <div style="background: #fff; border-radius: 8px; padding: 25px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-                        <!-- Order Header -->
-                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 20px; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #eee;">
-                            <div>
-                                <label style="color: #999; font-size: 12px; text-transform: uppercase;">Order ID</label>
-                                <p style="margin: 5px 0 0 0; font-weight: bold; font-size: 16px;">
-                                    <?php echo htmlspecialchars($order['order_number']); ?>
-                                </p>
-                            </div>
-                            <div>
-                                <label style="color: #999; font-size: 12px; text-transform: uppercase;">Date</label>
-                                <p style="margin: 5px 0 0 0; font-weight: bold;">
-                                    <?php echo date('F d, Y', strtotime($order['date'])); ?>
-                                </p>
-                            </div>
-                            <div>
-                                <label style="color: #999; font-size: 12px; text-transform: uppercase;">Status</label>
-                                <p style="margin: 5px 0 0 0; font-weight: bold;">
-                                    <span style="
-                                        display: inline-block;
-                                        padding: 5px 12px;
-                                        border-radius: 20px;
-                                        font-size: 12px;
-                                        background: <?php echo $order['status'] === 'Delivered' ? '#d4edda' : '#fff3cd'; ?>;
-                                        color: <?php echo $order['status'] === 'Delivered' ? '#155724' : '#856404'; ?>;
-                                    ">
-                                        <?php echo htmlspecialchars($order['status']); ?>
-                                    </span>
-                                </p>
-                            </div>
-                            <div>
-                                <label style="color: #999; font-size: 12px; text-transform: uppercase;">Total</label>
-                                <p style="margin: 5px 0 0 0; font-weight: bold; color: #d32f2f; font-size: 16px;">
-                                    <?php echo formatPrice($order['subtotal']); ?>
-                                </p>
-                            </div>
-                        </div>
-
-                        <!-- Order Items -->
-                        <div style="margin-bottom: 20px;">
-                            <h4 style="margin-bottom: 15px;">Items Ordered</h4>
-                            
-                            <?php foreach ($order['items'] as $item): ?>
-                                <?php $product = getProductById($item['product_id']); ?>
-                                <?php if ($product): ?>
-                                    <div style="display: flex; padding: 15px; background: #f8f9fa; border-radius: 8px; margin-bottom: 10px; align-items: center;">
-                                        <div style="font-size: 40px; margin-right: 20px;">
-                                            <?php echo $product['emoji']; ?>
-                                        </div>
-                                        <div style="flex: 1;">
-                                            <h5 style="margin: 0 0 5px 0;">
-                                                <?php echo htmlspecialchars($product['name']); ?>
-                                            </h5>
-                                            <p style="margin: 0; font-size: 14px; color: #666;">
-                                                Quantity: <?php echo $item['quantity']; ?> × <?php echo formatPrice($item['price']); ?>
-                                            </p>
-                                        </div>
-                                        <div style="text-align: right;">
-                                            <p style="margin: 0; font-weight: bold;">
-                                                <?php echo formatPrice($item['quantity'] * $item['price']); ?>
-                                            </p>
-                                        </div>
-                                    </div>
-                                <?php endif; ?>
-                            <?php endforeach; ?>
-                        </div>
-
-                        <!-- Order Summary -->
-                        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 30px; padding: 20px 0; border-top: 1px solid #eee;">
-                            <div>
-                                <!-- Tracking Info (for delivered orders) -->
-                                <?php if ($order['status'] === 'Delivered'): ?>
-                                    <div style="background: #d4edda; padding: 15px; border-radius: 8px;">
-                                        <p style="margin: 0; color: #155724; font-size: 12px; text-transform: uppercase; margin-bottom: 5px;">
-                                            <strong>Tracking Information</strong>
-                                        </p>
-                                        <p style="margin: 5px 0 0 0; color: #155724;">
-                                            Tracking #: <strong><?php echo 'TRACK' . str_pad($order['id'], 9, '0', STR_PAD_LEFT); ?></strong>
-                                        </p>
-                                        <p style="margin: 5px 0 0 0; font-size: 12px; color: #155724;">
-                                            Delivered on <?php echo date('F d, Y', strtotime($order['date'] . ' +5 days')); ?>
-                                        </p>
-                                    </div>
-                                <?php else: ?>
-                                    <div style="background: #fff3cd; padding: 15px; border-radius: 8px;">
-                                        <p style="margin: 0; color: #856404; font-size: 12px; text-transform: uppercase; margin-bottom: 5px;">
-                                            <strong>Order Status</strong>
-                                        </p>
-                                        <p style="margin: 5px 0 0 0; color: #856404;">
-                                            Your order is being processed. You'll receive a shipping confirmation shortly.
-                                        </p>
-                                    </div>
-                                <?php endif; ?>
-                            </div>
-
-                            <div style="text-align: right; padding: 15px 0;">
-                                <div style="margin-bottom: 10px;">
-                                    <label style="color: #999; font-size: 12px; text-transform: uppercase;">Order Total</label>
-                                    <p style="margin: 5px 0 0 0; font-weight: bold; font-size: 18px; color: #d32f2f;">
-                                        <?php echo formatPrice($order['subtotal']); ?>
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Order Actions -->
-                        <div style="padding-top: 20px; border-top: 1px solid #eee; text-align: right;">
-                            <a href="#" style="color: #2563eb; text-decoration: none; margin-right: 15px; font-size: 14px;">
-                                View Details
-                            </a>
-                            <a href="#" style="color: #2563eb; text-decoration: none; margin-right: 15px; font-size: 14px;">
-                                Download Invoice
-                            </a>
-                            <?php if ($order['status'] === 'Delivered'): ?>
-                                <a href="#" style="color: #2563eb; text-decoration: none; font-size: 14px;">
-                                    Leave Review
-                                </a>
-                            <?php endif; ?>
                         </div>
                     </div>
                 <?php endforeach; ?>

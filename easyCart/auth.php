@@ -4,15 +4,55 @@
  * Handles user login, signup, and session management
  */
 
-// Static user database (Phase 2 - will be replaced with real database in Phase 3)
-$registeredUsers = [
-    'demo@example.com' => [
-        'email' => 'demo@example.com',
-        'password' => 'password123', // In production, use hashed passwords
-        'name' => 'Demo User',
-        'created' => '2026-01-01'
-    ]
-];
+// Path to users data file
+$usersDataFile = __DIR__ . '/data/users.json';
+
+// Ensure data directory exists
+if (!is_dir(__DIR__ . '/data')) {
+    mkdir(__DIR__ . '/data', 0755, true);
+}
+
+// Load registered users from file
+function loadRegisteredUsers() {
+    global $usersDataFile;
+    
+    $defaultUsers = [
+        'demo@example.com' => [
+            'email' => 'demo@example.com',
+            'password' => 'password123',
+            'name' => 'Demo User',
+            'created' => '2026-01-01'
+        ]
+    ];
+    
+    // If file doesn't exist or is empty, use default users
+    if (!file_exists($usersDataFile) || filesize($usersDataFile) == 0) {
+        return $defaultUsers;
+    }
+    
+    // Load users from file
+    $fileContent = file_get_contents($usersDataFile);
+    $users = json_decode($fileContent, true);
+    
+    // Merge with default users (to ensure demo user always exists)
+    if (is_array($users)) {
+        return array_merge($defaultUsers, $users);
+    }
+    
+    return $defaultUsers;
+}
+
+// Save registered users to file
+function saveRegisteredUsers($users) {
+    global $usersDataFile;
+    
+    // Write users to file
+    $jsonData = json_encode($users, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+    file_put_contents($usersDataFile, $jsonData);
+}
+
+// Load users at the start
+$registeredUsers = loadRegisteredUsers();
 
 /**
  * Check if user is logged in
@@ -80,6 +120,9 @@ function registerUser($email, $password, $name, $confirmPassword) {
         'name' => $name,
         'created' => date('Y-m-d H:i:s')
     ];
+    
+    // Save users to file
+    saveRegisteredUsers($registeredUsers);
     
     // Create session
     $_SESSION['user_id'] = md5($email);

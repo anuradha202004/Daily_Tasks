@@ -200,14 +200,50 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                     </form>
 
                     <!-- Shipping & Returns Info -->
-                    <div class="info-features">
-                        <div class="feature-item">
-                            <span class="feature-icon">🚚</span>
-                            <div>
-                                <h4>Free Shipping</h4>
-                                <p>On orders over $50</p>
+                    <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-top: 20px;">
+                        <h4 style="margin-top: 0; margin-bottom: 15px;">Shipping Options</h4>
+                        <div style="display: flex; flex-direction: column; gap: 10px;">
+                            <div class="shipping-option" onclick="selectShipping(this)" style="
+                                padding: 12px;
+                                border: 2px solid #ddd;
+                                border-radius: 6px;
+                                cursor: pointer;
+                                transition: all 0.3s ease;
+                                background: white;
+                            " data-shipping-cost="0">
+                                <div style="font-weight: 600; color: #333;">Standard Shipping</div>
+                                <div style="font-size: 12px; color: #666;">5-7 business days</div>
+                                <div style="font-weight: 700; color: #10b981; margin-top: 5px;">FREE</div>
+                            </div>
+                            <div class="shipping-option" onclick="selectShipping(this)" style="
+                                padding: 12px;
+                                border: 2px solid #ddd;
+                                border-radius: 6px;
+                                cursor: pointer;
+                                transition: all 0.3s ease;
+                                background: white;
+                            " data-shipping-cost="5.99">
+                                <div style="font-weight: 600; color: #333;">Express Shipping</div>
+                                <div style="font-size: 12px; color: #666;">2-3 business days</div>
+                                <div style="font-weight: 700; color: #2563eb; margin-top: 5px;">$5.99</div>
+                            </div>
+                            <div class="shipping-option" onclick="selectShipping(this)" style="
+                                padding: 12px;
+                                border: 2px solid #ddd;
+                                border-radius: 6px;
+                                cursor: pointer;
+                                transition: all 0.3s ease;
+                                background: white;
+                            " data-shipping-cost="14.99">
+                                <div style="font-weight: 600; color: #333;">Overnight Shipping</div>
+                                <div style="font-size: 12px; color: #666;">Next business day</div>
+                                <div style="font-weight: 700; color: #f59e0b; margin-top: 5px;">$14.99</div>
                             </div>
                         </div>
+                    </div>
+
+                    <!-- Features -->
+                    <div class="info-features" style="margin-top: 20px;">
                         <div class="feature-item">
                             <span class="feature-icon">↩️</span>
                             <div>
@@ -230,6 +266,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                             </div>
                         </div>
                     </div>
+
+                    <script>
+                        function selectShipping(element) {
+                            // Remove selected state from all shipping options
+                            document.querySelectorAll('.shipping-option').forEach(option => {
+                                option.style.borderColor = '#ddd';
+                                option.style.backgroundColor = 'white';
+                            });
+                            
+                            // Add selected state to clicked option
+                            element.style.borderColor = '#2563eb';
+                            element.style.backgroundColor = '#eff6ff';
+                            
+                            // Store selected shipping in data attribute
+                            const shippingCost = element.dataset.shippingCost;
+                            document.body.dataset.selectedShipping = shippingCost;
+                        }
+                    </script>
                 </div>
             </div>
 

@@ -21,14 +21,20 @@ $displayProducts = array_reverse($displayProducts, true);
 
     <!-- Products Page -->
     <section class="container" style="padding: 40px 0;">
-        <h1 class="section-title">Our Products</h1>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h1 class="section-title">Our Products</h1>
+            <div style="background: #e8f4f8; padding: 8px 16px; border-radius: 20px; font-size: 14px; font-weight: 600; color: #2563eb;">
+                Showing <?php echo count($displayProducts); ?> product<?php echo count($displayProducts) !== 1 ? 's' : ''; ?>
+            </div>
+        </div>
         
         <div class="category-filters">
-            <a href="products.php" class="filter-btn <?php echo !$selectedCategory ? 'active' : ''; ?>">All Products</a>
+            <a href="products.php" class="filter-btn <?php echo !$selectedCategory ? 'active' : ''; ?>">All Products (<?php echo count($products); ?>)</a>
             <?php foreach ($categories as $category): ?>
+                <?php $categoryProducts = getProductsByCategory($category['id']); ?>
                 <a href="products.php?category=<?php echo $category['id']; ?>" 
                    class="filter-btn <?php echo $selectedCategory == $category['id'] ? 'active' : ''; ?>">
-                    <?php echo htmlspecialchars($category['name']); ?>
+                    <?php echo htmlspecialchars($category['name']); ?> (<?php echo count($categoryProducts); ?>)
                 </a>
             <?php endforeach; ?>
         </div>
@@ -44,7 +50,36 @@ $displayProducts = array_reverse($displayProducts, true);
         <?php if (count($displayProducts) > 0): ?>
             <div class="products-grid" style="margin-top: 30px;">
                 <?php foreach ($displayProducts as $product): ?>
-                    <div class="product-card">
+                    <?php $isWishlisted = isset($_SESSION['wishlist']) && in_array($product['id'], $_SESSION['wishlist']); ?>
+                    <div class="product-card" style="position: relative;">
+                        <!-- Wishlist Heart Icon (only for logged in users) -->
+                        <?php if (isLoggedIn()): ?>
+                            <div onclick="toggleWishlist(event, <?php echo $product['id']; ?>)" 
+                                 style="
+                                    position: absolute;
+                                    top: 10px;
+                                    right: 10px;
+                                    font-size: 24px;
+                                    cursor: pointer;
+                                    z-index: 10;
+                                    background: white;
+                                    width: 40px;
+                                    height: 40px;
+                                    border-radius: 50%;
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: center;
+                                    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+                                    transition: all 0.3s ease;
+                                 "
+                                 onmouseover="this.style.transform='scale(1.1)'"
+                                 onmouseout="this.style.transform='scale(1)'"
+                                 class="heart-icon"
+                                 data-product-id="<?php echo $product['id']; ?>">
+                                <?php echo $isWishlisted ? '❤️' : '🤍'; ?>
+                            </div>
+                        <?php endif; ?>
+
                         <div class="product-image"><?php echo $product['emoji']; ?></div>
                         <h3 class="product-title"><?php echo htmlspecialchars($product['name']); ?></h3>
                         <div class="product-rating"><?php echo renderStars($product['rating']); ?> <?php echo $product['rating']; ?> (<?php echo $product['reviews']; ?> reviews)</div>
@@ -70,5 +105,55 @@ $displayProducts = array_reverse($displayProducts, true);
             </div>
         <?php endif; ?>
     </section>
+
+    <script>
+        function toggleWishlist(event, productId) {
+            event.preventDefault();
+            event.stopPropagation();
+            
+            const heartIcon = event.currentTarget;
+            const isLiked = heartIcon.textContent.includes('❤️');
+            
+            const formData = new FormData();
+            formData.append('action', isLiked ? 'remove' : 'add');
+            formData.append('product_id', productId);
+            
+            fetch('wishlist.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    heartIcon.textContent = isLiked ? '🤍' : '❤️';
+                    updateWishlistBadge();
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Failed to update wishlist');
+            });
+        }
+        
+        function updateWishlistBadge() {
+            const badge = document.querySelector('.wishlist-icon .badge');
+            if (badge) {
+                const formData = new FormData();
+                formData.append('action', 'get_count');
+                
+                fetch('wishlist.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.count !== undefined) {
+                        badge.textContent = data.count;
+                    }
+                })
+                .catch(error => console.error('Error updating badge:', error));
+            }
+        }
+    </script>
 
 <?php include 'footer.php'; ?>
