@@ -13,9 +13,9 @@ $pageTitle = 'My Wishlist';
 // Require login
 requireLogin();
 
-// Initialize wishlist in session if not exists
+// Load wishlist from file on page load
 if (!isset($_SESSION['wishlist'])) {
-    $_SESSION['wishlist'] = [];
+    initializeWishlistFromFile();
 }
 
 // Handle add/remove wishlist actions (AJAX)
@@ -29,15 +29,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         if (!in_array($productId, $_SESSION['wishlist'])) {
             $_SESSION['wishlist'][] = $productId;
         }
+        saveUserWishlist($_SESSION['user_email'], $_SESSION['wishlist']);
         echo json_encode(['success' => true, 'message' => 'Added to wishlist']);
     } elseif ($action === 'remove' && $productId > 0) {
         $_SESSION['wishlist'] = array_filter($_SESSION['wishlist'], function($id) use ($productId) {
             return $id !== $productId;
         });
         $_SESSION['wishlist'] = array_values($_SESSION['wishlist']); // Re-index array
+        saveUserWishlist($_SESSION['user_email'], $_SESSION['wishlist']);
         echo json_encode(['success' => true, 'message' => 'Removed from wishlist']);
     } elseif ($action === 'get_wishlist') {
         echo json_encode(['wishlist' => $_SESSION['wishlist']]);
+    } elseif ($action === 'get_count') {
+        echo json_encode(['count' => count($_SESSION['wishlist'])]);
     }
     exit;
 }
@@ -101,15 +105,14 @@ if (!empty($_SESSION['wishlist'])) {
                         <div class="product-price"><?php echo formatPrice($product['price']); ?></div>
                         <div class="product-footer">
                             <span class="stock-info">Stock: <?php echo $product['stock']; ?> units</span>
-                            <?php if ($product['stock'] > 0): ?>
-                                <a href="product-detail.php?id=<?php echo $product['id']; ?>" class="btn-view-details" style="flex: 1; text-align: center; padding: 8px 12px; background: #2563eb; color: white; border-radius: 4px; text-decoration: none; font-size: 14px;">
-                                    View Details
-                                </a>
-                            <?php else: ?>
-                                <button style="flex: 1; background: #ccc; color: #666; border: none; padding: 8px 12px; border-radius: 4px; cursor: not-allowed;">
-                                    Out of Stock
-                                </button>
-                            <?php endif; ?>
+                            <div class="product-actions">
+                                <a href="product-detail.php?id=<?php echo $product['id']; ?>" class="btn btn-primary">View Details</a>
+                                <?php if ($product['stock'] > 0): ?>
+                                    <a href="checkout.php?product_id=<?php echo $product['id']; ?>&qty=1" class="btn btn-buy-now">Buy Now</a>
+                                <?php else: ?>
+                                    <button class="btn btn-disabled" disabled>Out of Stock</button>
+                                <?php endif; ?>
+                            </div>
                         </div>
                     </div>
                 <?php endforeach; ?>

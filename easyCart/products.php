@@ -1,10 +1,21 @@
 <?php
 session_start();
 
-// Include data
+// Include data and auth
 require_once 'data.php';
+require_once 'auth.php';
 
 $pageTitle = 'Products';
+
+// Load cart and wishlist from file if user is logged in
+if (isLoggedIn()) {
+    if (!isset($_SESSION['cart'])) {
+        initializeCartFromFile();
+    }
+    if (!isset($_SESSION['wishlist'])) {
+        initializeWishlistFromFile();
+    }
+}
 
 // Get selected category (if any)
 $selectedCategory = isset($_GET['category']) ? intval($_GET['category']) : null;

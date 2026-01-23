@@ -1,8 +1,19 @@
 <?php
 session_start();
 
-// Include data
+// Include data and auth
 require_once 'data.php';
+require_once 'auth.php';
+
+// Load cart and wishlist from file if user is logged in
+if (isLoggedIn()) {
+    if (!isset($_SESSION['cart'])) {
+        initializeCartFromFile();
+    }
+    if (!isset($_SESSION['wishlist'])) {
+        initializeWishlistFromFile();
+    }
+}
 
 $pageTitle = 'Home';
 
@@ -113,13 +124,40 @@ $featuredProducts = array_slice($products, 0, 4, true);
             </div>
         </div>
     </section>
-
     <!-- Featured Products Section -->
     <section class="container">
         <h2 class="section-title">Featured Products</h2>
         <div class="products-grid">
             <?php foreach ($featuredProducts as $product): ?>
-                <div class="product-card">
+                <?php $isWishlisted = isset($_SESSION['wishlist']) && in_array($product['id'], $_SESSION['wishlist']); ?>
+                <div class="product-card" style="position: relative;">
+                    <!-- Wishlist Heart Icon (only for logged in users) -->
+                    <?php if (isLoggedIn()): ?>
+                        <div onclick="toggleWishlist(event, <?php echo $product['id']; ?>)" 
+                             style="
+                                position: absolute;
+                                top: 10px;
+                                right: 10px;
+                                font-size: 24px;
+                                cursor: pointer;
+                                z-index: 10;
+                                background: white;
+                                width: 40px;
+                                height: 40px;
+                                border-radius: 50%;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+                                transition: all 0.3s ease;
+                             "
+                             onmouseover="this.style.transform='scale(1.1)'"
+                             onmouseout="this.style.transform='scale(1)'"
+                             class="heart-icon"
+                             data-product-id="<?php echo $product['id']; ?>">
+                            <?php echo $isWishlisted ? '❤️' : '🤍'; ?>
+                        </div>
+                    <?php endif; ?>
                     <div class="product-image"><?php echo $product['emoji']; ?></div>
                     <h3 class="product-title"><?php echo htmlspecialchars($product['name']); ?></h3>
                     <div class="product-rating"><?php echo renderStars($product['rating']); ?> <?php echo $product['rating']; ?> (<?php echo $product['reviews']; ?> reviews)</div>
@@ -127,7 +165,14 @@ $featuredProducts = array_slice($products, 0, 4, true);
                     <div class="product-price"><?php echo formatPrice($product['price']); ?></div>
                     <div class="product-footer">
                         <span class="stock-info">Stock: <?php echo $product['stock']; ?> units</span>
-                        <a href="product-detail.php?id=<?php echo $product['id']; ?>" class="btn btn-primary">View Details</a>
+                        <div class="product-actions">
+                            <a href="product-detail.php?id=<?php echo $product['id']; ?>" class="btn btn-primary">View Details</a>
+                            <?php if ($product['stock'] > 0): ?>
+                                <a href="checkout.php?product_id=<?php echo $product['id']; ?>&qty=1" class="btn btn-buy-now">Buy Now</a>
+                            <?php else: ?>
+                                <button class="btn btn-disabled" disabled>Out of Stock</button>
+                            <?php endif; ?>
+                        </div>
                     </div>
                 </div>
             <?php endforeach; ?>
@@ -149,7 +194,35 @@ $featuredProducts = array_slice($products, 0, 4, true);
 
         <div class="products-grid">
             <?php foreach (array_slice($products, 0, 8, true) as $product): ?>
-                <div class="product-card">
+                <?php $isWishlisted = isset($_SESSION['wishlist']) && in_array($product['id'], $_SESSION['wishlist']); ?>
+                <div class="product-card" style="position: relative;">
+                    <!-- Wishlist Heart Icon (only for logged in users) -->
+                    <?php if (isLoggedIn()): ?>
+                        <div onclick="toggleWishlist(event, <?php echo $product['id']; ?>)" 
+                             style="
+                                position: absolute;
+                                top: 10px;
+                                right: 10px;
+                                font-size: 24px;
+                                cursor: pointer;
+                                z-index: 10;
+                                background: white;
+                                width: 40px;
+                                height: 40px;
+                                border-radius: 50%;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+                                transition: all 0.3s ease;
+                             "
+                             onmouseover="this.style.transform='scale(1.1)'"
+                             onmouseout="this.style.transform='scale(1)'"
+                             class="heart-icon"
+                             data-product-id="<?php echo $product['id']; ?>">
+                            <?php echo $isWishlisted ? '❤️' : '🤍'; ?>
+                        </div>
+                    <?php endif; ?>
                     <div class="product-image"><?php echo $product['emoji']; ?></div>
                     <h3 class="product-title"><?php echo htmlspecialchars($product['name']); ?></h3>
                     <div class="product-rating"><?php echo renderStars($product['rating']); ?> <?php echo $product['rating']; ?> (<?php echo $product['reviews']; ?> reviews)</div>
@@ -159,8 +232,10 @@ $featuredProducts = array_slice($products, 0, 4, true);
                         <span class="stock-info">Stock: <?php echo $product['stock']; ?> units</span>
                         <div class="product-actions">
                             <a href="product-detail.php?id=<?php echo $product['id']; ?>" class="btn btn-primary">View Details</a>
-                            <?php if ($product['stock'] > 0 && isLoggedIn()): ?>
-                                <a href="checkout.php?product_id=<?php echo $product['id']; ?>&qty=1" class="btn btn-buy-now-card">Buy Now</a>
+                            <?php if ($product['stock'] > 0): ?>
+                                <a href="checkout.php?product_id=<?php echo $product['id']; ?>&qty=1" class="btn btn-buy-now">Buy Now</a>
+                            <?php else: ?>
+                                <button class="btn btn-disabled" disabled>Out of Stock</button>
                             <?php endif; ?>
                         </div>
                     </div>
@@ -298,4 +373,53 @@ $featuredProducts = array_slice($products, 0, 4, true);
         document.addEventListener('DOMContentLoaded', function() {
             startAutoplay();
         });
+
+        // Wishlist toggle functionality
+        function toggleWishlist(event, productId) {
+            event.preventDefault();
+            event.stopPropagation();
+            
+            const heartIcon = event.currentTarget;
+            const isLiked = heartIcon.textContent.includes('❤️');
+            
+            const formData = new FormData();
+            formData.append('action', isLiked ? 'remove' : 'add');
+            formData.append('product_id', productId);
+            
+            fetch('wishlist.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    heartIcon.textContent = isLiked ? '🤍' : '❤️';
+                    updateWishlistBadge();
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Failed to update wishlist');
+            });
+        }
+        
+        function updateWishlistBadge() {
+            const badge = document.querySelector('.wishlist-icon .badge');
+            if (badge) {
+                const formData = new FormData();
+                formData.append('action', 'get_count');
+                
+                fetch('wishlist.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.count !== undefined) {
+                        badge.textContent = data.count;
+                    }
+                })
+                .catch(error => console.error('Error updating badge:', error));
+            }
+        }
     </script>

@@ -113,6 +113,10 @@ function registerUser($email, $password, $name, $confirmPassword) {
         return ['success' => false, 'errors' => $errors];
     }
     
+    // Save guest cart items before clearing session
+    $guestCart = isset($_SESSION['cart']) ? $_SESSION['cart'] : [];
+    $guestWishlist = isset($_SESSION['wishlist']) ? $_SESSION['wishlist'] : [];
+    
     // Register user
     $registeredUsers[$email] = [
         'email' => $email,
@@ -129,6 +133,37 @@ function registerUser($email, $password, $name, $confirmPassword) {
     $_SESSION['user_email'] = $email;
     $_SESSION['user_name'] = $name;
     $_SESSION['login_time'] = date('Y-m-d H:i:s');
+    
+    // Load cart and wishlist from files for this user
+    require_once __DIR__ . '/data.php';
+    $_SESSION['cart'] = loadUserCart($email);
+    $_SESSION['wishlist'] = loadUserWishlist($email);
+    
+    // Merge guest cart items into user cart
+    if (!empty($guestCart)) {
+        foreach ($guestCart as $productId => $guestItem) {
+            if (isset($_SESSION['cart'][$productId])) {
+                // If product already exists in user cart, add quantities
+                $_SESSION['cart'][$productId]['quantity'] += $guestItem['quantity'];
+            } else {
+                // If product doesn't exist, add it from guest cart
+                $_SESSION['cart'][$productId] = $guestItem;
+            }
+        }
+        // Save merged cart to file
+        saveUserCart($email, $_SESSION['cart']);
+    }
+    
+    // Merge guest wishlist items into user wishlist
+    if (!empty($guestWishlist)) {
+        foreach ($guestWishlist as $productId => $guestWishItem) {
+            if (!isset($_SESSION['wishlist'][$productId])) {
+                $_SESSION['wishlist'][$productId] = $guestWishItem;
+            }
+        }
+        // Save merged wishlist to file
+        saveUserWishlist($email, $_SESSION['wishlist']);
+    }
     
     return ['success' => true, 'message' => 'Account created successfully!'];
 }
@@ -166,11 +201,46 @@ function loginUser($email, $password) {
         return ['success' => false, 'errors' => ['Invalid password']];
     }
     
+    // Save guest cart items before clearing session
+    $guestCart = isset($_SESSION['cart']) ? $_SESSION['cart'] : [];
+    $guestWishlist = isset($_SESSION['wishlist']) ? $_SESSION['wishlist'] : [];
+    
     // Create session
     $_SESSION['user_id'] = md5($email);
     $_SESSION['user_email'] = $email;
     $_SESSION['user_name'] = $user['name'];
     $_SESSION['login_time'] = date('Y-m-d H:i:s');
+    
+    // Load cart and wishlist from files for this user
+    require_once __DIR__ . '/data.php';
+    $_SESSION['cart'] = loadUserCart($email);
+    $_SESSION['wishlist'] = loadUserWishlist($email);
+    
+    // Merge guest cart items into user cart
+    if (!empty($guestCart)) {
+        foreach ($guestCart as $productId => $guestItem) {
+            if (isset($_SESSION['cart'][$productId])) {
+                // If product already exists in user cart, add quantities
+                $_SESSION['cart'][$productId]['quantity'] += $guestItem['quantity'];
+            } else {
+                // If product doesn't exist, add it from guest cart
+                $_SESSION['cart'][$productId] = $guestItem;
+            }
+        }
+        // Save merged cart to file
+        saveUserCart($email, $_SESSION['cart']);
+    }
+    
+    // Merge guest wishlist items into user wishlist
+    if (!empty($guestWishlist)) {
+        foreach ($guestWishlist as $productId => $guestWishItem) {
+            if (!isset($_SESSION['wishlist'][$productId])) {
+                $_SESSION['wishlist'][$productId] = $guestWishItem;
+            }
+        }
+        // Save merged wishlist to file
+        saveUserWishlist($email, $_SESSION['wishlist']);
+    }
     
     return ['success' => true, 'message' => 'Logged in successfully!'];
 }

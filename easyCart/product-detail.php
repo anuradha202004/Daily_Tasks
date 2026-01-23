@@ -27,12 +27,6 @@ $addToCartMessage = '';
 $addToCartError = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'add') {
-    // Check if user is logged in
-    if (!$isLoggedIn) {
-        header('Location: signin.php?login_required=1');
-        exit;
-    }
-    
     $quantity = isset($_POST['quantity']) ? intval($_POST['quantity']) : 1;
     
     if ($quantity > 0 && $quantity <= $product['stock']) {
@@ -49,6 +43,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 'product_id' => $productId,
                 'quantity' => $quantity
             ];
+        }
+        
+        // Save cart to file for logged-in users
+        if ($isLoggedIn && isset($_SESSION['user_email'])) {
+            saveUserCart($_SESSION['user_email'], $_SESSION['cart']);
         }
         
         $addToCartMessage = 'Product added to cart successfully!';
@@ -83,7 +82,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             <div class="product-detail-grid">
                 <!-- Left Column: Product Visual -->
                 <div class="product-detail-left">
-                    <div class="product-visual-container">
+                    <div class="product-visual-container" style="position: relative;">
+                        <!-- Wishlist Heart Icon (only for logged in users) -->
+                        <?php $isWishlisted = isset($_SESSION['wishlist']) && in_array($productId, $_SESSION['wishlist']); ?>
+                        <?php if (isLoggedIn()): ?>
+                            <div onclick="toggleWishlist(event, <?php echo $productId; ?>)" 
+                                 style="
+                                    position: absolute;
+                                    top: 15px;
+                                    right: 15px;
+                                    font-size: 32px;
+                                    cursor: pointer;
+                                    z-index: 10;
+                                    background: white;
+                                    width: 50px;
+                                    height: 50px;
+                                    border-radius: 50%;
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: center;
+                                    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                                    transition: all 0.3s ease;
+                                 "
+                                 onmouseover="this.style.transform='scale(1.15)'"
+                                 onmouseout="this.style.transform='scale(1)'"
+                                 class="heart-icon"
+                                 data-product-id="<?php echo $productId; ?>">
+                                <?php echo $isWishlisted ? '❤️' : '🤍'; ?>
+                            </div>
+                        <?php endif; ?>
+
                         <div class="product-emoji-large"><?php echo $product['emoji']; ?></div>
                     </div>
                     
@@ -170,28 +198,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                         <input type="hidden" id="buy-quantity" value="1">
 
                         <?php if ($product['stock'] > 0): ?>
-                            <?php if ($isLoggedIn): ?>
-                                <button type="submit" class="btn-add-to-cart">
-                                    <span class="btn-icon">🛒</span>
-                                    Add to Cart
-                                </button>
-                                <button type="button" class="btn-buy-now" onclick="buyNow(<?php echo $product['id']; ?>, <?php echo $product['stock']; ?>)">
-                                    <span class="btn-icon">💳</span>
-                                    Buy Now
-                                </button>
-                            <?php else: ?>
-                                <div class="login-prompt">
-                                    <p>Sign in to add items to your cart</p>
-                                    <div class="login-buttons">
-                                        <a href="signin.php" class="btn-signin">Sign In</a>
-                                        <a href="signup.php" class="btn-signup">Create Account</a>
-                                    </div>
-                                </div>
-                                <button type="button" class="btn-add-to-cart" disabled>
-                                    <span class="btn-icon">🛒</span>
-                                    Add to Cart (Sign in required)
-                                </button>
-                            <?php endif; ?>
+                            <button type="submit" class="btn-add-to-cart">
+                                <span class="btn-icon">🛒</span>
+                                Add to Cart
+                            </button>
+                            <button type="button" class="btn-buy-now" onclick="buyNow(<?php echo $product['id']; ?>, <?php echo $product['stock']; ?>)">
+                                <span class="btn-icon">💳</span>
+                                Buy Now
+                            </button>
                         <?php else: ?>
                             <button type="button" class="btn-add-to-cart" disabled>
                                 Out of Stock
@@ -373,4 +387,53 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     document.querySelector('.add-to-cart-form')?.addEventListener('submit', function() {
         updateQuantityHidden();
     });
+
+    // Wishlist toggle functionality
+    function toggleWishlist(event, productId) {
+        event.preventDefault();
+        event.stopPropagation();
+        
+        const heartIcon = event.currentTarget;
+        const isLiked = heartIcon.textContent.includes('❤️');
+        
+        const formData = new FormData();
+        formData.append('action', isLiked ? 'remove' : 'add');
+        formData.append('product_id', productId);
+        
+        fetch('wishlist.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                heartIcon.textContent = isLiked ? '🤍' : '❤️';
+                updateWishlistBadge();
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Failed to update wishlist');
+        });
+    }
+    
+    function updateWishlistBadge() {
+        const badge = document.querySelector('.wishlist-icon .badge');
+        if (badge) {
+            const formData = new FormData();
+            formData.append('action', 'get_count');
+            
+            fetch('wishlist.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.count !== undefined) {
+                    badge.textContent = data.count;
+                }
+            })
+            .catch(error => console.error('Error updating badge:', error));
+        }
+    }
 </script>

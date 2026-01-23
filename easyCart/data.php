@@ -456,4 +456,88 @@ function renderStars($rating) {
     
     return $stars;
 }
+
+// ============================================
+// CART & WISHLIST PERSISTENCE FUNCTIONS
+// ============================================
+
+// Get cart data file path for a user
+function getCartFilePath($userId) {
+    $dataDir = __DIR__ . '/data';
+    if (!is_dir($dataDir)) {
+        mkdir($dataDir, 0755, true);
+    }
+    return $dataDir . '/cart_' . md5($userId) . '.json';
+}
+
+// Get wishlist data file path for a user
+function getWishlistFilePath($userId) {
+    $dataDir = __DIR__ . '/data';
+    if (!is_dir($dataDir)) {
+        mkdir($dataDir, 0755, true);
+    }
+    return $dataDir . '/wishlist_' . md5($userId) . '.json';
+}
+
+// Load cart from file for logged-in user
+function loadUserCart($userId) {
+    $cartFile = getCartFilePath($userId);
+    
+    if (file_exists($cartFile) && filesize($cartFile) > 0) {
+        $fileContent = file_get_contents($cartFile);
+        $cart = json_decode($fileContent, true);
+        
+        if (is_array($cart)) {
+            return $cart;
+        }
+    }
+    
+    return [];
+}
+
+// Save cart to file for logged-in user
+function saveUserCart($userId, $cart) {
+    $cartFile = getCartFilePath($userId);
+    $jsonData = json_encode($cart, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+    file_put_contents($cartFile, $jsonData);
+}
+
+// Load wishlist from file for logged-in user
+function loadUserWishlist($userId) {
+    $wishlistFile = getWishlistFilePath($userId);
+    
+    if (file_exists($wishlistFile) && filesize($wishlistFile) > 0) {
+        $fileContent = file_get_contents($wishlistFile);
+        $wishlist = json_decode($fileContent, true);
+        
+        if (is_array($wishlist)) {
+            return $wishlist;
+        }
+    }
+    
+    return [];
+}
+
+// Save wishlist to file for logged-in user
+function saveUserWishlist($userId, $wishlist) {
+    $wishlistFile = getWishlistFilePath($userId);
+    $jsonData = json_encode($wishlist, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+    file_put_contents($wishlistFile, $jsonData);
+}
+
+// Initialize cart from file on login
+function initializeCartFromFile() {
+    if (isLoggedIn() && isset($_SESSION['user_email'])) {
+        $cart = loadUserCart($_SESSION['user_email']);
+        $_SESSION['cart'] = $cart;
+    }
+}
+
+// Initialize wishlist from file on login
+function initializeWishlistFromFile() {
+    if (isLoggedIn() && isset($_SESSION['user_email'])) {
+        $wishlist = loadUserWishlist($_SESSION['user_email']);
+        $_SESSION['wishlist'] = $wishlist;
+    }
+}
 ?>
