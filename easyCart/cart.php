@@ -2,8 +2,8 @@
 session_start();
 
 // Include data and auth
-require_once 'data.php';
-require_once 'auth.php';
+require_once 'includes/data.php';
+require_once 'includes/auth.php';
 
 $pageTitle = 'Shopping Cart';
 
@@ -75,7 +75,7 @@ foreach ($cartItems as $productId => $cartItem) {
 $tax = $subtotal * 0.10; // 10% tax
 $total = $subtotal + $tax;
 ?>
-<?php include 'header.php'; ?>
+<?php include 'includes/header.php'; ?>
 
     <!-- Shopping Cart Page -->
     <section class="container" style="padding: 40px 0;">
@@ -240,115 +240,5 @@ $total = $subtotal + $tax;
         <?php endif; ?>
     </section>
 
-    <script>
-        function increaseQuantity(btn) {
-            const cartItem = btn.closest('.cart-item');
-            const quantityInput = cartItem.querySelector('.quantity-input');
-            const maxStock = parseInt(quantityInput.max);
-            const currentQty = parseInt(quantityInput.value);
-            
-            if (currentQty < maxStock) {
-                quantityInput.value = currentQty + 1;
-                updateQuantityAndSummary(quantityInput);
-            }
-        }
-        
-        function decreaseQuantity(btn) {
-            const cartItem = btn.closest('.cart-item');
-            const quantityInput = cartItem.querySelector('.quantity-input');
-            const currentQty = parseInt(quantityInput.value);
-            
-            if (currentQty > 1) {
-                quantityInput.value = currentQty - 1;
-                updateQuantityAndSummary(quantityInput);
-            }
-        }
-        
-        function updateQuantityAndSummary(quantityInput) {
-            const cartItem = quantityInput.closest('.cart-item');
-            const productId = cartItem.dataset.productId;
-            const newQuantity = parseInt(quantityInput.value);
-            const price = parseFloat(cartItem.dataset.productPrice);
-            
-            // Update item total in UI
-            const itemTotal = price * newQuantity;
-            cartItem.querySelector('.item-total').textContent = formatCurrency(itemTotal);
-            
-            // Update cart on server via AJAX
-            const formData = new FormData();
-            formData.append('action', 'update');
-            formData.append('product_id', productId);
-            formData.append('quantity', newQuantity);
-            
-            fetch('cart.php', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.text())
-            .then(data => {
-                updateOrderSummary();
-            })
-            .catch(error => console.error('Error:', error));
-        }
-        
-        function updateCartItemTotal(cartItem) {
-            const price = parseFloat(cartItem.dataset.productPrice);
-            const quantity = parseInt(cartItem.querySelector('.quantity-input').value);
-            const total = price * quantity;
-        
-            cartItem.querySelector('.item-total').textContent = formatCurrency(total);
-        }
-        
-        function formatCurrency(value) {
-            return '$' + value.toFixed(2);
-        }
-        
-        function removeCartItem(btn) {
-            const cartItem = btn.closest('.cart-item');
-            const productId = cartItem.dataset.productId;
-            
-            if (confirm('Are you sure you want to remove this item from your cart?')) {
-                // Create and submit hidden form
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.action = '';
-                
-                const actionInput = document.createElement('input');
-                actionInput.type = 'hidden';
-                actionInput.name = 'action';
-                actionInput.value = 'remove';
-                
-                const productInput = document.createElement('input');
-                productInput.type = 'hidden';
-                productInput.name = 'product_id';
-                productInput.value = productId;
-                
-                form.appendChild(actionInput);
-                form.appendChild(productInput);
-                document.body.appendChild(form);
-                form.submit();
-            }
-        }
-        
-        function updateOrderSummary() {
-            // Calculate new subtotal from all cart items
-            let newSubtotal = 0;
-            document.querySelectorAll('.cart-item').forEach(item => {
-                const price = parseFloat(item.dataset.productPrice);
-                const quantity = parseInt(item.querySelector('.quantity-input').value);
-                newSubtotal += price * quantity;
-            });
-            
-            const newTax = newSubtotal * 0.10;
-            const shippingCost = newSubtotal > 50 ? 0 : 9.99;
-            const newTotal = newSubtotal + newTax + shippingCost;
-            
-            // Update summary display
-            document.getElementById('summary-subtotal').textContent = formatCurrency(newSubtotal);
-            document.getElementById('summary-tax').textContent = formatCurrency(newTax);
-            document.getElementById('summary-shipping').textContent = shippingCost === 0 ? 'Free' : formatCurrency(shippingCost);
-            document.getElementById('summary-total').textContent = formatCurrency(newTotal);
-        }
-    </script>
-
-<?php include 'footer.php'; ?>
+    <script src="js/cart.js"></script>
+    <?php include 'includes/footer.php'; ?>

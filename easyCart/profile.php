@@ -1,8 +1,8 @@
 <?php
 session_start();
 
-require_once 'auth.php';
-require_once 'data.php';
+require_once 'includes/auth.php';
+require_once 'includes/data.php';
 
 $pageTitle = 'My Profile';
 
@@ -11,7 +11,7 @@ requireLogin();
 
 $currentUser = getCurrentUser();
 ?>
-<?php include 'header.php'; ?>
+<?php include 'includes/header.php'; ?>
 
     <!-- Profile Page -->
     <section class="container" style="padding: 40px 0;">
@@ -168,4 +168,4 @@ $currentUser = getCurrentUser();
         </section>
     </section>
 
-<?php include 'footer.php'; ?>
+<?php include 'includes/footer.php'; ?>

@@ -27,7 +27,8 @@ if (!isset($_SESSION['last_order']['status'])) {
     $_SESSION['last_order']['order_number'] = 'ORD' . str_pad(rand(100000, 999999), 6, '0', STR_PAD_LEFT);
 }
 ?>
-<?php include 'header.php'; ?>
+<?php include 'includes/header.php'; ?>
+    <script src="js/order-confirmation.js"></script>
 
     <!-- Order Confirmation Page -->
     <section class="container" style="padding: 40px 0;">
@@ -456,28 +457,4 @@ if (!isset($_SESSION['last_order']['status'])) {
         </div>
     </div>
 
-    <script>
-        function openCancelModal() {
-            document.getElementById('cancelModal').style.display = 'flex';
-        }
-
-        function closeCancelModal() {
-            document.getElementById('cancelModal').style.display = 'none';
-        }
-
-        // Close modal when clicking outside
-        document.getElementById('cancelModal').addEventListener('click', function(event) {
-            if (event.target === this) {
-                closeCancelModal();
-            }
-        });
-
-        // Close modal on Escape key
-        document.addEventListener('keydown', function(event) {
-            if (event.key === 'Escape') {
-                closeCancelModal();
-            }
-        });
-    </script>
-
-<?php include 'footer.php'; ?>
+<?php include 'includes/footer.php'; ?>

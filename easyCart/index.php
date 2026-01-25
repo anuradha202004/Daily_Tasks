@@ -2,8 +2,8 @@
 session_start();
 
 // Include data and auth
-require_once 'data.php';
-require_once 'auth.php';
+require_once 'includes/data.php';
+require_once 'includes/auth.php';
 
 // Load cart and wishlist from file if user is logged in
 if (isLoggedIn()) {
@@ -20,7 +20,9 @@ $pageTitle = 'Home';
 // Get featured products (first 4 products)
 $featuredProducts = array_slice($products, 0, 4, true);
 ?>
-<?php include 'header.php'; ?>
+<?php include 'includes/header.php'; ?>
+    <script src="js/carousel.js"></script>
+    <script src="js/wishlist.js"></script>
 
     <!-- Modern Hero Section - Split Design with Glassmorphism -->
     <!-- Modern Interactive Ad Hero Section -->
@@ -314,112 +316,4 @@ $featuredProducts = array_slice($products, 0, 4, true);
         </div>
     </section>
 
-<?php include 'footer.php'; ?>
-
-    <!-- Interactive Ad Carousel Script -->
-    <script>
-        let currentAdIndex = 0;
-        const totalAds = 4;
-        let autoplayInterval;
-
-        function showAd(index) {
-            // Get all slides and dots
-            const slides = document.querySelectorAll('.ad-slide');
-            const dots = document.querySelectorAll('.carousel-dots .dot');
-
-            // Remove active class from all
-            slides.forEach(slide => slide.classList.remove('active'));
-            dots.forEach(dot => dot.classList.remove('active'));
-
-            // Add active class to current
-            slides[index].classList.add('active');
-            dots[index].classList.add('active');
-
-            // Update progress bar
-            const progress = ((index + 1) / totalAds) * 100;
-            document.querySelector('.progress-fill').style.width = progress + '%';
-        }
-
-        function goToAd(index) {
-            currentAdIndex = index;
-            showAd(currentAdIndex);
-            resetAutoplay();
-        }
-
-        function nextAd() {
-            currentAdIndex = (currentAdIndex + 1) % totalAds;
-            showAd(currentAdIndex);
-            resetAutoplay();
-        }
-
-        function prevAd() {
-            currentAdIndex = (currentAdIndex - 1 + totalAds) % totalAds;
-            showAd(currentAdIndex);
-            resetAutoplay();
-        }
-
-        function resetAutoplay() {
-            clearInterval(autoplayInterval);
-            startAutoplay();
-        }
-
-        function startAutoplay() {
-            autoplayInterval = setInterval(() => {
-                nextAd();
-            }, 5000);
-        }
-
-        // Initialize on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            startAutoplay();
-        });
-
-        // Wishlist toggle functionality
-        function toggleWishlist(event, productId) {
-            event.preventDefault();
-            event.stopPropagation();
-            
-            const heartIcon = event.currentTarget;
-            const isLiked = heartIcon.textContent.includes('❤️');
-            
-            const formData = new FormData();
-            formData.append('action', isLiked ? 'remove' : 'add');
-            formData.append('product_id', productId);
-            
-            fetch('wishlist.php', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    heartIcon.textContent = isLiked ? '🤍' : '❤️';
-                    updateWishlistBadge();
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Failed to update wishlist');
-            });
-        }
-        
-        function updateWishlistBadge() {
-            const badge = document.querySelector('.wishlist-icon .badge');
-            if (badge) {
-                const formData = new FormData();
-                formData.append('action', 'get_count');
-                
-                fetch('wishlist.php', {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.count !== undefined) {
-                        badge.textContent = data.count;
-                    }
-                })
-                .catch(error => console.error('Error updating badge:', error));
-            }
-        }
-    </script>
+<?php include 'includes/footer.php'; ?>

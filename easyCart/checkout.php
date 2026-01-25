@@ -2,8 +2,8 @@
 session_start();
 
 // Include data and auth
-require_once 'data.php';
-require_once 'auth.php';
+require_once 'includes/data.php';
+require_once 'includes/auth.php';
 
 $pageTitle = 'Checkout';
 
@@ -117,7 +117,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     }
 }
 ?>
-<?php include 'header.php'; ?>
+<?php include 'includes/header.php'; ?>
+    <script src="js/validation.js"></script>
 
     <!-- Checkout Page -->
     <section class="container" style="padding: 40px 0;">
@@ -225,84 +226,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                         Back to Cart
                     </a>
                 </form>
-
-                <script>
-                    function validateCheckoutForm() {
-                        let isValid = true;
-                        
-                        // Validation patterns
-                        const nameRegex = /^[a-zA-Z\s]{2,}$/;
-                        const zipRegex = /^\d{5}(-\d{4})?$/;
-                        const phoneRegex = /^\d{10}$/;
-                        const cardRegex = /^\d{16}$/;
-                        
-                        // First Name
-                        const firstName = document.querySelector('input[name="first_name"]').value.trim();
-                        if (!firstName || !nameRegex.test(firstName)) {
-                            alert('Please enter a valid first name (letters only, at least 2 characters)');
-                            isValid = false;
-                        }
-                        
-                        // Last Name
-                        const lastName = document.querySelector('input[name="last_name"]').value.trim();
-                        if (!lastName || !nameRegex.test(lastName)) {
-                            alert('Please enter a valid last name (letters only, at least 2 characters)');
-                            isValid = false;
-                        }
-                        
-                        // Email
-                        const email = document.querySelector('input[name="email"]').value.trim();
-                        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                        if (!email || !emailRegex.test(email)) {
-                            alert('Please enter a valid email address');
-                            isValid = false;
-                        }
-                        
-                        // Phone
-                        const phone = document.querySelector('input[name="phone"]').value.trim().replace(/\D/g, '');
-                        if (!phone || phone.length !== 10) {
-                            alert('Please enter a valid 10-digit phone number');
-                            isValid = false;
-                        }
-                        
-                        // Address
-                        const address = document.querySelector('input[name="address"]').value.trim();
-                        if (!address || address.length < 5) {
-                            alert('Please enter a valid street address');
-                            isValid = false;
-                        }
-                        
-                        // City
-                        const city = document.querySelector('input[name="city"]').value.trim();
-                        if (!city || city.length < 2) {
-                            alert('Please enter a valid city name');
-                            isValid = false;
-                        }
-                        
-                        // State
-                        const state = document.querySelector('input[name="state"]').value.trim();
-                        if (!state || state.length < 2) {
-                            alert('Please enter a valid state');
-                            isValid = false;
-                        }
-                        
-                        // Zip Code
-                        const zip = document.querySelector('input[name="zip"]').value.trim();
-                        if (!zip || !zipRegex.test(zip)) {
-                            alert('Please enter a valid zip code (5 digits or 5+4 format)');
-                            isValid = false;
-                        }
-                        
-                        // Card Number
-                        const cardNumber = document.querySelector('input[name="card_number"]').value.trim().replace(/\s/g, '');
-                        if (!cardNumber || !cardRegex.test(cardNumber)) {
-                            alert('Please enter a valid 16-digit card number');
-                            isValid = false;
-                        }
-                        
-                        return isValid;
-                    }
-                </script>
             </div>
 
             <!-- Order Summary -->
@@ -362,4 +285,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         </div>
     </section>
 
-<?php include 'footer.php'; ?>
+<?php include 'includes/footer.php'; ?>

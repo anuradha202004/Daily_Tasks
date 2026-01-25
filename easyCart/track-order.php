@@ -2,7 +2,7 @@
 session_start();
 
 // Include data and auth
-require_once 'data.php';
+require_once 'includes/data.php';
 
 $pageTitle = 'Track Order';
 
@@ -40,7 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     }
 }
 ?>
-<?php include 'header.php'; ?>
+<?php include 'includes/header.php'; ?>
 
     <!-- Track Order Page -->
     <section class="container" style="padding: 40px 0;">
@@ -321,4 +321,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         <?php endif; ?>
     </section>
 
-<?php include 'footer.php'; ?>
+<?php include 'includes/footer.php'; ?>

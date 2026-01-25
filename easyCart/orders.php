@@ -2,8 +2,8 @@
 session_start();
 
 // Include data and auth
-require_once 'data.php';
-require_once 'auth.php';
+require_once 'includes/data.php';
+require_once 'includes/auth.php';
 
 $pageTitle = 'My Orders';
 
@@ -32,7 +32,7 @@ if (isset($_SESSION['last_order'])) {
     array_unshift($allOrders, $lastOrderData);
 }
 ?>
-<?php include 'header.php'; ?>
+<?php include 'includes/header.php'; ?>
 
     <!-- My Orders Page -->
     <section class="container" style="padding: 40px 0;">
@@ -281,4 +281,4 @@ if (isset($_SESSION['last_order'])) {
         <?php endif; ?>
     </section>
 
-<?php include 'footer.php'; ?>
+<?php include 'includes/footer.php'; ?>

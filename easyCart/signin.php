@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-require_once 'auth.php';
+require_once 'includes/auth.php';
 
 $pageTitle = 'Sign In';
 
@@ -36,7 +36,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     }
 }
 ?>
-<?php include 'header.php'; ?>
+<?php include 'includes/header.php'; ?>
+    <script src="js/validation.js"></script>
 
     <!-- Sign In Page -->
     <section class="container" style="padding: 60px 20px;">
@@ -92,47 +93,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 </button>
             </form>
 
-            <script>
-                function validateLoginForm() {
-                    let isValid = true;
-                    
-                    // Clear previous errors
-                    document.getElementById('emailError').style.display = 'none';
-                    document.getElementById('passwordError').style.display = 'none';
-                    
-                    // Email validation
-                    const email = document.getElementById('email').value.trim();
-                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                    
-                    if (!email) {
-                        showError('emailError', 'Email address is required');
-                        isValid = false;
-                    } else if (!emailRegex.test(email)) {
-                        showError('emailError', 'Please enter a valid email address');
-                        isValid = false;
-                    }
-                    
-                    // Password validation
-                    const password = document.getElementById('password').value;
-                    
-                    if (!password) {
-                        showError('passwordError', 'Password is required');
-                        isValid = false;
-                    } else if (password.length < 6) {
-                        showError('passwordError', 'Password must be at least 6 characters');
-                        isValid = false;
-                    }
-                    
-                    return isValid;
-                }
-                
-                function showError(elementId, message) {
-                    const errorElement = document.getElementById(elementId);
-                    errorElement.textContent = message;
-                    errorElement.style.display = 'block';
-                }
-            </script>
-
             <!-- Divider -->
             <div style="text-align: center; margin: 30px 0; color: #999;">
                 <span style="background: white; padding: 0 10px;">or</span>
@@ -165,4 +125,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         </div>
     </section>
 
-<?php include 'footer.php'; ?>
+<?php include 'includes/footer.php'; ?>

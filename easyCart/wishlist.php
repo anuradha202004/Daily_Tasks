@@ -5,8 +5,8 @@
  */
 
 session_start();
-require_once 'data.php';
-require_once 'auth.php';
+require_once 'includes/data.php';
+require_once 'includes/auth.php';
 
 $pageTitle = 'My Wishlist';
 
@@ -57,7 +57,8 @@ if (!empty($_SESSION['wishlist'])) {
     }
 }
 ?>
-<?php include 'header.php'; ?>
+<?php include 'includes/header.php'; ?>
+    <script src="js/wishlist.js"></script>
 
     <!-- My Wishlist Page -->
     <section class="container" style="padding: 40px 0;">
@@ -131,36 +132,4 @@ if (!empty($_SESSION['wishlist'])) {
         <?php endif; ?>
     </section>
 
-    <script>
-        function toggleWishlist(event, productId) {
-            event.preventDefault();
-            event.stopPropagation();
-            
-            const heartIcon = event.currentTarget;
-            const isLiked = heartIcon.textContent.includes('❤️');
-            
-            const formData = new FormData();
-            formData.append('action', isLiked ? 'remove' : 'add');
-            formData.append('product_id', productId);
-            
-            fetch('<?php echo basename(__FILE__); ?>', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    if (isLiked) {
-                        heartIcon.textContent = '🤍';
-                        // Reload page to update wishlist
-                        setTimeout(() => location.reload(), 300);
-                    } else {
-                        heartIcon.textContent = '❤️';
-                    }
-                }
-            })
-            .catch(error => console.error('Error:', error));
-        }
-    </script>
-
-<?php include 'footer.php'; ?>
+<?php include 'includes/footer.php'; ?>

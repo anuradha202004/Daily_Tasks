@@ -2,8 +2,8 @@
 session_start();
 
 // Include data and auth
-require_once 'data.php';
-require_once 'auth.php';
+require_once 'includes/data.php';
+require_once 'includes/auth.php';
 
 // Get product ID from URL
 $productId = isset($_GET['id']) ? intval($_GET['id']) : null;
@@ -56,7 +56,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     }
 }
 ?>
-<?php include 'header.php'; ?>
+<?php include 'includes/header.php'; ?>
+    <script src="js/product-detail.js"></script>
+    <script src="js/wishlist.js"></script>
 
     <!-- Product Detail Page - Modern Design -->
     <section class="product-detail-section">
@@ -334,106 +336,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     </section>
                        
 
-<?php include 'footer.php'; ?>
-<script>
-    // Color selector functionality
-    document.querySelectorAll('.color-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('active'));
-            this.classList.add('active');
-        });
-    });
-
-    // Quantity increment/decrement
-    function incrementQty(max) {
-        const qtyInput = document.getElementById('quantity');
-        let currentVal = parseInt(qtyInput.value);
-        if (currentVal < max) {
-            qtyInput.value = currentVal + 1;
-            updateQuantityHidden();
-        }
-    }
-
-    function decrementQty() {
-        const qtyInput = document.getElementById('quantity');
-        let currentVal = parseInt(qtyInput.value);
-        if (currentVal > 1) {
-            qtyInput.value = currentVal - 1;
-            updateQuantityHidden();
-        }
-    }
-
-    function updateQuantityHidden() {
-        const qtyInput = document.getElementById('quantity');
-        const qtyHidden = document.getElementById('quantity-hidden');
-        qtyHidden.value = qtyInput.value;
-    }
-
-    function buyNow(productId, maxStock) {
-        const qtyInput = document.getElementById('quantity');
-        const qty = parseInt(qtyInput.value);
-        
-        if (qty > 0 && qty <= maxStock) {
-            window.location.href = 'checkout.php?product_id=' + productId + '&qty=' + qty;
-        } else {
-            alert('Please select a valid quantity');
-        }
-    }
-
-    // Update hidden quantity when input changes
-    document.getElementById('quantity').addEventListener('change', updateQuantityHidden);
-
-    // Update hidden quantity on form submit
-    document.querySelector('.add-to-cart-form')?.addEventListener('submit', function() {
-        updateQuantityHidden();
-    });
-
-    // Wishlist toggle functionality
-    function toggleWishlist(event, productId) {
-        event.preventDefault();
-        event.stopPropagation();
-        
-        const heartIcon = event.currentTarget;
-        const isLiked = heartIcon.textContent.includes('❤️');
-        
-        const formData = new FormData();
-        formData.append('action', isLiked ? 'remove' : 'add');
-        formData.append('product_id', productId);
-        
-        fetch('wishlist.php', {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                heartIcon.textContent = isLiked ? '🤍' : '❤️';
-                updateWishlistBadge();
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Failed to update wishlist');
-        });
-    }
-    
-    function updateWishlistBadge() {
-        const badge = document.querySelector('.wishlist-icon .badge');
-        if (badge) {
-            const formData = new FormData();
-            formData.append('action', 'get_count');
-            
-            fetch('wishlist.php', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.count !== undefined) {
-                    badge.textContent = data.count;
-                }
-            })
-            .catch(error => console.error('Error updating badge:', error));
-        }
-    }
-</script>
+<?php include 'includes/footer.php'; ?>

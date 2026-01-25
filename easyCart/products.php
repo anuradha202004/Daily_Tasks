@@ -2,8 +2,8 @@
 session_start();
 
 // Include data and auth
-require_once 'data.php';
-require_once 'auth.php';
+require_once 'includes/data.php';
+require_once 'includes/auth.php';
 
 $pageTitle = 'Products';
 
@@ -28,7 +28,8 @@ $displayProducts = $selectedCategory
 // Sort by latest (or by ID for consistency)
 $displayProducts = array_reverse($displayProducts, true);
 ?>
-<?php include 'header.php'; ?>
+<?php include 'includes/header.php'; ?>
+    <script src="js/wishlist.js"></script>
 
     <!-- Products Page -->
     <section class="container" style="padding: 40px 0;">
@@ -117,54 +118,6 @@ $displayProducts = array_reverse($displayProducts, true);
         <?php endif; ?>
     </section>
 
-    <script>
-        function toggleWishlist(event, productId) {
-            event.preventDefault();
-            event.stopPropagation();
-            
-            const heartIcon = event.currentTarget;
-            const isLiked = heartIcon.textContent.includes('❤️');
-            
-            const formData = new FormData();
-            formData.append('action', isLiked ? 'remove' : 'add');
-            formData.append('product_id', productId);
-            
-            fetch('wishlist.php', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    heartIcon.textContent = isLiked ? '🤍' : '❤️';
-                    updateWishlistBadge();
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Failed to update wishlist');
-            });
-        }
-        
-        function updateWishlistBadge() {
-            const badge = document.querySelector('.wishlist-icon .badge');
-            if (badge) {
-                const formData = new FormData();
-                formData.append('action', 'get_count');
-                
-                fetch('wishlist.php', {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.count !== undefined) {
-                        badge.textContent = data.count;
-                    }
-                })
-                .catch(error => console.error('Error updating badge:', error));
-            }
-        }
-    </script>
+    <script src="js/wishlist.js"></script>
 
-<?php include 'footer.php'; ?>
+<?php include 'includes/footer.php'; ?>
