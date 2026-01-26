@@ -463,7 +463,7 @@ function renderStars($rating) {
 
 // Get cart data file path for a user
 function getCartFilePath($userId) {
-    $dataDir = __DIR__ . '/data';
+    $dataDir = __DIR__ . '/../data';
     if (!is_dir($dataDir)) {
         mkdir($dataDir, 0755, true);
     }
@@ -472,7 +472,7 @@ function getCartFilePath($userId) {
 
 // Get wishlist data file path for a user
 function getWishlistFilePath($userId) {
-    $dataDir = __DIR__ . '/data';
+    $dataDir = __DIR__ . '/../data';
     if (!is_dir($dataDir)) {
         mkdir($dataDir, 0755, true);
     }

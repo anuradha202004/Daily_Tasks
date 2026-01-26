@@ -17,9 +17,45 @@ if (!isset($_SESSION['cart'])) {
     $_SESSION['cart'] = [];
 }
 
-// Handle cart actions
+// Handle AJAX cart actions
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = isset($_POST['action']) ? $_POST['action'] : null;
+    $isAjax = isset($_SERVER['HTTP_X_REQUESTED_WITH']) || 
+              (isset($_SERVER['HTTP_ACCEPT']) && strpos($_SERVER['HTTP_ACCEPT'], 'application/json') !== false) ||
+              ($action === 'add' && isset($_POST['product_id']));
+    
+    // Handle add action (AJAX)
+    if ($action === 'add' && isset($_POST['product_id'])) {
+        $productId = intval($_POST['product_id']);
+        $quantity = isset($_POST['quantity']) ? intval($_POST['quantity']) : 1;
+        $product = getProductById($productId);
+        
+        if (!$product || $product['stock'] <= 0) {
+            exit;
+        }
+        
+        // Add or update cart
+        if (isset($_SESSION['cart'][$productId])) {
+            $newQty = $_SESSION['cart'][$productId]['quantity'] + $quantity;
+            if ($newQty <= $product['stock']) {
+                $_SESSION['cart'][$productId]['quantity'] = $newQty;
+            } else {
+                $_SESSION['cart'][$productId]['quantity'] = $product['stock'];
+            }
+        } else {
+            $_SESSION['cart'][$productId] = [
+                'product_id' => $productId,
+                'quantity' => min($quantity, $product['stock'])
+            ];
+        }
+        
+        // Save cart for logged-in users
+        if (isLoggedIn() && isset($_SESSION['user_email'])) {
+            saveUserCart($_SESSION['user_email'], $_SESSION['cart']);
+        }
+        
+        exit;
+    }
     
     if ($action === 'remove' && isset($_POST['product_id'])) {
         $productId = intval($_POST['product_id']);
@@ -48,6 +84,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (isLoggedIn() && isset($_SESSION['user_email'])) {
             saveUserCart($_SESSION['user_email'], $_SESSION['cart']);
         }
+    } elseif ($action === 'get_count') {
+        header('Content-Type: application/json');
+        echo json_encode(['success' => true, 'cartCount' => count($_SESSION['cart'])]);
+        exit;
     }
 }
 

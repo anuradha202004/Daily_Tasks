@@ -30,6 +30,7 @@ $displayProducts = array_reverse($displayProducts, true);
 ?>
 <?php include 'includes/header.php'; ?>
     <script src="js/wishlist.js"></script>
+    <script src="js/cart.js"></script>
 
     <!-- Products Page -->
     <section class="container" style="padding: 40px 0;">
@@ -63,35 +64,17 @@ $displayProducts = array_reverse($displayProducts, true);
             <div class="products-grid" style="margin-top: 30px;">
                 <?php foreach ($displayProducts as $product): ?>
                     <?php $isWishlisted = isset($_SESSION['wishlist']) && in_array($product['id'], $_SESSION['wishlist']); ?>
-                    <div class="product-card" style="position: relative;">
-                        <!-- Wishlist Heart Icon (only for logged in users) -->
+                    <div class="product-card" style="position: relative; cursor: pointer;" onclick="window.location.href='product-detail.php?id=<?php echo $product['id']; ?>'">
                         <?php if (isLoggedIn()): ?>
-                            <div onclick="toggleWishlist(event, <?php echo $product['id']; ?>)" 
-                                 style="
-                                    position: absolute;
-                                    top: 10px;
-                                    right: 10px;
-                                    font-size: 24px;
-                                    cursor: pointer;
-                                    z-index: 10;
-                                    background: white;
-                                    width: 40px;
-                                    height: 40px;
-                                    border-radius: 50%;
-                                    display: flex;
-                                    align-items: center;
-                                    justify-content: center;
-                                    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-                                    transition: all 0.3s ease;
-                                 "
-                                 onmouseover="this.style.transform='scale(1.1)'"
-                                 onmouseout="this.style.transform='scale(1)'"
-                                 class="heart-icon"
-                                 data-product-id="<?php echo $product['id']; ?>">
-                                <?php echo $isWishlisted ? '❤️' : '🤍'; ?>
-                            </div>
+                        <div onclick="event.stopPropagation(); toggleWishlist(event, <?php echo $product['id']; ?>)" 
+                             style="position: absolute; top: 10px; right: 10px; font-size: 24px; cursor: pointer; z-index: 10; background: white; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.15); transition: all 0.3s ease;"
+                             onmouseover="this.style.transform='scale(1.1)'"
+                             onmouseout="this.style.transform='scale(1)'"
+                             class="heart-icon"
+                             data-product-id="<?php echo $product['id']; ?>">
+                            <?php echo $isWishlisted ? '❤️' : '🤍'; ?>
+                        </div>
                         <?php endif; ?>
-
                         <div class="product-image"><?php echo $product['emoji']; ?></div>
                         <h3 class="product-title"><?php echo htmlspecialchars($product['name']); ?></h3>
                         <div class="product-rating"><?php echo renderStars($product['rating']); ?> <?php echo $product['rating']; ?> (<?php echo $product['reviews']; ?> reviews)</div>
@@ -99,10 +82,12 @@ $displayProducts = array_reverse($displayProducts, true);
                         <div class="product-price"><?php echo formatPrice($product['price']); ?></div>
                         <div class="product-footer">
                             <span class="stock-info">Stock: <?php echo $product['stock']; ?> units</span>
-                            <div class="product-actions">
-                                <a href="product-detail.php?id=<?php echo $product['id']; ?>" class="btn btn-primary">View Details</a>
+                            <div class="product-actions" onclick="event.stopPropagation();">
                                 <?php if ($product['stock'] > 0): ?>
-                                    <a href="checkout.php?product_id=<?php echo $product['id']; ?>&qty=1" class="btn btn-buy-now">Buy Now</a>
+                                    <button type="button" onclick="(function(e, id){ e.preventDefault(); e.stopPropagation(); alert('Product added successfully'); var fd = new FormData(); fd.append('action', 'add'); fd.append('product_id', id); fd.append('quantity', 1); fetch('cart.php', {method: 'POST', body: fd}).then(function(){ var badge = document.querySelector('.badge'); if(badge){ var count = parseInt(badge.textContent) || 0; badge.textContent = count + 1; badge.style.display = 'flex'; } }); return false; })(event, <?php echo $product['id']; ?>)" class="btn btn-primary btn-add-cart" data-product-id="<?php echo $product['id']; ?>">
+                                        Add to Cart
+                                    </button>
+                                    <a href="<?php echo isLoggedIn() ? 'checkout.php?product_id=' . $product['id'] . '&qty=1' : 'signin.php?redirect=products'; ?>" class="btn btn-buy-now">Buy Now</a>
                                 <?php else: ?>
                                     <button class="btn btn-disabled" disabled>Out of Stock</button>
                                 <?php endif; ?>
@@ -117,7 +102,5 @@ $displayProducts = array_reverse($displayProducts, true);
             </div>
         <?php endif; ?>
     </section>
-
-    <script src="js/wishlist.js"></script>
 
 <?php include 'includes/footer.php'; ?>

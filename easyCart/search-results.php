@@ -40,33 +40,7 @@ $pageTitle = $query ? "Search: $query" : "Search Products";
                 <?php foreach ($searchResults as $product): ?>
                     <?php $isWishlisted = isset($_SESSION['wishlist']) && in_array($product['id'], $_SESSION['wishlist']); ?>
                     <div class="product-card" style="position: relative;">
-                        <!-- Wishlist Heart Icon (only for logged in users) -->
-                        <?php if (isLoggedIn()): ?>
-                            <div onclick="toggleWishlist(event, <?php echo $product['id']; ?>)" 
-                                 style="
-                                    position: absolute;
-                                    top: 10px;
-                                    right: 10px;
-                                    font-size: 24px;
-                                    cursor: pointer;
-                                    z-index: 10;
-                                    background: white;
-                                    width: 40px;
-                                    height: 40px;
-                                    border-radius: 50%;
-                                    display: flex;
-                                    align-items: center;
-                                    justify-content: center;
-                                    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-                                    transition: all 0.3s ease;
-                                 "
-                                 onmouseover="this.style.transform='scale(1.1)'"
-                                 onmouseout="this.style.transform='scale(1)'"
-                                 class="heart-icon"
-                                 data-product-id="<?php echo $product['id']; ?>">
-                                <?php echo $isWishlisted ? '❤️' : '🤍'; ?>
-                            </div>
-                        <?php endif; ?>
+
 
                         <div class="product-image"><?php echo $product['emoji']; ?></div>
                         <h3 class="product-title"><?php echo htmlspecialchars($product['name']); ?></h3>

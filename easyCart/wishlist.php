@@ -10,17 +10,26 @@ require_once 'includes/auth.php';
 
 $pageTitle = 'My Wishlist';
 
-// Require login
-requireLogin();
-
-// Load wishlist from file on page load
-if (!isset($_SESSION['wishlist'])) {
-    initializeWishlistFromFile();
-}
-
-// Handle add/remove wishlist actions (AJAX)
+// Handle AJAX requests BEFORE requireLogin (so we can return proper JSON)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     header('Content-Type: application/json');
+    
+    // Check if user is logged in for AJAX requests
+    if (!isLoggedIn()) {
+        echo json_encode(['success' => false, 'message' => 'Please login to use wishlist', 'redirect' => 'signin.php']);
+        exit;
+    }
+    
+    // Initialize wishlist if not set
+    if (!isset($_SESSION['wishlist'])) {
+        $_SESSION['wishlist'] = [];
+        initializeWishlistFromFile();
+    }
+    
+    // Ensure wishlist is an array
+    if (!is_array($_SESSION['wishlist'])) {
+        $_SESSION['wishlist'] = [];
+    }
     
     $action = $_POST['action'];
     $productId = isset($_POST['product_id']) ? intval($_POST['product_id']) : 0;
@@ -30,20 +39,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             $_SESSION['wishlist'][] = $productId;
         }
         saveUserWishlist($_SESSION['user_email'], $_SESSION['wishlist']);
-        echo json_encode(['success' => true, 'message' => 'Added to wishlist']);
+        echo json_encode(['success' => true, 'message' => 'Added to wishlist', 'count' => count($_SESSION['wishlist'])]);
     } elseif ($action === 'remove' && $productId > 0) {
         $_SESSION['wishlist'] = array_filter($_SESSION['wishlist'], function($id) use ($productId) {
             return $id !== $productId;
         });
         $_SESSION['wishlist'] = array_values($_SESSION['wishlist']); // Re-index array
         saveUserWishlist($_SESSION['user_email'], $_SESSION['wishlist']);
-        echo json_encode(['success' => true, 'message' => 'Removed from wishlist']);
+        echo json_encode(['success' => true, 'message' => 'Removed from wishlist', 'count' => count($_SESSION['wishlist'])]);
     } elseif ($action === 'get_wishlist') {
-        echo json_encode(['wishlist' => $_SESSION['wishlist']]);
+        echo json_encode(['success' => true, 'wishlist' => $_SESSION['wishlist']]);
     } elseif ($action === 'get_count') {
-        echo json_encode(['count' => count($_SESSION['wishlist'])]);
+        echo json_encode(['success' => true, 'count' => count($_SESSION['wishlist'])]);
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Invalid action']);
     }
     exit;
+}
+
+// For page view, require login
+requireLogin();
+
+// Load wishlist from file on page load
+if (!isset($_SESSION['wishlist'])) {
+    initializeWishlistFromFile();
+}
+
+// Ensure wishlist is an array
+if (!is_array($_SESSION['wishlist'])) {
+    $_SESSION['wishlist'] = [];
 }
 
 // Get wishlist items with product details
@@ -59,6 +83,7 @@ if (!empty($_SESSION['wishlist'])) {
 ?>
 <?php include 'includes/header.php'; ?>
     <script src="js/wishlist.js"></script>
+    <script src="js/cart.js"></script>
 
     <!-- My Wishlist Page -->
     <section class="container" style="padding: 40px 0;">
@@ -107,8 +132,10 @@ if (!empty($_SESSION['wishlist'])) {
                         <div class="product-footer">
                             <span class="stock-info">Stock: <?php echo $product['stock']; ?> units</span>
                             <div class="product-actions">
-                                <a href="product-detail.php?id=<?php echo $product['id']; ?>" class="btn btn-primary">View Details</a>
                                 <?php if ($product['stock'] > 0): ?>
+                                    <button type="button" onclick="(function(e, id){ e.preventDefault(); e.stopPropagation(); alert('Product added successfully'); var fd = new FormData(); fd.append('action', 'add'); fd.append('product_id', id); fd.append('quantity', 1); fetch('cart.php', {method: 'POST', body: fd}).then(function(){ var badge = document.querySelector('.badge'); if(badge){ var count = parseInt(badge.textContent) || 0; badge.textContent = count + 1; badge.style.display = 'flex'; } }); return false; })(event, <?php echo $product['id']; ?>)" class="btn btn-primary btn-add-cart" data-product-id="<?php echo $product['id']; ?>">
+                                        Add to Cart
+                                    </button>
                                     <a href="checkout.php?product_id=<?php echo $product['id']; ?>&qty=1" class="btn btn-buy-now">Buy Now</a>
                                 <?php else: ?>
                                     <button class="btn btn-disabled" disabled>Out of Stock</button>

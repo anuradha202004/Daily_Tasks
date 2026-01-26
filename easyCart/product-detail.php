@@ -85,34 +85,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 <!-- Left Column: Product Visual -->
                 <div class="product-detail-left">
                     <div class="product-visual-container" style="position: relative;">
-                        <!-- Wishlist Heart Icon (only for logged in users) -->
-                        <?php $isWishlisted = isset($_SESSION['wishlist']) && in_array($productId, $_SESSION['wishlist']); ?>
-                        <?php if (isLoggedIn()): ?>
-                            <div onclick="toggleWishlist(event, <?php echo $productId; ?>)" 
-                                 style="
-                                    position: absolute;
-                                    top: 15px;
-                                    right: 15px;
-                                    font-size: 32px;
-                                    cursor: pointer;
-                                    z-index: 10;
-                                    background: white;
-                                    width: 50px;
-                                    height: 50px;
-                                    border-radius: 50%;
-                                    display: flex;
-                                    align-items: center;
-                                    justify-content: center;
-                                    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-                                    transition: all 0.3s ease;
-                                 "
-                                 onmouseover="this.style.transform='scale(1.15)'"
-                                 onmouseout="this.style.transform='scale(1)'"
-                                 class="heart-icon"
-                                 data-product-id="<?php echo $productId; ?>">
-                                <?php echo $isWishlisted ? '❤️' : '🤍'; ?>
-                            </div>
-                        <?php endif; ?>
+
 
                         <div class="product-emoji-large"><?php echo $product['emoji']; ?></div>
                     </div>

@@ -2,5 +2,9 @@
     "2": {
         "product_id": 2,
         "quantity": 3
+    },
+    "3": {
+        "product_id": 3,
+        "quantity": 1
     }
 }

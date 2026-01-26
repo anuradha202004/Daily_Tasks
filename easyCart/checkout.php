@@ -13,10 +13,12 @@ requireLogin();
 // Check if coming from Buy Now button
 $directProduct = null;
 $directQuantity = 1;
+$isBuyNow = false;
 
 if (isset($_GET['product_id']) && isset($_GET['qty'])) {
     $directProduct = getProductById(intval($_GET['product_id']));
     $directQuantity = intval($_GET['qty']);
+    $isBuyNow = true;
     
     if (!$directProduct) {
         header('Location: products.php');
@@ -27,8 +29,8 @@ if (isset($_GET['product_id']) && isset($_GET['qty'])) {
 // Get cart items from session
 $cartItems = isset($_SESSION['cart']) ? $_SESSION['cart'] : [];
 
-// If coming from Buy Now and no cart items, use the direct product
-if ($directProduct && count($cartItems) === 0) {
+// If coming from Buy Now, ONLY use the direct product (ignore cart)
+if ($isBuyNow && $directProduct) {
     $cartItems = [
         $directProduct['id'] => [
             'product_id' => $directProduct['id'],
@@ -38,7 +40,7 @@ if ($directProduct && count($cartItems) === 0) {
 }
 
 // If cart is empty and no direct product, redirect to cart page
-if (count($cartItems) === 0 && !$directProduct) {
+if (count($cartItems) === 0) {
     header('Location: cart.php');
     exit;
 }
@@ -120,165 +122,245 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 <?php include 'includes/header.php'; ?>
     <script src="js/validation.js"></script>
 
-    <!-- Checkout Page -->
-    <section class="container" style="padding: 40px 0;">
-        <h1 class="section-title">Checkout</h1>
-
-        <?php if ($checkoutMessage): ?>
-            <div style="background: #f8d7da; color: #721c24; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #f5c6cb;">
-                <?php echo htmlspecialchars($checkoutMessage); ?>
-            </div>
-        <?php endif; ?>
-
-        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 30px;">
-            <!-- Checkout Form -->
-            <div>
-                <form method="POST" action="" id="checkoutForm" onsubmit="return validateCheckoutForm()">
-                    <input type="hidden" name="action" value="complete_order">
-
-                    <!-- Personal Information -->
-                    <div style="background: #fff; padding: 25px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-                        <h3 style="margin-top: 0; margin-bottom: 20px;">Personal Information</h3>
-
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
-                            <div>
-                                <label style="display: block; margin-bottom: 8px; font-weight: 500;">First Name *</label>
-                                <input type="text" name="first_name" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
-                            </div>
-                            <div>
-                                <label style="display: block; margin-bottom: 8px; font-weight: 500;">Last Name *</label>
-                                <input type="text" name="last_name" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
-                            </div>
-                        </div>
-
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                            <div>
-                                <label style="display: block; margin-bottom: 8px; font-weight: 500;">Email Address *</label>
-                                <input type="email" name="email" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
-                            </div>
-                            <div>
-                                <label style="display: block; margin-bottom: 8px; font-weight: 500;">Phone Number *</label>
-                                <input type="tel" name="phone" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Shipping Address -->
-                    <div style="background: #fff; padding: 25px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-                        <h3 style="margin-top: 0; margin-bottom: 20px;">Shipping Address</h3>
-
-                        <div style="margin-bottom: 15px;">
-                            <label style="display: block; margin-bottom: 8px; font-weight: 500;">Address *</label>
-                            <input type="text" name="address" placeholder="Street address" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
-                        </div>
-
-                        <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 15px;">
-                            <div>
-                                <label style="display: block; margin-bottom: 8px; font-weight: 500;">City *</label>
-                                <input type="text" name="city" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
-                            </div>
-                            <div>
-                                <label style="display: block; margin-bottom: 8px; font-weight: 500;">State *</label>
-                                <input type="text" name="state" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
-                            </div>
-                            <div>
-                                <label style="display: block; margin-bottom: 8px; font-weight: 500;">Zip Code *</label>
-                                <input type="text" name="zip" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Payment Information -->
-                    <div style="background: #fff; padding: 25px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-                        <h3 style="margin-top: 0; margin-bottom: 20px;">Payment Information</h3>
-
-                        <div style="margin-bottom: 15px;">
-                            <label style="display: block; margin-bottom: 8px; font-weight: 500;">Card Number *</label>
-                            <input type="text" name="card_number" placeholder="1234 5678 9012 3456" maxlength="19" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
-                        </div>
-
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                            <div>
-                                <label style="display: block; margin-bottom: 8px; font-weight: 500;">Expiry Date *</label>
-                                <input type="text" name="expiry" placeholder="MM/YY" maxlength="5" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
-                            </div>
-                            <div>
-                                <label style="display: block; margin-bottom: 8px; font-weight: 500;">CVV *</label>
-                                <input type="text" name="cvv" placeholder="123" maxlength="3" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Terms & Conditions -->
-                    <div style="background: #f0f4f8; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
-                        <label style="display: flex; align-items: center; cursor: pointer;">
-                            <input type="checkbox" name="agree_terms" required style="margin-right: 10px; cursor: pointer;">
-                            <span>I agree to the <a href="#" style="color: #2563eb;">Terms and Conditions</a> and <a href="#" style="color: #2563eb;">Privacy Policy</a></span>
-                        </label>
-                    </div>
-
-                    <!-- Submit Button -->
-                    <button type="submit" class="btn btn-primary" style="width: 100%; padding: 15px; font-size: 16px; cursor: pointer;">
-                        Complete Order - <?php echo formatPrice($total); ?>
-                    </button>
-
-                    <a href="cart.php" style="display: block; text-align: center; padding: 12px; margin-top: 10px; color: #2563eb; text-decoration: none; border: 1px solid #2563eb; border-radius: 4px;">
-                        Back to Cart
-                    </a>
-                </form>
+    <!-- Modern Checkout Page -->
+    <section class="checkout-page">
+        <div class="checkout-container">
+            <!-- Checkout Header -->
+            <div class="checkout-header">
+                <h1 class="checkout-title">
+                    <span class="checkout-icon">🛒</span>
+                    Secure Checkout
+                </h1>
+                <p class="checkout-subtitle">Complete your order in just a few steps</p>
             </div>
 
-            <!-- Order Summary -->
-            <div>
-                <div style="background: #f8f9fa; padding: 25px; border-radius: 8px; border: 2px solid #dee2e6; position: sticky; top: 100px;">
-                    <h3 style="margin-top: 0; margin-bottom: 20px;">Order Summary</h3>
+            <!-- Progress Steps -->
+            <div class="checkout-progress">
+                <div class="progress-step active">
+                    <div class="step-number">1</div>
+                    <span class="step-label">Details</span>
+                </div>
+                <div class="progress-line active"></div>
+                <div class="progress-step active">
+                    <div class="step-number">2</div>
+                    <span class="step-label">Shipping</span>
+                </div>
+                <div class="progress-line active"></div>
+                <div class="progress-step active">
+                    <div class="step-number">3</div>
+                    <span class="step-label">Payment</span>
+                </div>
+            </div>
 
-                    <!-- Items List -->
-                    <div style="margin-bottom: 20px; max-height: 300px; overflow-y: auto;">
-                        <?php foreach ($cartItemsWithDetails as $item): ?>
-                            <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #dee2e6; align-items: center;">
-                                <div style="flex: 1;">
-                                    <div style="font-size: 24px; display: inline-block; margin-right: 10px;">
-                                        <?php echo $item['product']['emoji']; ?>
+            <?php if ($checkoutMessage): ?>
+                <div class="checkout-alert checkout-alert-error">
+                    <span class="alert-icon">⚠️</span>
+                    <?php echo htmlspecialchars($checkoutMessage); ?>
+                </div>
+            <?php endif; ?>
+
+            <div class="checkout-grid">
+                <!-- Checkout Form -->
+                <div class="checkout-form-wrapper">
+                    <form method="POST" action="" id="checkoutForm" onsubmit="return validateCheckoutForm()">
+                        <input type="hidden" name="action" value="complete_order">
+
+                        <!-- Personal Information Card -->
+                        <div class="checkout-card">
+                            <div class="card-header">
+                                <span class="card-icon">👤</span>
+                                <h3>Personal Information</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="form-row">
+                                    <div class="form-field">
+                                        <label class="field-label">First Name <span class="required">*</span></label>
+                                        <input type="text" name="first_name" class="checkout-input" placeholder="John" required>
                                     </div>
-                                    <span style="font-size: 14px;"><?php echo htmlspecialchars($item['product']['name']); ?></span>
-                                    <div style="font-size: 12px; color: #666; margin-top: 3px;">
-                                        Qty: <?php echo $item['quantity']; ?>
+                                    <div class="form-field">
+                                        <label class="field-label">Last Name <span class="required">*</span></label>
+                                        <input type="text" name="last_name" class="checkout-input" placeholder="Doe" required>
                                     </div>
                                 </div>
-                                <div style="text-align: right; font-weight: bold;">
-                                    <?php echo formatPrice($item['itemTotal']); ?>
+                                <div class="form-row">
+                                    <div class="form-field">
+                                        <label class="field-label">Email Address <span class="required">*</span></label>
+                                        <div class="input-with-icon">
+                                            <span class="input-icon">📧</span>
+                                            <input type="email" name="email" class="checkout-input with-icon" placeholder="john@example.com" required>
+                                        </div>
+                                    </div>
+                                    <div class="form-field">
+                                        <label class="field-label">Phone Number <span class="required">*</span></label>
+                                        <div class="input-with-icon">
+                                            <span class="input-icon">📱</span>
+                                            <input type="tel" name="phone" class="checkout-input with-icon" placeholder="+1 (555) 000-0000" required>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        <?php endforeach; ?>
-                    </div>
-
-                    <!-- Totals -->
-                    <div style="padding-top: 20px; border-top: 2px solid #dee2e6;">
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                            <span>Subtotal</span>
-                            <span><?php echo formatPrice($subtotal); ?></span>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                            <span>Tax (10%)</span>
-                            <span><?php echo formatPrice($tax); ?></span>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
-                            <span>Shipping</span>
-                            <span><?php echo $shipping === 0 ? 'Free' : formatPrice($shipping); ?></span>
                         </div>
 
-                        <div style="display: flex; justify-content: space-between; font-size: 18px; font-weight: bold; padding: 15px 0; border-top: 1px solid #dee2e6; border-bottom: 1px solid #dee2e6;">
-                            <span>Total</span>
-                            <span style="color: #d32f2f;"><?php echo formatPrice($total); ?></span>
+                        <!-- Shipping Address Card -->
+                        <div class="checkout-card">
+                            <div class="card-header">
+                                <span class="card-icon">📦</span>
+                                <h3>Shipping Address</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="form-field full-width">
+                                    <label class="field-label">Street Address <span class="required">*</span></label>
+                                    <div class="input-with-icon">
+                                        <span class="input-icon">🏠</span>
+                                        <input type="text" name="address" class="checkout-input with-icon" placeholder="123 Main Street, Apt 4B" required>
+                                    </div>
+                                </div>
+                                <div class="form-row three-cols">
+                                    <div class="form-field">
+                                        <label class="field-label">City <span class="required">*</span></label>
+                                        <input type="text" name="city" class="checkout-input" placeholder="New York" required>
+                                    </div>
+                                    <div class="form-field">
+                                        <label class="field-label">State <span class="required">*</span></label>
+                                        <input type="text" name="state" class="checkout-input" placeholder="NY" required>
+                                    </div>
+                                    <div class="form-field">
+                                        <label class="field-label">Zip Code <span class="required">*</span></label>
+                                        <input type="text" name="zip" class="checkout-input" placeholder="10001" required>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                    </div>
 
-                    <!-- Security Info -->
-                    <div style="margin-top: 20px; padding: 15px; background: #d4edda; border-radius: 4px; text-align: center;">
-                        <p style="margin: 0; font-size: 12px; color: #155724;">
-                            🔒 Secure SSL Encrypted Payment
-                        </p>
+                        <!-- Payment Information Card -->
+                        <div class="checkout-card">
+                            <div class="card-header">
+                                <span class="card-icon">💳</span>
+                                <h3>Payment Information</h3>
+                                <div class="payment-badges">
+                                    <span class="payment-badge">VISA</span>
+                                    <span class="payment-badge">MC</span>
+                                    <span class="payment-badge">AMEX</span>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="form-field full-width">
+                                    <label class="field-label">Card Number <span class="required">*</span></label>
+                                    <div class="input-with-icon">
+                                        <span class="input-icon">💳</span>
+                                        <input type="text" name="card_number" class="checkout-input with-icon" placeholder="1234 5678 9012 3456" maxlength="19" required>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-field">
+                                        <label class="field-label">Expiry Date <span class="required">*</span></label>
+                                        <input type="text" name="expiry" class="checkout-input" placeholder="MM/YY" maxlength="5" required>
+                                    </div>
+                                    <div class="form-field">
+                                        <label class="field-label">CVV <span class="required">*</span></label>
+                                        <div class="input-with-icon">
+                                            <input type="text" name="cvv" class="checkout-input" placeholder="•••" maxlength="3" required>
+                                            <span class="cvv-help" title="3 digits on the back of your card">?</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Terms & Conditions -->
+                        <div class="checkout-terms">
+                            <label class="terms-checkbox">
+                                <input type="checkbox" name="agree_terms" required>
+                                <span class="checkmark"></span>
+                                <span class="terms-text">
+                                    I agree to the <a href="#">Terms and Conditions</a> and <a href="#">Privacy Policy</a>
+                                </span>
+                            </label>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="checkout-actions">
+                            <button type="submit" class="btn-checkout-submit">
+                                <span class="btn-icon">🔒</span>
+                                Complete Order - <?php echo formatPrice($total); ?>
+                            </button>
+                            <a href="cart.php" class="btn-back-cart">
+                                <span>←</span> Back to Cart
+                            </a>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Order Summary Sidebar -->
+                <div class="checkout-summary-wrapper">
+                    <div class="checkout-summary">
+                        <div class="summary-header">
+                            <h3>
+                                <span class="summary-icon">📋</span>
+                                Order Summary
+                            </h3>
+                            <span class="item-count"><?php echo count($cartItemsWithDetails); ?> item<?php echo count($cartItemsWithDetails) > 1 ? 's' : ''; ?></span>
+                        </div>
+
+                        <!-- Items List -->
+                        <div class="summary-items">
+                            <?php foreach ($cartItemsWithDetails as $item): ?>
+                                <div class="summary-item">
+                                    <div class="item-emoji"><?php echo $item['product']['emoji']; ?></div>
+                                    <div class="item-details">
+                                        <span class="item-name"><?php echo htmlspecialchars($item['product']['name']); ?></span>
+                                        <span class="item-qty">Qty: <?php echo $item['quantity']; ?></span>
+                                    </div>
+                                    <div class="item-price"><?php echo formatPrice($item['itemTotal']); ?></div>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+
+                        <!-- Promo Code -->
+                        <div class="promo-section">
+                            <div class="promo-input-wrapper">
+                                <input type="text" placeholder="Promo code" class="promo-input">
+                                <button type="button" class="promo-btn">Apply</button>
+                            </div>
+                        </div>
+
+                        <!-- Totals -->
+                        <div class="summary-totals">
+                            <div class="total-row">
+                                <span>Subtotal</span>
+                                <span><?php echo formatPrice($subtotal); ?></span>
+                            </div>
+                            <div class="total-row">
+                                <span>Tax (10%)</span>
+                                <span><?php echo formatPrice($tax); ?></span>
+                            </div>
+                            <div class="total-row shipping-row">
+                                <span>Shipping</span>
+                                <span class="<?php echo $shipping === 0 ? 'free-shipping' : ''; ?>">
+                                    <?php echo $shipping === 0 ? '✓ Free' : formatPrice($shipping); ?>
+                                </span>
+                            </div>
+                            <div class="total-row grand-total">
+                                <span>Total</span>
+                                <span><?php echo formatPrice($total); ?></span>
+                            </div>
+                        </div>
+
+                        <!-- Trust Badges -->
+                        <div class="trust-badges">
+                            <div class="trust-badge">
+                                <span class="badge-icon">🔒</span>
+                                <span>SSL Secured</span>
+                            </div>
+                            <div class="trust-badge">
+                                <span class="badge-icon">✓</span>
+                                <span>Safe Payment</span>
+                            </div>
+                            <div class="trust-badge">
+                                <span class="badge-icon">↩️</span>
+                                <span>Easy Returns</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
