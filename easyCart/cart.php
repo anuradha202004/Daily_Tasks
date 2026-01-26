@@ -31,29 +31,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $product = getProductById($productId);
         
         if (!$product || $product['stock'] <= 0) {
+            header('Content-Type: application/json');
+            echo json_encode(['success' => false, 'message' => 'Product not available']);
             exit;
         }
         
-        // Add or update cart
-        if (isset($_SESSION['cart'][$productId])) {
-            $newQty = $_SESSION['cart'][$productId]['quantity'] + $quantity;
-            if ($newQty <= $product['stock']) {
-                $_SESSION['cart'][$productId]['quantity'] = $newQty;
-            } else {
-                $_SESSION['cart'][$productId]['quantity'] = $product['stock'];
-            }
-        } else {
-            $_SESSION['cart'][$productId] = [
-                'product_id' => $productId,
-                'quantity' => min($quantity, $product['stock'])
-            ];
+        $alreadyInCart = isset($_SESSION['cart'][$productId]);
+        
+        // Check if product already in cart - don't add again
+        if ($alreadyInCart) {
+            header('Content-Type: application/json');
+            echo json_encode([
+                'success' => false, 
+                'alreadyInCart' => true,
+                'message' => 'Product already in cart',
+                'productName' => $product['name']
+            ]);
+            exit;
         }
+        
+        // Add new product to cart
+        $_SESSION['cart'][$productId] = [
+            'product_id' => $productId,
+            'quantity' => min($quantity, $product['stock'])
+        ];
         
         // Save cart for logged-in users
         if (isLoggedIn() && isset($_SESSION['user_email'])) {
             saveUserCart($_SESSION['user_email'], $_SESSION['cart']);
         }
         
+        header('Content-Type: application/json');
+        echo json_encode([
+            'success' => true,
+            'message' => 'Product added to cart',
+            'productName' => $product['name'],
+            'cartCount' => count($_SESSION['cart'])
+        ]);
         exit;
     }
     

@@ -83,6 +83,7 @@ if (!empty($_SESSION['wishlist'])) {
 ?>
 <?php include 'includes/header.php'; ?>
     <script src="js/wishlist.js"></script>
+    <script src="js/toast.js"></script>
     <script src="js/cart.js"></script>
 
     <!-- My Wishlist Page -->
@@ -133,7 +134,7 @@ if (!empty($_SESSION['wishlist'])) {
                             <span class="stock-info">Stock: <?php echo $product['stock']; ?> units</span>
                             <div class="product-actions">
                                 <?php if ($product['stock'] > 0): ?>
-                                    <button type="button" onclick="(function(e, id){ e.preventDefault(); e.stopPropagation(); alert('Product added successfully'); var fd = new FormData(); fd.append('action', 'add'); fd.append('product_id', id); fd.append('quantity', 1); fetch('cart.php', {method: 'POST', body: fd}).then(function(){ var badge = document.querySelector('.badge'); if(badge){ var count = parseInt(badge.textContent) || 0; badge.textContent = count + 1; badge.style.display = 'flex'; } }); return false; })(event, <?php echo $product['id']; ?>)" class="btn btn-primary btn-add-cart" data-product-id="<?php echo $product['id']; ?>">
+                                    <button type="button" onclick="(function(e, id, name){ e.preventDefault(); e.stopPropagation(); var fd = new FormData(); fd.append('action', 'add'); fd.append('product_id', id); fd.append('quantity', 1); fetch('cart.php', {method: 'POST', body: fd}).then(res => res.json()).then(data => { if(data.success) { showToast('🛒 ' + name + ' added to cart!', 'success', 3500); var badge = document.querySelector('.badge'); if(badge){ badge.textContent = data.cartCount || (parseInt(badge.textContent) + 1); badge.style.display = 'flex'; } } else if(data.alreadyInCart) { showToast('ℹ️ ' + name + ' is already in your cart!', 'info', 3500); } else { showToast('❌ ' + (data.message || 'Error adding to cart'), 'error', 3000); } }).catch(() => showToast('❌ Error adding to cart', 'error', 3000)); return false; })(event, <?php echo $product['id']; ?>, '<?php echo addslashes($product['name']); ?>')" class="btn btn-primary btn-add-cart" data-product-id="<?php echo $product['id']; ?>">
                                         Add to Cart
                                     </button>
                                     <a href="checkout.php?product_id=<?php echo $product['id']; ?>&qty=1" class="btn btn-buy-now">Buy Now</a>

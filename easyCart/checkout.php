@@ -15,9 +15,10 @@ $directProduct = null;
 $directQuantity = 1;
 $isBuyNow = false;
 
-if (isset($_GET['product_id']) && isset($_GET['qty'])) {
-    $directProduct = getProductById(intval($_GET['product_id']));
-    $directQuantity = intval($_GET['qty']);
+// Handle both GET (initial load) and POST (form submission)
+if (isset($_REQUEST['product_id']) && isset($_REQUEST['qty'])) {
+    $directProduct = getProductById(intval($_REQUEST['product_id']));
+    $directQuantity = intval($_REQUEST['qty']);
     $isBuyNow = true;
     
     if (!$directProduct) {
@@ -45,7 +46,7 @@ if (count($cartItems) === 0) {
     exit;
 }
 
-// Calculate totals (same logic as cart page)
+// Calculate totals
 $subtotal = 0;
 $cartItemsWithDetails = [];
 
@@ -67,7 +68,7 @@ $tax = $subtotal * 0.10;
 $shipping = $subtotal > 50 ? 0 : 9.99;
 $total = $subtotal + $tax + $shipping;
 
-// Handle checkout
+// Handle checkout completion
 $checkoutMessage = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'complete_order') {
     // Validate form data
@@ -82,12 +83,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     }
     
     if ($all_filled) {
-        // In a real application, you would:
-        // 1. Process payment with payment gateway
-        // 2. Save order to database
-        // 3. Send confirmation email
-        // For now, we'll just clear the cart and show success
-        
         $_SESSION['last_order'] = [
             'subtotal' => $subtotal,
             'tax' => $tax,
@@ -109,8 +104,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             'date' => date('Y-m-d H:i:s')
         ];
         
-        // Clear cart
-        $_SESSION['cart'] = [];
+        // Clear cart ONLY if checking out from cart (not Buy Now)
+        if (!$isBuyNow) {
+            $_SESSION['cart'] = [];
+            if (isLoggedIn() && isset($_SESSION['user_email'])) {
+                saveUserCart($_SESSION['user_email'], $_SESSION['cart']);
+            }
+        }
         
         header('Location: order-confirmation.php');
         exit;
@@ -121,6 +121,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 ?>
 <?php include 'includes/header.php'; ?>
     <script src="js/validation.js"></script>
+    <script src="js/checkout.js"></script>
 
     <!-- Modern Checkout Page -->
     <section class="checkout-page">
@@ -164,6 +165,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 <div class="checkout-form-wrapper">
                     <form method="POST" action="" id="checkoutForm" onsubmit="return validateCheckoutForm()">
                         <input type="hidden" name="action" value="complete_order">
+                        <?php if ($isBuyNow && $directProduct): ?>
+                            <input type="hidden" name="product_id" value="<?php echo $directProduct['id']; ?>">
+                            <input type="hidden" name="qty" value="<?php echo $directQuantity; ?>">
+                        <?php endif; ?>
 
                         <!-- Personal Information Card -->
                         <div class="checkout-card">
@@ -282,7 +287,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                         <div class="checkout-actions">
                             <button type="submit" class="btn-checkout-submit">
                                 <span class="btn-icon">🔒</span>
-                                Complete Order - <?php echo formatPrice($total); ?>
+                                Complete Order - <span id="btn-total"><?php echo formatPrice($total); ?></span>
                             </button>
                             <a href="cart.php" class="btn-back-cart">
                                 <span>←</span> Back to Cart
@@ -304,12 +309,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 
                         <!-- Items List -->
                         <div class="summary-items">
-                            <?php foreach ($cartItemsWithDetails as $item): ?>
-                                <div class="summary-item">
+                            <?php foreach ($cartItemsWithDetails as $index => $item): ?>
+                                <div class="summary-item" data-product-id="<?php echo $item['product']['id']; ?>" data-product-price="<?php echo $item['product']['price']; ?>" data-stock="<?php echo $item['product']['stock']; ?>">
                                     <div class="item-emoji"><?php echo $item['product']['emoji']; ?></div>
                                     <div class="item-details">
                                         <span class="item-name"><?php echo htmlspecialchars($item['product']['name']); ?></span>
-                                        <span class="item-qty">Qty: <?php echo $item['quantity']; ?></span>
+                                        <div class="item-qty-controls">
+                                            <button type="button" class="qty-btn-small" onclick="decrementCheckoutQty(this)">−</button>
+                                            <input type="number" class="qty-input-small" value="<?php echo $item['quantity']; ?>" min="1" max="<?php echo $item['product']['stock']; ?>" readonly>
+                                            <button type="button" class="qty-btn-small" onclick="incrementCheckoutQty(this)">+</button>
+                                        </div>
                                     </div>
                                     <div class="item-price"><?php echo formatPrice($item['itemTotal']); ?></div>
                                 </div>
@@ -328,21 +337,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                         <div class="summary-totals">
                             <div class="total-row">
                                 <span>Subtotal</span>
-                                <span><?php echo formatPrice($subtotal); ?></span>
+                                <span id="checkout-subtotal"><?php echo formatPrice($subtotal); ?></span>
                             </div>
                             <div class="total-row">
                                 <span>Tax (10%)</span>
-                                <span><?php echo formatPrice($tax); ?></span>
+                                <span id="checkout-tax"><?php echo formatPrice($tax); ?></span>
                             </div>
                             <div class="total-row shipping-row">
                                 <span>Shipping</span>
-                                <span class="<?php echo $shipping === 0 ? 'free-shipping' : ''; ?>">
+                                <span id="checkout-shipping" class="<?php echo $shipping === 0 ? 'free-shipping' : ''; ?>">
                                     <?php echo $shipping === 0 ? '✓ Free' : formatPrice($shipping); ?>
                                 </span>
                             </div>
                             <div class="total-row grand-total">
                                 <span>Total</span>
-                                <span><?php echo formatPrice($total); ?></span>
+                                <span id="checkout-total"><?php echo formatPrice($total); ?></span>
                             </div>
                         </div>
 

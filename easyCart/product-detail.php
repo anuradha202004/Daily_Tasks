@@ -59,6 +59,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 <?php include 'includes/header.php'; ?>
     <script src="js/product-detail.js"></script>
     <script src="js/wishlist.js"></script>
+    <script src="js/toast.js"></script>
+
+    <?php if ($addToCartMessage): ?>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                showToast('<?php echo htmlspecialchars($addToCartMessage); ?>', 'success', 3500);
+            });
+        </script>
+    <?php endif; ?>
+
+    <?php if ($addToCartError): ?>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                showToast('<?php echo htmlspecialchars($addToCartError); ?>', 'error', 4000);
+            });
+        </script>
+    <?php endif; ?>
 
     <!-- Product Detail Page - Modern Design -->
     <section class="product-detail-section">
@@ -67,19 +84,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             <a href="products.php" class="back-link">← Back to Products</a>
 
             <!-- Success/Error Messages -->
-            <?php if ($addToCartMessage): ?>
-                <div class="alert alert-success">
-                    <span class="alert-icon">✓</span>
-                    <?php echo htmlspecialchars($addToCartMessage); ?>
-                </div>
-            <?php endif; ?>
-
-            <?php if ($addToCartError): ?>
-                <div class="alert alert-error">
-                    <span class="alert-icon">✕</span>
-                    <?php echo htmlspecialchars($addToCartError); ?>
-                </div>
-            <?php endif; ?>
+            
 
             <div class="product-detail-grid">
                 <!-- Left Column: Product Visual -->
