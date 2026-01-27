@@ -126,8 +126,9 @@ foreach ($cartItems as $productId => $cartItem) {
     }
 }
 
-$tax = $subtotal * 0.10; // 10% tax
-$total = $subtotal + $tax;
+$tax = $subtotal * 0.18; // 18% tax based on Phase 4
+$shipping = $subtotal > 500 ? 0 : 40.00; // Standard shipping $40, free over $500
+$total = $subtotal + $tax + $shipping;
 ?>
 <?php include 'includes/header.php'; ?>
 
@@ -239,25 +240,19 @@ $total = $subtotal + $tax;
                                 <span id="summary-subtotal" style="font-weight: 500; color: #1f2937;"><?php echo formatPrice($subtotal); ?></span>
                             </div>
                             <div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 15px; color: #666;">
-                                <span>Tax (10%)</span>
+                                <span>Tax (18%)</span>
                                 <span id="summary-tax" style="font-weight: 500; color: #1f2937;"><?php echo formatPrice($tax); ?></span>
                             </div>
                             <div style="display: flex; justify-content: space-between; margin-bottom: 0; font-size: 15px; color: #666;">
-                                <span>Shipping</span>
-                                <span id="summary-shipping" style="font-weight: 500; color: #1f2937;"><?php echo $subtotal > 50 ? 'Free' : formatPrice(9.99); ?></span>
+                                <span>Shipping (Standard)</span>
+                                <span id="summary-shipping" style="font-weight: 500; color: #1f2937;"><?php echo $shipping === 0 ? 'Free' : formatPrice($shipping); ?></span>
                             </div>
                         </div>
 
                         <div style="display: flex; justify-content: space-between; margin-bottom: 20px; padding-top: 15px; font-size: 20px; font-weight: bold; color: #2563eb; border-top: 2px solid #e3f2fd;">
                             <span>Total Amount</span>
                             <span id="summary-total" style="color: #d32f2f;">
-                                <?php 
-                                $finalTotal = $total;
-                                if ($subtotal <= 50) {
-                                    $finalTotal += 9.99;
-                                }
-                                echo formatPrice($finalTotal);
-                                ?>
+                                <?php echo formatPrice($total); ?>
                             </span>
                         </div>
 

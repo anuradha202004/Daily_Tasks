@@ -46,7 +46,41 @@ if (count($cartItems) === 0) {
     exit;
 }
 
-// Calculate totals
+// ============================================
+// SHIPPING OPTIONS & COST CALCULATION
+// ============================================
+
+/**
+ * Calculate shipping cost based on selected method and subtotal
+ * 
+ * @param string $method Shipping method (standard, express, whiteglove, freight)
+ * @param float $subtotal Order subtotal
+ * @return float Calculated shipping cost
+ */
+function calculateShippingCost($method, $subtotal) {
+    switch ($method) {
+        case 'standard':
+            // Standard Shipping: Flat $40
+            return 40.00;
+            
+        case 'express':
+            // Express Shipping: Flat $80 OR 10% of subtotal (whichever is lower)
+            return min(80.00, $subtotal * 0.10);
+            
+        case 'whiteglove':
+            // White Glove Delivery: Flat $150 OR 5% of subtotal (whichever is lower)
+            return min(150.00, $subtotal * 0.05);
+
+        case 'freight':
+            // Freight Shipping: 3% of subtotal, Minimum $200
+            return max(200.00, $subtotal * 0.03);
+        
+        default:
+            return 40.00; // Default to standard shipping
+    }
+}
+
+// Calculate subtotal
 $subtotal = 0;
 $cartItemsWithDetails = [];
 
@@ -64,15 +98,56 @@ foreach ($cartItems as $productId => $cartItem) {
     }
 }
 
-$tax = $subtotal * 0.10;
-$shipping = $subtotal > 50 ? 0 : 9.99;
-$total = $subtotal + $tax + $shipping;
+// Get selected shipping method (default to standard)
+$selectedShipping = isset($_POST['shipping_method']) ? $_POST['shipping_method'] : 
+                   (isset($_GET['shipping_method']) ? $_GET['shipping_method'] : 'standard');
+
+// Calculate shipping cost
+$shippingCost = calculateShippingCost($selectedShipping, $subtotal);
+
+// Calculate tax (18% on Subtotal + Shipping)
+$taxableAmount = $subtotal + $shippingCost;
+$tax = $taxableAmount * 0.18;
+
+// Calculate final total
+$total = $subtotal + $shippingCost + $tax;
+
+// Define shipping options for display
+$shippingOptions = [
+    'standard' => [
+        'name' => 'Standard Shipping',
+        'description' => 'Delivery in 5-7 business days',
+        'cost' => 40.00,
+        'icon' => '📦'
+    ],
+    'express' => [
+        'name' => 'Express Shipping',
+        'description' => 'Delivery in 2-3 business days',
+        'cost' => min(80.00, $subtotal * 0.10),
+        'calculation' => 'Flat $80 OR 10% of subtotal (whichever is lower)',
+        'icon' => '⚡'
+    ],
+    'whiteglove' => [
+        'name' => 'White Glove Delivery',
+        'description' => 'Premium delivery with installation',
+        'cost' => min(150.00, $subtotal * 0.05),
+        'calculation' => 'Flat $150 OR 5% of subtotal (whichever is lower)',
+        'icon' => '🎩'
+    ],
+    'freight' => [
+        'name' => 'Freight Shipping',
+        'description' => 'For large or bulk orders',
+        'cost' => max(200.00, $subtotal * 0.03),
+        'calculation' => '3% of subtotal, Minimum $200',
+        'icon' => '🚛'
+    ]
+];
 
 // Handle checkout completion
 $checkoutMessage = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'complete_order') {
     // Validate form data
-    $required_fields = ['first_name', 'last_name', 'email', 'phone', 'address', 'city', 'state', 'zip', 'card_number'];
+    $required_fields = ['first_name', 'last_name', 'email', 'phone', 'address', 'city', 'state', 'zip', 'card_number', 'shipping_method'];
     $all_filled = true;
     
     foreach ($required_fields as $field) {
@@ -83,11 +158,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     }
     
     if ($all_filled) {
+        // Recalculate with submitted shipping method
+        $finalShippingMethod = $_POST['shipping_method'];
+        $finalShippingCost = calculateShippingCost($finalShippingMethod, $subtotal);
+        $finalTaxableAmount = $subtotal + $finalShippingCost;
+        $finalTax = $finalTaxableAmount * 0.18;
+        $finalTotal = $subtotal + $finalShippingCost + $finalTax;
+        
         $_SESSION['last_order'] = [
             'subtotal' => $subtotal,
-            'tax' => $tax,
-            'shipping' => $shipping,
-            'total' => $total,
+            'shipping_method' => $finalShippingMethod,
+            'shipping_method_name' => $shippingOptions[$finalShippingMethod]['name'],
+            'shipping_cost' => $finalShippingCost,
+            'tax' => $finalTax,
+            'tax_rate' => 18,
+            'total' => $finalTotal,
             'status' => 'Processing',
             'order_number' => 'ORD' . str_pad(rand(100000, 999999), 6, '0', STR_PAD_LEFT),
             'customer' => [
@@ -122,6 +207,141 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 <?php include 'includes/header.php'; ?>
     <script src="js/validation.js"></script>
     <script src="js/checkout.js"></script>
+
+    <style>
+        /* Shipping Options Card Styling */
+        .shipping-options {
+            display: grid;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .shipping-option {
+            position: relative;
+            display: block;
+            background: #fff;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .shipping-option:hover {
+            border-color: #2563eb;
+            background: #f8faff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1);
+        }
+
+        .shipping-option.selected {
+            border-color: #2563eb;
+            background: #f0f7ff;
+            box-shadow: 0 0 0 1px #2563eb;
+        }
+
+        .shipping-option input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .shipping-option-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .shipping-option-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .shipping-icon {
+            font-size: 32px;
+            background: #fff;
+            width: 54px;
+            height: 54px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .shipping-option-details h4 {
+            font-size: 16px;
+            font-weight: 700;
+            color: #111827;
+            margin: 0 0 4px 0;
+        }
+
+        .shipping-option-details p {
+            font-size: 13px;
+            color: #6b7280;
+            margin: 0;
+        }
+
+        .shipping-calc {
+            display: block;
+            font-size: 11px;
+            color: #3b82f6;
+            margin-top: 4px;
+            font-weight: 600;
+        }
+
+        .shipping-option-price {
+            font-size: 18px;
+            font-weight: 800;
+            color: #2563eb;
+            white-space: nowrap;
+        }
+
+        /* Custom Radio Checkmark */
+        .radio-checkmark {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            height: 20px;
+            width: 20px;
+            background-color: #fff;
+            border: 2px solid #d1d5db;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+            display: none; /* Hide if we want simple design, but let's keep it optional */
+        }
+
+        .shipping-option.selected .radio-checkmark {
+            border-color: #2563eb;
+            border-width: 6px;
+        }
+
+        /* Order Summary Enhancements */
+        #shipping-method-name {
+            display: block;
+            color: #2563eb;
+            font-weight: 600;
+            font-size: 11px;
+            margin-top: 2px;
+        }
+
+        .total-row small {
+            display: block;
+            font-size: 10px;
+            color: #9ca3af;
+            font-weight: normal;
+        }
+
+        .grand-total {
+            background: #f0f7ff;
+            margin: 0 -25px;
+            padding: 20px 25px !important;
+            border-top: 2px dashed #2563eb !important;
+        }
+    </style>
 
     <!-- Modern Checkout Page -->
     <section class="checkout-page">
@@ -237,6 +457,48 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                             </div>
                         </div>
 
+                        <!-- Shipping Options Card -->
+                        <div class="checkout-card">
+                            <div class="card-header">
+                                <span class="card-icon">🚚</span>
+                                <h3>Shipping Method <span class="required">*</span></h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="shipping-options">
+                                    <?php foreach ($shippingOptions as $key => $option): ?>
+                                        <label class="shipping-option <?php echo $key === $selectedShipping ? 'selected' : ''; ?>" for="shipping_<?php echo $key; ?>">
+                                            <input 
+                                                type="radio" 
+                                                name="shipping_method" 
+                                                id="shipping_<?php echo $key; ?>" 
+                                                value="<?php echo $key; ?>" 
+                                                data-cost="<?php echo $option['cost']; ?>"
+                                                <?php echo $key === $selectedShipping ? 'checked' : ''; ?>
+                                                onchange="updateShippingCost()"
+                                                required
+                                            >
+                                            <div class="shipping-option-content">
+                                                <div class="shipping-option-header">
+                                                    <span class="shipping-icon"><?php echo $option['icon']; ?></span>
+                                                    <div class="shipping-option-details">
+                                                        <h4><?php echo $option['name']; ?></h4>
+                                                        <p><?php echo $option['description']; ?></p>
+                                                        <?php if (isset($option['calculation'])): ?>
+                                                            <small class="shipping-calc"><?php echo $option['calculation']; ?></small>
+                                                        <?php endif; ?>
+                                                    </div>
+                                                </div>
+                                                <div class="shipping-option-price">
+                                                    <?php echo formatPrice($option['cost']); ?>
+                                                </div>
+                                            </div>
+                                            <span class="radio-checkmark"></span>
+                                        </label>
+                                    <?php endforeach; ?>
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- Payment Information Card -->
                         <div class="checkout-card">
                             <div class="card-header">
@@ -337,21 +599,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                         <div class="summary-totals">
                             <div class="total-row">
                                 <span>Subtotal</span>
-                                <span id="checkout-subtotal"><?php echo formatPrice($subtotal); ?></span>
-                            </div>
-                            <div class="total-row">
-                                <span>Tax (10%)</span>
-                                <span id="checkout-tax"><?php echo formatPrice($tax); ?></span>
+                                <span id="checkout-subtotal" data-value="<?php echo $subtotal; ?>"><?php echo formatPrice($subtotal); ?></span>
                             </div>
                             <div class="total-row shipping-row">
-                                <span>Shipping</span>
-                                <span id="checkout-shipping" class="<?php echo $shipping === 0 ? 'free-shipping' : ''; ?>">
-                                    <?php echo $shipping === 0 ? '✓ Free' : formatPrice($shipping); ?>
+                                <span>
+                                    Shipping
+                                    <small id="shipping-method-name">(<?php echo $shippingOptions[$selectedShipping]['name']; ?>)</small>
+                                </span>
+                                <span id="checkout-shipping" data-value="<?php echo $shippingCost; ?>">
+                                    <?php echo formatPrice($shippingCost); ?>
                                 </span>
                             </div>
+                            <div class="total-row">
+                                <span>
+                                    Tax (18%)
+                                    <small>on Subtotal + Shipping</small>
+                                </span>
+                                <span id="checkout-tax" data-value="<?php echo $tax; ?>"><?php echo formatPrice($tax); ?></span>
+                            </div>
                             <div class="total-row grand-total">
-                                <span>Total</span>
-                                <span id="checkout-total"><?php echo formatPrice($total); ?></span>
+                                <span>Total Payable</span>
+                                <span id="checkout-total" data-value="<?php echo $total; ?>"><?php echo formatPrice($total); ?></span>
                             </div>
                         </div>
 

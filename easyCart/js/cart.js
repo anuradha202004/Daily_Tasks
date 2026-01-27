@@ -269,8 +269,8 @@ function updateOrderSummary() {
         newSubtotal += price * quantity;
     });
 
-    const newTax = newSubtotal * 0.10;
-    const shippingCost = newSubtotal > 50 ? 0 : 9.99;
+    const newTax = newSubtotal * 0.18; // 18% tax
+    const shippingCost = newSubtotal > 500 ? 0 : 40.00; // Phase 4 rules
     const newTotal = newSubtotal + newTax + shippingCost;
 
     // Update summary display
