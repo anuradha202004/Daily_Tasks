@@ -77,6 +77,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (isLoggedIn() && isset($_SESSION['user_email'])) {
             saveUserCart($_SESSION['user_email'], $_SESSION['cart']);
         }
+        
+        if ($isAjax) {
+            $summary = calculateCartSummary();
+            header('Content-Type: application/json');
+            echo json_encode(array_merge(['success' => true, 'cartCount' => count($_SESSION['cart'])], $summary));
+            exit;
+        }
     } elseif ($action === 'update' && isset($_POST['product_id']) && isset($_POST['quantity'])) {
         $productId = intval($_POST['product_id']);
         $quantity = intval($_POST['quantity']);
@@ -93,16 +100,55 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (isLoggedIn() && isset($_SESSION['user_email'])) {
             saveUserCart($_SESSION['user_email'], $_SESSION['cart']);
         }
+        
+        if ($isAjax) {
+            $summary = calculateCartSummary();
+            header('Content-Type: application/json');
+            echo json_encode(array_merge(['success' => true, 'cartCount' => count($_SESSION['cart'])], $summary));
+            exit;
+        }
     } elseif ($action === 'clear') {
         $_SESSION['cart'] = [];
         if (isLoggedIn() && isset($_SESSION['user_email'])) {
             saveUserCart($_SESSION['user_email'], $_SESSION['cart']);
+        }
+        if ($isAjax) {
+            header('Content-Type: application/json');
+            echo json_encode(['success' => true, 'cartCount' => 0]);
+            exit;
         }
     } elseif ($action === 'get_count') {
         header('Content-Type: application/json');
         echo json_encode(['success' => true, 'cartCount' => count($_SESSION['cart'])]);
         exit;
     }
+}
+
+// Function to calculate cart summary for dynamic updates
+function calculateCartSummary() {
+    $subtotal = 0;
+    $items = isset($_SESSION['cart']) ? $_SESSION['cart'] : [];
+    foreach ($items as $pid => $item) {
+        $product = getProductById($pid);
+        if ($product) {
+            $subtotal += $product['price'] * $item['quantity'];
+        }
+    }
+    
+    $tax = $subtotal * 0.18;
+    $shipping = $subtotal > 500 ? 0 : 40.00;
+    $total = $subtotal + $tax + $shipping;
+    
+    return [
+        'subtotal' => $subtotal,
+        'tax' => $tax,
+        'shipping' => $shipping,
+        'total' => $total,
+        'formattedSubtotal' => formatPrice($subtotal),
+        'formattedTax' => formatPrice($tax),
+        'formattedShipping' => $shipping == 0 ? 'Free' : formatPrice($shipping),
+        'formattedTotal' => formatPrice($total)
+    ];
 }
 
 // Get cart items

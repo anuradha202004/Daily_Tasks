@@ -29,5 +29,13 @@
     "7": {
         "product_id": 7,
         "quantity": 3
+    },
+    "24": {
+        "product_id": 24,
+        "quantity": 1
+    },
+    "6": {
+        "product_id": 6,
+        "quantity": 1
     }
 }

@@ -8,11 +8,37 @@ function formatPrice(amount) {
 }
 
 /**
+ * Sync quantity with session via AJAX
+ */
+function syncQuantityWithSession(productId, quantity) {
+    const formData = new FormData();
+    formData.append('action', 'update');
+    formData.append('product_id', productId);
+    formData.append('quantity', quantity);
+
+    fetch('cart.php', {
+        method: 'POST',
+        headers: { 'X-Requested-With': 'XMLHttpRequest' },
+        body: formData
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Update cart badge if needed
+                const badge = document.querySelector('.badge, #cart-badge');
+                if (badge) badge.textContent = data.cartCount;
+            }
+        })
+        .catch(err => console.error('Sync failed:', err));
+}
+
+/**
  * Increment quantity in checkout summary
  */
 function incrementCheckoutQty(button) {
     const summaryItem = button.closest('.summary-item');
     const qtyInput = summaryItem.querySelector('.qty-input-small');
+    const productId = summaryItem.dataset.productId;
     const maxStock = parseInt(summaryItem.dataset.stock);
     let currentQty = parseInt(qtyInput.value);
 
@@ -20,6 +46,7 @@ function incrementCheckoutQty(button) {
         currentQty++;
         qtyInput.value = currentQty;
         updateCheckoutPrices();
+        syncQuantityWithSession(productId, currentQty);
     }
 }
 
@@ -29,12 +56,14 @@ function incrementCheckoutQty(button) {
 function decrementCheckoutQty(button) {
     const summaryItem = button.closest('.summary-item');
     const qtyInput = summaryItem.querySelector('.qty-input-small');
+    const productId = summaryItem.dataset.productId;
     let currentQty = parseInt(qtyInput.value);
 
     if (currentQty > 1) {
         currentQty--;
         qtyInput.value = currentQty;
         updateCheckoutPrices();
+        syncQuantityWithSession(productId, currentQty);
     }
 }
 
@@ -70,14 +99,16 @@ function updateCheckoutPrices() {
         const itemTotal = price * qty;
 
         // Update item total
-        item.querySelector('.item-price').textContent = formatPrice(itemTotal);
+        const itemPriceEl = item.querySelector('.item-price');
+        if (itemPriceEl) itemPriceEl.textContent = formatPrice(itemTotal);
 
         // Add to subtotal
         subtotal += itemTotal;
     });
 
     // Get selected shipping method
-    const selectedMethod = document.querySelector('input[name="shipping_method"]:checked')?.value || 'standard';
+    const selectedMethodInput = document.querySelector('input[name="shipping_method"]:checked');
+    const selectedMethod = selectedMethodInput ? selectedMethodInput.value : 'standard';
     let shipping = 40.00;
 
     switch (selectedMethod) {
@@ -96,7 +127,8 @@ function updateCheckoutPrices() {
     }
 
     // Update shipping method name in summary
-    const methodName = document.querySelector(`label[for="shipping_${selectedMethod}"] h4`)?.textContent || 'Standard Shipping';
+    const methodLabel = document.querySelector(`label[for="shipping_${selectedMethod}"] h4`);
+    const methodName = methodLabel ? methodLabel.textContent : 'Standard Shipping';
     const methodNameElement = document.getElementById('shipping-method-name');
     if (methodNameElement) {
         methodNameElement.textContent = `(${methodName})`;
@@ -109,25 +141,30 @@ function updateCheckoutPrices() {
     const total = subtotal + shipping + tax;
 
     // Update all totals in the DOM
-    document.getElementById('checkout-subtotal').textContent = formatPrice(subtotal);
+    const subtotalEl = document.getElementById('checkout-subtotal');
+    if (subtotalEl) subtotalEl.textContent = formatPrice(subtotal);
 
-    const shippingElement = document.getElementById('checkout-shipping');
-    if (shippingElement) {
-        shippingElement.textContent = formatPrice(shipping);
-    }
+    const shippingEl = document.getElementById('checkout-shipping');
+    if (shippingEl) shippingEl.textContent = formatPrice(shipping);
 
-    document.getElementById('checkout-tax').textContent = formatPrice(tax);
-    document.getElementById('checkout-total').textContent = formatPrice(total);
-    document.getElementById('btn-total').textContent = formatPrice(total);
+    const taxEl = document.getElementById('checkout-tax');
+    if (taxEl) taxEl.textContent = formatPrice(tax);
+
+    const totalEl = document.getElementById('checkout-total');
+    if (totalEl) totalEl.textContent = formatPrice(total);
+
+    const btnTotalEl = document.getElementById('btn-total');
+    if (btnTotalEl) btnTotalEl.textContent = formatPrice(total);
 
     // Update item count
     const totalQuantity = Array.from(summaryItems).reduce((sum, item) => {
-        return sum + parseInt(item.querySelector('.qty-input-small').value);
+        const qtyInput = item.querySelector('.qty-input-small');
+        return sum + (qtyInput ? parseInt(qtyInput.value) : 0);
     }, 0);
 
     const itemCountElement = document.querySelector('.item-count');
     if (itemCountElement) {
-        itemCountElement.textContent = totalQuantity + ' item' + (totalQuantity > 1 ? 's' : '');
+        itemCountElement.textContent = totalQuantity + ' item' + (totalQuantity !== 1 ? 's' : '');
     }
 }
 
