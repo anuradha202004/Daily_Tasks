@@ -82,7 +82,7 @@ $currentUser = getCurrentUser();
                                 <a href="wishlist.php" class="dropdown-item">❤️ My Wishlist</a>
                                 <a href="orders.php" class="dropdown-item">📦 My Orders</a>
                                 <div class="dropdown-divider"></div>
-                                <a href="logout.php" class="dropdown-item logout-item">🚪 Logout</a>
+                                <a href="logout.php" class="dropdown-item logout-item" onclick="return confirmLogout()">🚪 Logout</a>
                             </div>
                         </div>
 

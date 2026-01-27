@@ -86,10 +86,9 @@ function validateSignupForm() {
         showError('confirmError', 'Passwords do not match');
         isValid = false;
     }
-    
     return isValid;
 }
-
+ 
 /**
  * Validate password strength
  */

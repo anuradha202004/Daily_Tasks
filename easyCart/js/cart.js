@@ -20,7 +20,6 @@ function addToCart(productId, quantity = 1) {
     fetch('cart.php', {
         method: 'POST',
         body: formData
-        
     })
         .then(response => {
             // Show alert message FIRST
@@ -169,7 +168,7 @@ function decreaseQuantity(btn) {
     }
 }
 
-/**
+/*
  * Update quantity and cart summary when quantity input changes
  */
 function updateQuantityAndSummary(quantityInput) {

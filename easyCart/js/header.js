@@ -28,9 +28,16 @@ function toggleUserMenu() {
 }
 
 /**
+ * Confirm logout action
+ */
+function confirmLogout() {
+    return confirm('Are you sure you want to logout?');
+}
+
+/**
  * Close user dropdown when clicking outside
  */
-document.addEventListener('click', function(event) {
+document.addEventListener('click', function (event) {
     const userMenu = document.querySelector('.user-menu');
     if (userMenu && !userMenu.contains(event.target)) {
         const dropdown = document.getElementById('userDropdown');

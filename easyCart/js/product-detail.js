@@ -70,7 +70,7 @@ function updateQuantityHidden() {
     }
 }
 
-/**
+/*
  * Handle Buy Now button click
  */
 function buyNow(productId, maxStock) {
