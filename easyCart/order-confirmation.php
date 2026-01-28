@@ -336,12 +336,12 @@ if (!isset($_SESSION['last_order']['status'])) {
                             <span>$<?php echo number_format($lastOrder['subtotal'], 2); ?></span>
                         </div>
                         <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                            <span>Tax (10%)</span>
+                            <span>Tax (18%)</span>
                             <span>$<?php echo number_format($lastOrder['tax'], 2); ?></span>
                         </div>
                         <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
-                            <span>Shipping</span>
-                            <span><?php echo $lastOrder['subtotal'] > 50 ? 'Free' : '$9.99'; ?></span>
+                            <span>Shipping (<?php echo htmlspecialchars($lastOrder['shipping_method_name'] ?? 'Standard'); ?>)</span>
+                            <span><?php echo ($lastOrder['shipping_cost'] ?? 0) == 0 ? 'Free' : '$' . number_format($lastOrder['shipping_cost'], 2); ?></span>
                         </div>
                     </div>
 

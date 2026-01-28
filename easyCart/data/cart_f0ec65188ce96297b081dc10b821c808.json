@@ -1,41 +1,14 @@
 {
-    "1": {
-        "product_id": 1,
-        "quantity": 3
-    },
-    "3": {
-        "product_id": 3,
+    "100": {
+        "product_id": 100,
         "quantity": 1
     },
-    "2": {
+    "98": {
+        "product_id": 98,
         "quantity": 1
     },
-    "22": {
-        "product_id": 22,
-        "quantity": 1
-    },
-    "21": {
-        "product_id": 21,
-        "quantity": 1
-    },
-    "20": {
-        "product_id": 20,
-        "quantity": 1
-    },
-    "25": {
-        "product_id": 25,
-        "quantity": 1
-    },
-    "7": {
-        "product_id": 7,
-        "quantity": 3
-    },
-    "24": {
-        "product_id": 24,
-        "quantity": 1
-    },
-    "6": {
-        "product_id": 6,
+    "99": {
+        "product_id": 99,
         "quantity": 1
     }
 }

@@ -135,8 +135,8 @@ function calculateCartSummary() {
         }
     }
     
-    $tax = $subtotal * 0.18;
     $shipping = $subtotal > 500 ? 0 : 40.00;
+    $tax = ($subtotal + $shipping) * 0.18;
     $total = $subtotal + $tax + $shipping;
     
     return [
@@ -172,8 +172,8 @@ foreach ($cartItems as $productId => $cartItem) {
     }
 }
 
-$tax = $subtotal * 0.18; // 18% tax based on Phase 4
 $shipping = $subtotal > 500 ? 0 : 40.00; // Standard shipping $40, free over $500
+$tax = ($subtotal + $shipping) * 0.18; // 18% tax on (Subtotal + Shipping)
 $total = $subtotal + $tax + $shipping;
 ?>
 <?php include 'includes/header.php'; ?>

@@ -24,7 +24,8 @@ if (isset($_SESSION['last_order'])) {
         'status' => $_SESSION['last_order']['status'] ?? 'Processing',
         'subtotal' => $_SESSION['last_order']['subtotal'] ?? 0,
         'tax' => $_SESSION['last_order']['tax'] ?? 0,
-        'shipping' => $_SESSION['last_order']['shipping'] ?? 0,
+        'shipping' => $_SESSION['last_order']['shipping_cost'] ?? 0,
+        'shipping_method_name' => $_SESSION['last_order']['shipping_method_name'] ?? 'Standard',
         'total' => $_SESSION['last_order']['total'] ?? 0,
         'items' => $_SESSION['last_order']['items'] ?? [],
         'customer' => $_SESSION['last_order']['customer'] ?? []
@@ -238,7 +239,7 @@ if (isset($_SESSION['last_order'])) {
                                         <span>$<?php echo number_format($order['tax'] ?? 0, 2); ?></span>
                                     </div>
                                     <div style="display: flex; justify-content: space-between; margin-bottom: 15px; font-size: 14px;">
-                                        <span>Shipping:</span>
+                                        <span>Shipping<?php echo isset($order['shipping_method_name']) ? ' ('.htmlspecialchars($order['shipping_method_name']).')' : ''; ?>:</span>
                                         <span><?php echo ($order['shipping'] ?? 0) === 0 ? 'Free' : '$' . number_format($order['shipping'], 2); ?></span>
                                     </div>
                                     <div style="display: flex; justify-content: space-between; font-size: 18px; font-weight: bold; padding-top: 15px; border-top: 2px solid #eee;">
