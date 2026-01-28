@@ -1,12 +1,13 @@
 <?php
 session_start();
-
+// echo "<pre>";
+// print_r($_SESSION);
+// echo "</pre>";
 // Include data and auth
 require_once 'includes/data.php';
 require_once 'includes/auth.php';
 
 $pageTitle = 'Shopping Cart';
-
 // Load cart from file on page load (for logged-in users)
 if (isLoggedIn() && !isset($_SESSION['cart'])) {
     initializeCartFromFile();

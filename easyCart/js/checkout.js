@@ -68,6 +68,26 @@ function decrementCheckoutQty(button) {
 }
 
 /**
+ * Save shipping method to session via AJAX
+ */
+function saveShippingToSession(method) {
+    const formData = new FormData();
+    formData.append('action', 'save_shipping');
+    formData.append('method', method);
+
+    fetch('checkout.php', {
+        method: 'POST',
+        headers: { 'X-Requested-With': 'XMLHttpRequest' },
+        body: formData
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (!data.success) console.error('Failed to save shipping method');
+        })
+        .catch(err => console.error('Shipping save failed:', err));
+}
+
+/**
  * Update shipping cost based on selected method and subtotal
  */
 function updateShippingCost() {
@@ -75,14 +95,20 @@ function updateShippingCost() {
 
     // Update selected class on shipping options
     const options = document.querySelectorAll('.shipping-option');
+    let selectedMethod = 'standard';
+
     options.forEach(opt => {
         const input = opt.querySelector('input');
         if (input.checked) {
             opt.classList.add('selected');
+            selectedMethod = input.value;
         } else {
             opt.classList.remove('selected');
         }
     });
+
+    // Save to session
+    saveShippingToSession(selectedMethod);
 }
 
 /**

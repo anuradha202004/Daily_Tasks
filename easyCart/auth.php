@@ -1,4 +1,7 @@
 <?php
+
+
+
 /**
  * Authentication Management for EasyCart
  * Handles user login, signup, and session management
@@ -38,7 +41,6 @@ function loadRegisteredUsers() {
     if (is_array($users)) {
         return array_merge($defaultUsers, $users);
     }
-    
     return $defaultUsers;
 }
 

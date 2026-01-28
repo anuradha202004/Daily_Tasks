@@ -98,9 +98,31 @@ foreach ($cartItems as $productId => $cartItem) {
     }
 }
 
-// Get selected shipping method (default to standard)
-$selectedShipping = isset($_POST['shipping_method']) ? $_POST['shipping_method'] : 
-                   (isset($_GET['shipping_method']) ? $_GET['shipping_method'] : 'standard');
+// Handle AJAX save shipping method to session
+if (isset($_POST['action']) && $_POST['action'] === 'save_shipping') {
+    $_SESSION['selected_shipping'] = $_POST['method'];
+    header('Content-Type: application/json');
+    echo json_encode(['success' => true]);
+    exit;
+}
+
+// Get selected shipping method (Priority: POST > GET > SESSION > default)
+$selectedShipping = 'standard';
+if (isset($_POST['shipping_method'])) {
+    $selectedShipping = $_POST['shipping_method'];
+    $_SESSION['selected_shipping'] = $selectedShipping;
+} elseif (isset($_GET['shipping_method'])) {
+    $selectedShipping = $_GET['shipping_method'];
+    $_SESSION['selected_shipping'] = $selectedShipping;
+} elseif (isset($_SESSION['selected_shipping'])) {
+    $selectedShipping = $_SESSION['selected_shipping'];
+}
+
+// Ensure the selected method is valid
+$validMethods = ['standard', 'express', 'whiteglove', 'freight'];
+if (!in_array($selectedShipping, $validMethods)) {
+    $selectedShipping = 'standard';
+}
 
 // Calculate shipping cost
 $shippingCost = calculateShippingCost($selectedShipping, $subtotal);

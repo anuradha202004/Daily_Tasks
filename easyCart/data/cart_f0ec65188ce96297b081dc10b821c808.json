@@ -1,14 +1,18 @@
 {
-    "100": {
-        "product_id": 100,
+    "3": {
+        "product_id": 3,
+        "quantity": 7
+    },
+    "6": {
+        "product_id": 6,
         "quantity": 1
     },
-    "98": {
-        "product_id": 98,
+    "94": {
+        "product_id": 94,
         "quantity": 1
     },
-    "99": {
-        "product_id": 99,
+    "93": {
+        "product_id": 93,
         "quantity": 1
     }
 }

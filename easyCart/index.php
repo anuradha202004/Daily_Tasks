@@ -1,5 +1,4 @@
 <?php
-session_start();
 
 // Include data and auth
 require_once 'includes/data.php';
