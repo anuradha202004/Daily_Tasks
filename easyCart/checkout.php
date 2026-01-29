@@ -187,9 +187,24 @@ if (isset($_POST['shipping_method'])) {
 }
 
 // Ensure the selected method is valid
+// Ensure the selected method is valid
 $validMethods = ['standard', 'express', 'whiteglove', 'freight'];
+
+// validation based on subtotal
+if ($subtotal < 300) {
+    // Disable whiteglove and freight
+    if ($selectedShipping === 'whiteglove' || $selectedShipping === 'freight') {
+        $selectedShipping = 'standard'; // Default to standard
+    }
+} else {
+    // Disable standard and express
+    if ($selectedShipping === 'standard' || $selectedShipping === 'express') {
+        $selectedShipping = 'whiteglove'; // Default to whiteglove
+    }
+}
+
 if (!in_array($selectedShipping, $validMethods)) {
-    $selectedShipping = 'standard';
+    $selectedShipping = ($subtotal < 300) ? 'standard' : 'whiteglove';
 }
 
 // Calculate shipping cost
@@ -250,6 +265,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     if ($all_filled) {
         // Recalculate with submitted shipping method
         $finalShippingMethod = $_POST['shipping_method'];
+
+        // Validate shipping method against subtotal rules
+        if ($subtotal < 300) {
+            if (in_array($finalShippingMethod, ['whiteglove', 'freight'])) {
+                $finalShippingMethod = 'standard';
+            }
+        } else {
+            if (in_array($finalShippingMethod, ['standard', 'express'])) {
+                $finalShippingMethod = 'whiteglove';
+            }
+        }
         $finalShippingCost = calculateShippingCost($finalShippingMethod, $subtotal);
         $finalTaxableAmount = $subtotal - $discount + $finalShippingCost;
         $finalTax = max(0, $finalTaxableAmount) * 0.18;
@@ -560,7 +586,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                             <div class="card-body">
                                 <div class="shipping-options">
                                     <?php foreach ($shippingOptions as $key => $option): ?>
-                                        <label class="shipping-option <?php echo $key === $selectedShipping ? 'selected' : ''; ?>" for="shipping_<?php echo $key; ?>">
+                                        <?php
+                                        // Determine if this option should be disabled
+                                        $isDisabled = false;
+                                        if ($subtotal < 300) {
+                                            if (in_array($key, ['whiteglove', 'freight'])) $isDisabled = true;
+                                        } else {
+                                            if (in_array($key, ['standard', 'express'])) $isDisabled = true;
+                                        }
+                                        ?>
+                                        <label class="shipping-option <?php echo $key === $selectedShipping ? 'selected' : ''; ?>" for="shipping_<?php echo $key; ?>" style="<?php echo $isDisabled ? 'opacity: 0.5; pointer-events: none;' : ''; ?>">
                                             <input 
                                                 type="radio" 
                                                 name="shipping_method" 
@@ -568,6 +603,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                                                 value="<?php echo $key; ?>" 
                                                 data-cost="<?php echo $option['cost']; ?>"
                                                 <?php echo $key === $selectedShipping ? 'checked' : ''; ?>
+                                                <?php echo $isDisabled ? 'disabled' : ''; ?>
                                                 onchange="updateShippingCost()"
                                                 autocomplete="off"
                                                 required

@@ -139,7 +139,48 @@ function updateCheckoutPrices() {
     });
 
     // Get selected shipping method
-    const selectedMethodInput = document.querySelector('input[name="shipping_method"]:checked');
+    const shippingOptions = document.querySelectorAll('.shipping-option');
+    let autoSwitchNeeded = false;
+    let selectedMethodInput = document.querySelector('input[name="shipping_method"]:checked');
+
+    // Update shipping method availability based on subtotal
+    shippingOptions.forEach(option => {
+        const input = option.querySelector('input[type="radio"]');
+        const method = input.value;
+        let isDisabled = false;
+
+        if (subtotal < 300) {
+            if (method === 'whiteglove' || method === 'freight') isDisabled = true;
+        } else {
+            if (method === 'standard' || method === 'express') isDisabled = true;
+        }
+
+        input.disabled = isDisabled;
+        if (isDisabled) {
+            option.style.opacity = '0.5';
+            option.style.pointerEvents = 'none';
+            if (input.checked) {
+                input.checked = false;
+                option.classList.remove('selected');
+                autoSwitchNeeded = true;
+                selectedMethodInput = null;
+            }
+        } else {
+            option.style.opacity = '1';
+            option.style.pointerEvents = 'auto';
+        }
+    });
+
+    if (autoSwitchNeeded || !selectedMethodInput) {
+        // Select the first enabled option
+        const enabledInput = document.querySelector('input[name="shipping_method"]:not([disabled])');
+        if (enabledInput) {
+            enabledInput.checked = true;
+            enabledInput.closest('.shipping-option').classList.add('selected');
+            selectedMethodInput = enabledInput;
+        }
+    }
+
     const selectedMethod = selectedMethodInput ? selectedMethodInput.value : 'standard';
     let shipping = 40.00;
 
