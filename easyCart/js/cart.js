@@ -266,4 +266,31 @@ function updateSummaryDisplay(data) {
     if (taxEl) taxEl.textContent = data.formattedTax;
     if (shippingEl) shippingEl.textContent = data.formattedShipping;
     if (totalEl) totalEl.textContent = data.formattedTotal;
+
+    // Update shipping method indicators
+    const methodEl = document.getElementById('summary-shipping-method');
+    if (methodEl) methodEl.textContent = data.shippingMethod;
+
+    const btnExpress = document.getElementById('btn-express');
+    const btnFreight = document.getElementById('btn-freight');
+
+    if (btnExpress && btnFreight) {
+        if (data.shippingMethod === 'Express') {
+            btnExpress.style.background = '#2563eb';
+            btnExpress.style.color = 'white';
+            btnExpress.style.border = '2px solid #2563eb';
+
+            btnFreight.style.background = '#f3f4f6';
+            btnFreight.style.color = '#9ca3af';
+            btnFreight.style.border = '2px solid #e5e7eb';
+        } else {
+            btnFreight.style.background = '#f59e0b';
+            btnFreight.style.color = 'white';
+            btnFreight.style.border = '2px solid #f59e0b';
+
+            btnExpress.style.background = '#f3f4f6';
+            btnExpress.style.color = '#9ca3af';
+            btnExpress.style.border = '2px solid #e5e7eb';
+        }
+    }
 }

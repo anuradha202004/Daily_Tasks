@@ -549,15 +549,13 @@ function formatPrice($price) {
 }
 
 /**
- * Calculate discount based on quantity
- * 5-9 units: 10% discount
- * 10+ units: 20% discount
+ * Calculate discount based on quantity: 1% discount per item
+ * (e.g., 2 items = 2% discount, 5 items = 5% discount)
  */
 function calculateBulkDiscount($price, $quantity) {
-    if ($quantity >= 10) {
-        return ($price * $quantity) * 0.20; // 20% off
-    } elseif ($quantity >= 5) {
-        return ($price * $quantity) * 0.10; // 10% off
+    if ($quantity > 0) {
+        $discountPercent = $quantity / 100;
+        return ($price * $quantity) * $discountPercent;
     }
     return 0;
 }

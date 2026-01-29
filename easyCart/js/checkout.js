@@ -125,11 +125,9 @@ function updateCheckoutPrices() {
         const qty = parseInt(item.querySelector('.qty-input-small').value);
         const itemTotal = price * qty;
 
-        // Calculate bulk discount for this item
-        if (qty >= 10) {
-            discount += itemTotal * 0.20;
-        } else if (qty >= 5) {
-            discount += itemTotal * 0.10;
+        // Calculate bulk discount: 1% discount per item (e.g. 2 items = 2%, 5 items = 5%)
+        if (qty > 0) {
+            discount += itemTotal * (qty / 100);
         }
 
         // Update item total

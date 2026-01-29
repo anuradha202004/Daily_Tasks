@@ -1,10 +1,13 @@
 <?php
 session_start();
 
+// die("<pre>" . json_encode($_SESSION, 128) . "</pre>");
 
 // echo "<pre>";
 // print_r($_SESSION);
 // // echo "</pre>";
+
+// echo "<pre>" . json_encode(json_decode(file_get_contents('data/users.json')), 128) . "</pre>";
 // die;
 // Include data and auth
 require_once 'includes/data.php';

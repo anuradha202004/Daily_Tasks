@@ -142,7 +142,15 @@ function calculateCartSummary() {
         }
     }
     
-    $shipping = 40.00;
+    $netAmount = $subtotal - $discount;
+    if ($netAmount < 300) {
+        $shipping = 80.00;
+        $shippingMethod = 'Express';
+    } else {
+        $shipping = 200.00;
+        $shippingMethod = 'Freight';
+    }
+
     $taxableAmount = $subtotal - $discount + $shipping;
     $tax = max(0, $taxableAmount) * 0.18;
     $total = $subtotal - $discount + $tax + $shipping;
@@ -152,11 +160,12 @@ function calculateCartSummary() {
         'discount' => $discount,
         'tax' => $tax,
         'shipping' => $shipping,
+        'shippingMethod' => $shippingMethod,
         'total' => $total,
         'formattedSubtotal' => formatPrice($subtotal),
         'formattedDiscount' => '-' . formatPrice($discount),
         'formattedTax' => formatPrice($tax),
-        'formattedShipping' => $shipping == 0 ? 'Free' : formatPrice($shipping),
+        'formattedShipping' => formatPrice($shipping),
         'formattedTotal' => formatPrice($total)
     ];
 }
@@ -184,7 +193,15 @@ foreach ($cartItems as $productId => $cartItem) {
     }
 }
 
-$shipping = 40.00; // Standard shipping $40
+$netAmount = $subtotal - $discount;
+if ($netAmount < 300) {
+    $shipping = 80.00;
+    $shippingMethod = 'Express';
+} else {
+    $shipping = 200.00;
+    $shippingMethod = 'Freight';
+}
+
 $taxableAmount = $subtotal - $discount + $shipping;
 $tax = max(0, $taxableAmount) * 0.18; // 18% tax on (Subtotal - Discount + Shipping)
 $total = $subtotal - $discount + $tax + $shipping;
@@ -302,13 +319,16 @@ $total = $subtotal - $discount + $tax + $shipping;
                                 <span>Bulk Discount</span>
                                 <span id="summary-discount" style="font-weight: 500; color: #10b981;">-<?php echo formatPrice($discount); ?></span>
                             </div>
-                            <div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 15px; color: #666;">
-                                <span>Tax (18%)</span>
-                                <span id="summary-tax" style="font-weight: 500; color: #1f2937;"><?php echo formatPrice($tax); ?></span>
-                            </div>
-                            <div style="display: flex; justify-content: space-between; margin-bottom: 0; font-size: 15px; color: #666;">
-                                <span>Shipping (Standard)</span>
-                                <span id="summary-shipping" style="font-weight: 500; color: #1f2937;"><?php echo formatPrice($shipping); ?></span>
+                        </div>
+                        <div style="margin-bottom: 15px;">
+                            <label style="display: block; font-size: 14px; color: #666; margin-bottom: 8px;">Shipping Method (Auto-selected)</label>
+                            <div style="display: flex; gap: 10px;">
+                                <div id="btn-express" style="flex: 1; text-align: center; padding: 8px; border-radius: 6px; font-size: 13px; font-weight: 600; transition: all 0.3s ease; <?php echo $shippingMethod === 'Express' ? 'background: #2563eb; color: white; border: 2px solid #2563eb;' : 'background: #f3f4f6; color: #9ca3af; border: 2px solid #e5e7eb;'; ?>">
+                                    🚀 Express
+                                </div>
+                                <div id="btn-freight" style="flex: 1; text-align: center; padding: 8px; border-radius: 6px; font-size: 13px; font-weight: 600; transition: all 0.3s ease; <?php echo $shippingMethod === 'Freight' ? 'background: #f59e0b; color: white; border: 2px solid #f59e0b;' : 'background: #f3f4f6; color: #9ca3af; border: 2px solid #e5e7eb;'; ?>">
+                                    🚛 Freight
+                                </div>
                             </div>
                         </div>
 
