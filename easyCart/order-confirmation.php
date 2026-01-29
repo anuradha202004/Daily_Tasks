@@ -341,7 +341,7 @@ if (!isset($_SESSION['last_order']['status'])) {
                         </div>
                         <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
                             <span>Shipping (<?php echo htmlspecialchars($lastOrder['shipping_method_name'] ?? 'Standard'); ?>)</span>
-                            <span><?php echo ($lastOrder['shipping_cost'] ?? 0) == 0 ? 'Free' : '$' . number_format($lastOrder['shipping_cost'], 2); ?></span>
+                            <span>$<?php echo number_format($lastOrder['shipping_cost'] ?? 0, 2); ?></span>
                         </div>
                     </div>
 

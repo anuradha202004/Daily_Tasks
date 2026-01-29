@@ -10,10 +10,30 @@ $pageTitle = 'Checkout';
 // Require login
 requireLogin();
 
+// Prevent browser caching
+header("Cache-Control: no-cache, no-store, must-revalidate"); // HTTP 1.1.
+header("Pragma: no-cache"); // HTTP 1.0.
+header("Expires: 0"); // Proxies.
+
 // Check if coming from Buy Now button
 $directProduct = null;
 $directQuantity = 1;
 $isBuyNow = false;
+
+// RESET SHIPPING: Force standard if reset_shipping is requested
+if (isset($_GET['reset_shipping']) && $_GET['reset_shipping'] == '1') {
+    unset($_SESSION['selected_shipping']);
+    
+    // Redirect to the same page without the reset_shipping parameter
+    // This ensures that refreshing the page doesn't trigger the reset again
+    $params = $_GET;
+    unset($params['reset_shipping']);
+    $queryString = http_build_query($params);
+    $redirectUrl = 'checkout.php' . ($queryString ? '?' . $queryString : '');
+    
+    header("Location: " . $redirectUrl);
+    exit;
+}
 
 // Handle both GET (initial load) and POST (form submission)
 if (isset($_REQUEST['product_id']) && isset($_REQUEST['qty'])) {
@@ -28,6 +48,12 @@ if (isset($_REQUEST['product_id']) && isset($_REQUEST['qty'])) {
 
     // Capture the intended quantity
     $targetQty = intval($_REQUEST['qty']);
+
+    // RESET SHIPPING METHOD: If checking out a different product, reset to standard
+    if (isset($_SESSION['checkout_product_id']) && $_SESSION['checkout_product_id'] !== $pid) {
+        unset($_SESSION['selected_shipping']);
+    }
+    $_SESSION['checkout_product_id'] = $pid;
 
     // SYNC WITH SESSION: If it's a Buy Now, we ensure it's in the session cart 
     // so refreshes don't lose the quantity updates made in the UI
@@ -50,6 +76,13 @@ if (isset($_REQUEST['product_id']) && isset($_REQUEST['qty'])) {
         if (isLoggedIn() && isset($_SESSION['user_email'])) {
             saveUserCart($_SESSION['user_email'], $_SESSION['cart']);
         }
+    }
+} else {
+    // If not a Buy Now (e.g. multi-item cart), we might want to track the total item count
+    // to detect changes, but usually, resetting isn't needed unless it's a fresh cart entry.
+    // For now, let's just clear the checkout_product_id if it's not a single product checkout
+    if (!$isBuyNow) {
+        unset($_SESSION['checkout_product_id']);
     }
 }
 
@@ -254,6 +287,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 saveUserCart($_SESSION['user_email'], $_SESSION['cart']);
             }
         }
+        
+        // Clear shipping selection for the next order
+        unset($_SESSION['selected_shipping']);
         
         header('Location: order-confirmation.php');
         exit;
@@ -533,6 +569,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                                                 data-cost="<?php echo $option['cost']; ?>"
                                                 <?php echo $key === $selectedShipping ? 'checked' : ''; ?>
                                                 onchange="updateShippingCost()"
+                                                autocomplete="off"
                                                 required
                                             >
                                             <div class="shipping-option-content">

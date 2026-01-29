@@ -142,7 +142,7 @@ function calculateCartSummary() {
         }
     }
     
-    $shipping = $subtotal > 500 ? 0 : 40.00;
+    $shipping = 40.00;
     $taxableAmount = $subtotal - $discount + $shipping;
     $tax = max(0, $taxableAmount) * 0.18;
     $total = $subtotal - $discount + $tax + $shipping;
@@ -184,7 +184,7 @@ foreach ($cartItems as $productId => $cartItem) {
     }
 }
 
-$shipping = $subtotal > 500 ? 0 : 40.00; // Standard shipping $40, free over $500
+$shipping = 40.00; // Standard shipping $40
 $taxableAmount = $subtotal - $discount + $shipping;
 $tax = max(0, $taxableAmount) * 0.18; // 18% tax on (Subtotal - Discount + Shipping)
 $total = $subtotal - $discount + $tax + $shipping;
@@ -308,7 +308,7 @@ $total = $subtotal - $discount + $tax + $shipping;
                             </div>
                             <div style="display: flex; justify-content: space-between; margin-bottom: 0; font-size: 15px; color: #666;">
                                 <span>Shipping (Standard)</span>
-                                <span id="summary-shipping" style="font-weight: 500; color: #1f2937;"><?php echo $shipping === 0 ? 'Free' : formatPrice($shipping); ?></span>
+                                <span id="summary-shipping" style="font-weight: 500; color: #1f2937;"><?php echo formatPrice($shipping); ?></span>
                             </div>
                         </div>
 
@@ -319,7 +319,7 @@ $total = $subtotal - $discount + $tax + $shipping;
                             </span>
                         </div>
 
-                        <a href="<?php echo isLoggedIn() ? 'checkout.php' : 'signin.php?redirect=cart'; ?>" class="btn btn-primary" style="display: block; text-align: center; padding: 15px; text-decoration: none; background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); border-radius: 8px; font-weight: 600; font-size: 16px; transition: all 0.3s ease; color: white;" onmouseover="this.style.background='linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%)'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 16px rgba(37, 99, 235, 0.3)';" onmouseout="this.style.background='linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)'; this.style.transform='translateY(0)'; this.style.boxShadow='none';">
+                        <a href="<?php echo isLoggedIn() ? 'checkout.php?reset_shipping=1' : 'signin.php?redirect=cart'; ?>" class="btn btn-primary" style="display: block; text-align: center; padding: 15px; text-decoration: none; background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); border-radius: 8px; font-weight: 600; font-size: 16px; transition: all 0.3s ease; color: white;" onmouseover="this.style.background='linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%)'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 16px rgba(37, 99, 235, 0.3)';" onmouseout="this.style.background='linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)'; this.style.transform='translateY(0)'; this.style.boxShadow='none';">
                             <?php echo isLoggedIn() ? 'Proceed to Checkout' : 'Login to Checkout'; ?>
                         </a>
 
@@ -328,11 +328,8 @@ $total = $subtotal - $discount + $tax + $shipping;
                         </a>
                     </div>
 
-                    <!-- Promo Code -->
+                    <!-- Promo Info -->
                     <div style="background: linear-gradient(135deg, #e3f2fd 0%, #f0f7ff 100%); padding: 18px; border-radius: 8px; margin-top: 20px; border-left: 4px solid #2563eb;">
-                        <p style="margin: 0 0 10px 0; font-size: 14px; color: #2563eb; font-weight: 500;">
-                            🚚 <strong>Free Shipping:</strong> Orders over $50
-                        </p>
                         <p style="margin: 0; font-size: 14px; color: #2563eb; font-weight: 500;">
                             🔒 <strong>Secure Checkout:</strong> All transactions are protected
                         </p>

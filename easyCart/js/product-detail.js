@@ -1,35 +1,5 @@
 // Product detail page functionality - Quantity, shipping, and wishlist
 
-/**
- * Select shipping option
- */
-function selectShipping(element) {
-    // Remove active class from all options
-    document.querySelectorAll('.shipping-option').forEach(option => {
-        option.classList.remove('active');
-    });
-
-    // Add active class to selected option
-    element.classList.add('active');
-
-    // Update hidden input
-    const shippingInput = document.querySelector('input[name="shipping"]');
-    if (shippingInput) {
-        shippingInput.value = element.dataset.value;
-    }
-}
-
-/**
- * Initialize shipping option selection
- */
-document.addEventListener('DOMContentLoaded', function () {
-    const defaultShipping = document.querySelector('.shipping-option');
-    if (defaultShipping) {
-        defaultShipping.addEventListener('click', function () {
-            selectShipping(this);
-        });
-    }
-});
 
 /**
  * Increment quantity in product detail
@@ -90,8 +60,8 @@ function buyNow(productId, maxStock) {
         return false;
     }
 
-    // Navigate to checkout page
-    window.location.href = `checkout.php?product_id=${productId}&qty=${quantity}`;
+    // Navigate to checkout page - force shipping reset
+    window.location.href = `checkout.php?product_id=${productId}&qty=${quantity}&reset_shipping=1`;
     return false;
 }
 

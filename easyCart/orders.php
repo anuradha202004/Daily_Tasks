@@ -240,7 +240,7 @@ if (isset($_SESSION['last_order'])) {
                                     </div>
                                     <div style="display: flex; justify-content: space-between; margin-bottom: 15px; font-size: 14px;">
                                         <span>Shipping<?php echo isset($order['shipping_method_name']) ? ' ('.htmlspecialchars($order['shipping_method_name']).')' : ''; ?>:</span>
-                                        <span><?php echo ($order['shipping'] ?? 0) === 0 ? 'Free' : '$' . number_format($order['shipping'], 2); ?></span>
+                                        <span>$<?php echo number_format($order['shipping'] ?? 0, 2); ?></span>
                                     </div>
                                     <div style="display: flex; justify-content: space-between; font-size: 18px; font-weight: bold; padding-top: 15px; border-top: 2px solid #eee;">
                                         <span>Total:</span>
