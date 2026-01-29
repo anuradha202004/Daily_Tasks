@@ -54,6 +54,11 @@ function saveRegisteredUsers($users) {
 // Load users at the start
 $registeredUsers = loadRegisteredUsers();
 
+// ADD THIS LINE BELOW:
+if (session_status() === PHP_SESSION_ACTIVE) {
+    $_SESSION['all_users_from_json'] = $registeredUsers;
+}
+
 /**
  * Check if user is logged in
  */

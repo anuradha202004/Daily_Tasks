@@ -95,6 +95,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Check stock limit
             $product = getProductById($productId);
             if ($product && $quantity <= $product['stock']) {
+                if (!isset($_SESSION['cart'][$productId])) {
+                    $_SESSION['cart'][$productId] = ['product_id' => $productId];
+                }
                 $_SESSION['cart'][$productId]['quantity'] = $quantity;
             }
         }
@@ -128,24 +131,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 // Function to calculate cart summary for dynamic updates
 function calculateCartSummary() {
     $subtotal = 0;
+    $discount = 0;
     $items = isset($_SESSION['cart']) ? $_SESSION['cart'] : [];
     foreach ($items as $pid => $item) {
         $product = getProductById($pid);
         if ($product) {
-            $subtotal += $product['price'] * $item['quantity'];
+            $itemPrice = $product['price'] * $item['quantity'];
+            $subtotal += $itemPrice;
+            $discount += calculateBulkDiscount($product['price'], $item['quantity']);
         }
     }
     
     $shipping = $subtotal > 500 ? 0 : 40.00;
-    $tax = ($subtotal + $shipping) * 0.18;
-    $total = $subtotal + $tax + $shipping;
+    $taxableAmount = $subtotal - $discount + $shipping;
+    $tax = max(0, $taxableAmount) * 0.18;
+    $total = $subtotal - $discount + $tax + $shipping;
     
     return [
         'subtotal' => $subtotal,
+        'discount' => $discount,
         'tax' => $tax,
         'shipping' => $shipping,
         'total' => $total,
         'formattedSubtotal' => formatPrice($subtotal),
+        'formattedDiscount' => '-' . formatPrice($discount),
         'formattedTax' => formatPrice($tax),
         'formattedShipping' => $shipping == 0 ? 'Free' : formatPrice($shipping),
         'formattedTotal' => formatPrice($total)
@@ -157,6 +166,7 @@ $cartItems = isset($_SESSION['cart']) ? $_SESSION['cart'] : [];
 
 // Calculate totals
 $subtotal = 0;
+$discount = 0;
 $cartItemsWithDetails = [];
 
 foreach ($cartItems as $productId => $cartItem) {
@@ -164,6 +174,7 @@ foreach ($cartItems as $productId => $cartItem) {
     if ($product) {
         $itemTotal = $product['price'] * $cartItem['quantity'];
         $subtotal += $itemTotal;
+        $discount += calculateBulkDiscount($product['price'], $cartItem['quantity']);
         
         $cartItemsWithDetails[] = [
             'product' => $product,
@@ -174,8 +185,9 @@ foreach ($cartItems as $productId => $cartItem) {
 }
 
 $shipping = $subtotal > 500 ? 0 : 40.00; // Standard shipping $40, free over $500
-$tax = ($subtotal + $shipping) * 0.18; // 18% tax on (Subtotal + Shipping)
-$total = $subtotal + $tax + $shipping;
+$taxableAmount = $subtotal - $discount + $shipping;
+$tax = max(0, $taxableAmount) * 0.18; // 18% tax on (Subtotal - Discount + Shipping)
+$total = $subtotal - $discount + $tax + $shipping;
 ?>
 <?php include 'includes/header.php'; ?>
 
@@ -285,6 +297,10 @@ $total = $subtotal + $tax + $shipping;
                             <div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 15px; color: #666;">
                                 <span>Subtotal</span>
                                 <span id="summary-subtotal" style="font-weight: 500; color: #1f2937;"><?php echo formatPrice($subtotal); ?></span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 15px; color: #666;">
+                                <span>Bulk Discount</span>
+                                <span id="summary-discount" style="font-weight: 500; color: #10b981;">-<?php echo formatPrice($discount); ?></span>
                             </div>
                             <div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 15px; color: #666;">
                                 <span>Tax (18%)</span>

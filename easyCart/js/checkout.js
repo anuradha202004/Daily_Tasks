@@ -117,12 +117,20 @@ function updateShippingCost() {
 function updateCheckoutPrices() {
     const summaryItems = document.querySelectorAll('.summary-item');
     let subtotal = 0;
+    let discount = 0;
 
     // Calculate new subtotal and update each item's price
     summaryItems.forEach(item => {
         const price = parseFloat(item.dataset.productPrice);
         const qty = parseInt(item.querySelector('.qty-input-small').value);
         const itemTotal = price * qty;
+
+        // Calculate bulk discount for this item
+        if (qty >= 10) {
+            discount += itemTotal * 0.20;
+        } else if (qty >= 5) {
+            discount += itemTotal * 0.10;
+        }
 
         // Update item total
         const itemPriceEl = item.querySelector('.item-price');
@@ -160,15 +168,19 @@ function updateCheckoutPrices() {
         methodNameElement.textContent = `(${methodName})`;
     }
 
-    // Calculate tax (18% on Subtotal + Shipping)
-    const tax = (subtotal + shipping) * 0.18;
+    // Calculate tax (18% on Subtotal - Discount + Shipping)
+    const taxableAmount = Math.max(0, subtotal - discount + shipping);
+    const tax = taxableAmount * 0.18;
 
     // Calculate grand total
-    const total = subtotal + shipping + tax;
+    const total = subtotal - discount + shipping + tax;
 
     // Update all totals in the DOM
     const subtotalEl = document.getElementById('checkout-subtotal');
     if (subtotalEl) subtotalEl.textContent = formatPrice(subtotal);
+
+    const discountEl = document.getElementById('checkout-discount');
+    if (discountEl) discountEl.textContent = '-' + formatPrice(discount);
 
     const shippingEl = document.getElementById('checkout-shipping');
     if (shippingEl) shippingEl.textContent = formatPrice(shipping);

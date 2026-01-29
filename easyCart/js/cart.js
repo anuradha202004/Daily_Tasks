@@ -256,11 +256,13 @@ function removeCartItem(btn) {
  */
 function updateSummaryDisplay(data) {
     const subtotalEl = document.getElementById('summary-subtotal');
+    const discountEl = document.getElementById('summary-discount');
     const taxEl = document.getElementById('summary-tax');
     const shippingEl = document.getElementById('summary-shipping');
     const totalEl = document.getElementById('summary-total');
 
     if (subtotalEl) subtotalEl.textContent = data.formattedSubtotal;
+    if (discountEl) discountEl.textContent = data.formattedDiscount;
     if (taxEl) taxEl.textContent = data.formattedTax;
     if (shippingEl) shippingEl.textContent = data.formattedShipping;
     if (totalEl) totalEl.textContent = data.formattedTotal;

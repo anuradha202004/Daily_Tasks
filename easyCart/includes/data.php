@@ -548,6 +548,20 @@ function formatPrice($price) {
     return '$' . number_format($price, 2);
 }
 
+/**
+ * Calculate discount based on quantity
+ * 5-9 units: 10% discount
+ * 10+ units: 20% discount
+ */
+function calculateBulkDiscount($price, $quantity) {
+    if ($quantity >= 10) {
+        return ($price * $quantity) * 0.20; // 20% off
+    } elseif ($quantity >= 5) {
+        return ($price * $quantity) * 0.10; // 10% off
+    }
+    return 0;
+}
+
 // Helper function to check if product is in wishlist
 function isProductInWishlist($productId) {
     if (!isset($_SESSION['wishlist'])) {

@@ -64,7 +64,7 @@ function decrementQty() {
  */
 function updateQuantityHidden() {
     const quantity = document.getElementById('quantity').value;
-    const hiddenInput = document.querySelector('input[name="quantity"]');
+    const hiddenInput = document.getElementById('quantity-hidden');
     if (hiddenInput) {
         hiddenInput.value = quantity;
     }

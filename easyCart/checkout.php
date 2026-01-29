@@ -17,27 +17,60 @@ $isBuyNow = false;
 
 // Handle both GET (initial load) and POST (form submission)
 if (isset($_REQUEST['product_id']) && isset($_REQUEST['qty'])) {
-    $directProduct = getProductById(intval($_REQUEST['product_id']));
-    $directQuantity = intval($_REQUEST['qty']);
+    $pid = intval($_REQUEST['product_id']);
+    $directProduct = getProductById($pid);
     $isBuyNow = true;
     
     if (!$directProduct) {
         header('Location: products.php');
         exit;
     }
+
+    // Capture the intended quantity
+    $targetQty = intval($_REQUEST['qty']);
+
+    // SYNC WITH SESSION: If it's a Buy Now, we ensure it's in the session cart 
+    // so refreshes don't lose the quantity updates made in the UI
+    if (!isset($_SESSION['cart'])) {
+        $_SESSION['cart'] = [];
+    }
+
+    // If a session quantity already exists for this product (e.g. after a refresh), 
+    // we use that. Otherwise, we use the one from the URL.
+    if (isset($_SESSION['cart'][$pid])) {
+        $directQuantity = $_SESSION['cart'][$pid]['quantity'];
+    } else {
+        $directQuantity = $targetQty;
+        $_SESSION['cart'][$pid] = [
+            'product_id' => $pid,
+            'quantity' => $directQuantity
+        ];
+        
+        // Save for logged-in users
+        if (isLoggedIn() && isset($_SESSION['user_email'])) {
+            saveUserCart($_SESSION['user_email'], $_SESSION['cart']);
+        }
+    }
 }
 
 // Get cart items from session
 $cartItems = isset($_SESSION['cart']) ? $_SESSION['cart'] : [];
 
-// If coming from Buy Now, ONLY use the direct product (ignore cart)
+// If coming from Buy Now, ONLY show the direct product in the UI (ignore other cart items for now)
 if ($isBuyNow && $directProduct) {
-    $cartItems = [
-        $directProduct['id'] => [
-            'product_id' => $directProduct['id'],
-            'quantity' => $directQuantity
-        ]
-    ];
+    if (isset($cartItems[$directProduct['id']])) {
+        $cartItems = [
+            $directProduct['id'] => $cartItems[$directProduct['id']]
+        ];
+    } else {
+        // Fallback
+        $cartItems = [
+            $directProduct['id'] => [
+                'product_id' => $directProduct['id'],
+                'quantity' => $directQuantity
+            ]
+        ];
+    }
 }
 
 // If cart is empty and no direct product, redirect to cart page
@@ -80,8 +113,9 @@ function calculateShippingCost($method, $subtotal) {
     }
 }
 
-// Calculate subtotal
+// Calculate subtotal and discount
 $subtotal = 0;
+$discount = 0;
 $cartItemsWithDetails = [];
 
 foreach ($cartItems as $productId => $cartItem) {
@@ -89,6 +123,7 @@ foreach ($cartItems as $productId => $cartItem) {
     if ($product) {
         $itemTotal = $product['price'] * $cartItem['quantity'];
         $subtotal += $itemTotal;
+        $discount += calculateBulkDiscount($product['price'], $cartItem['quantity']);
         
         $cartItemsWithDetails[] = [
             'product' => $product,
@@ -127,12 +162,12 @@ if (!in_array($selectedShipping, $validMethods)) {
 // Calculate shipping cost
 $shippingCost = calculateShippingCost($selectedShipping, $subtotal);
 
-// Calculate tax (18% on Subtotal + Shipping)
-$taxableAmount = $subtotal + $shippingCost;
-$tax = $taxableAmount * 0.18;
+// Calculate tax (18% on Subtotal - Discount + Shipping)
+$taxableAmount = $subtotal - $discount + $shippingCost;
+$tax = max(0, $taxableAmount) * 0.18;
 
 // Calculate final total
-$total = $subtotal + $shippingCost + $tax;
+$total = ($subtotal - $discount) + $shippingCost + $tax;
 
 // Define shipping options for display
 $shippingOptions = [
@@ -183,12 +218,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         // Recalculate with submitted shipping method
         $finalShippingMethod = $_POST['shipping_method'];
         $finalShippingCost = calculateShippingCost($finalShippingMethod, $subtotal);
-        $finalTaxableAmount = $subtotal + $finalShippingCost;
-        $finalTax = $finalTaxableAmount * 0.18;
-        $finalTotal = $subtotal + $finalShippingCost + $finalTax;
+        $finalTaxableAmount = $subtotal - $discount + $finalShippingCost;
+        $finalTax = max(0, $finalTaxableAmount) * 0.18;
+        $finalTotal = $subtotal - $discount + $finalShippingCost + $finalTax;
         
         $_SESSION['last_order'] = [
             'subtotal' => $subtotal,
+            'discount' => $discount,
             'shipping_method' => $finalShippingMethod,
             'shipping_method_name' => $shippingOptions[$finalShippingMethod]['name'],
             'shipping_cost' => $finalShippingCost,
@@ -622,6 +658,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                             <div class="total-row">
                                 <span>Subtotal</span>
                                 <span id="checkout-subtotal" data-value="<?php echo $subtotal; ?>"><?php echo formatPrice($subtotal); ?></span>
+                            </div>
+                            <div class="total-row discount-row" style="color: #10b981;">
+                                <span>Bulk Discount</span>
+                                <span id="checkout-discount" data-value="<?php echo $discount; ?>">-<?php echo formatPrice($discount); ?></span>
                             </div>
                             <div class="total-row shipping-row">
                                 <span>

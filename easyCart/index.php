@@ -1,5 +1,11 @@
 <?php
+session_start();
 
+
+// echo "<pre>";
+// print_r($_SESSION);
+// // echo "</pre>";
+// die;
 // Include data and auth
 require_once 'includes/data.php';
 require_once 'includes/auth.php';
