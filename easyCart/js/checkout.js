@@ -112,6 +112,93 @@ function updateShippingCost() {
 }
 
 /**
+ * Apply Promo Code
+ */
+function applyPromoCode() {
+    const input = document.getElementById('promo-code-input');
+    const btn = document.getElementById('promo-btn');
+    const msg = document.getElementById('promo-message');
+    const code = input.value.trim();
+
+    if (!code) return;
+
+    btn.textContent = '...';
+    btn.disabled = true;
+
+    const formData = new FormData();
+    formData.append('action', 'apply_promo');
+    formData.append('code', code);
+
+    fetch('checkout.php', {
+        method: 'POST',
+        headers: { 'X-Requested-With': 'XMLHttpRequest' },
+        body: formData
+    })
+        .then(res => res.json())
+        .then(data => {
+            btn.disabled = false;
+            if (data.success) {
+                input.disabled = true;
+                btn.textContent = 'Remove';
+                btn.setAttribute('onclick', 'removePromoCode()');
+                msg.textContent = data.message;
+                msg.style.color = '#10b981';
+
+                // Set active promo based on code (matching server logic)
+                if (code.toUpperCase() === 'SAVE10') {
+                    window.activePromo = { type: 'percent', value: 10, code: 'SAVE10' };
+                } else if (code.toUpperCase() === 'FLAT50') {
+                    window.activePromo = { type: 'fixed', value: 50, code: 'FLAT50' };
+                }
+                updateCheckoutPrices();
+            } else {
+                btn.textContent = 'Apply';
+                msg.textContent = data.message;
+                msg.style.color = '#ef4444';
+            }
+        })
+        .catch(err => {
+            btn.textContent = 'Apply';
+            btn.disabled = false;
+            console.error(err);
+        });
+}
+
+/**
+ * Remove Promo Code
+ */
+function removePromoCode() {
+    const input = document.getElementById('promo-code-input');
+    const btn = document.getElementById('promo-btn');
+    const msg = document.getElementById('promo-message');
+
+    btn.textContent = '...';
+    btn.disabled = true;
+
+    const formData = new FormData();
+    formData.append('action', 'remove_promo');
+
+    fetch('checkout.php', {
+        method: 'POST',
+        headers: { 'X-Requested-With': 'XMLHttpRequest' },
+        body: formData
+    })
+        .then(res => res.json())
+        .then(data => {
+            btn.disabled = false;
+            if (data.success) {
+                input.disabled = false;
+                input.value = '';
+                btn.textContent = 'Apply';
+                btn.setAttribute('onclick', 'applyPromoCode()');
+                msg.textContent = '';
+                window.activePromo = null;
+                updateCheckoutPrices();
+            }
+        });
+}
+
+/**
  * Update all prices in checkout based on current quantities and shipping
  */
 function updateCheckoutPrices() {
@@ -137,6 +224,20 @@ function updateCheckoutPrices() {
         // Add to subtotal
         subtotal += itemTotal;
     });
+
+    // Calculate Promo Discount
+    let promoDiscount = 0;
+    if (window.activePromo) {
+        if (window.activePromo.type === 'percent') {
+            promoDiscount = subtotal * (window.activePromo.value / 100);
+        } else {
+            promoDiscount = parseFloat(window.activePromo.value);
+        }
+        // Cap at subtotal - bulkDiscount
+        if ((subtotal - discount - promoDiscount) < 0) {
+            promoDiscount = Math.max(0, subtotal - discount);
+        }
+    }
 
     // Get selected shipping method
     const shippingOptions = document.querySelectorAll('.shipping-option');
@@ -207,12 +308,15 @@ function updateCheckoutPrices() {
         methodNameElement.textContent = `(${methodName})`;
     }
 
-    // Calculate tax (18% on Subtotal - Discount + Shipping)
-    const taxableAmount = Math.max(0, subtotal - discount + shipping);
+    // Calculate Discounted Subtotal
+    const discountedSubtotal = Math.max(0, subtotal - discount - promoDiscount);
+
+    // Calculate tax (18% on Discounted Subtotal + Shipping)
+    const taxableAmount = Math.max(0, discountedSubtotal + shipping);
     const tax = taxableAmount * 0.18;
 
     // Calculate grand total
-    const total = subtotal - discount + shipping + tax;
+    const total = discountedSubtotal + shipping + tax;
 
     // Update all totals in the DOM
     const subtotalEl = document.getElementById('checkout-subtotal');
@@ -220,6 +324,22 @@ function updateCheckoutPrices() {
 
     const discountEl = document.getElementById('checkout-discount');
     if (discountEl) discountEl.textContent = '-' + formatPrice(discount);
+
+    // Update Promo Row
+    const promoRow = document.getElementById('promo-row');
+    const promoVal = document.getElementById('checkout-promo');
+    if (promoRow && promoVal) {
+        if (promoDiscount > 0) {
+            promoRow.style.display = 'flex';
+            promoVal.textContent = '-' + formatPrice(promoDiscount);
+        } else {
+            promoRow.style.display = 'none';
+        }
+    }
+
+    // Update Discounted Subtotal
+    const discountedSubtotalEl = document.getElementById('checkout-discounted-subtotal');
+    if (discountedSubtotalEl) discountedSubtotalEl.textContent = formatPrice(discountedSubtotal);
 
     const shippingEl = document.getElementById('checkout-shipping');
     if (shippingEl) shippingEl.textContent = formatPrice(shipping);

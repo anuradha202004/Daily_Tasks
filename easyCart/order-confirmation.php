@@ -339,6 +339,12 @@ if (!isset($_SESSION['last_order']['status'])) {
                             <span>Tax (18%)</span>
                             <span>$<?php echo number_format($lastOrder['tax'], 2); ?></span>
                         </div>
+                        <?php if (isset($lastOrder['promo_discount']) && $lastOrder['promo_discount'] > 0): ?>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px; color: #10b981;">
+                            <span>Promo Discount</span>
+                            <span>-$<?php echo number_format($lastOrder['promo_discount'], 2); ?></span>
+                        </div>
+                        <?php endif; ?>
                         <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
                             <span>Shipping (<?php echo htmlspecialchars($lastOrder['shipping_method_name'] ?? 'Standard'); ?>)</span>
                             <span>$<?php echo number_format($lastOrder['shipping_cost'] ?? 0, 2); ?></span>

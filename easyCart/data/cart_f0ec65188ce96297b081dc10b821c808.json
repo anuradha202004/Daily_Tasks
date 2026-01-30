@@ -38,5 +38,9 @@
     "100": {
         "product_id": 100,
         "quantity": 2
+    },
+    "30": {
+        "product_id": 30,
+        "quantity": 1
     }
 }

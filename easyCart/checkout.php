@@ -174,6 +174,35 @@ if (isset($_POST['action']) && $_POST['action'] === 'save_shipping') {
     exit;
 }
 
+// Handle AJAX apply promo
+if (isset($_POST['action']) && $_POST['action'] === 'apply_promo') {
+    $code = strtoupper(trim($_POST['code']));
+    $response = ['success' => false, 'message' => 'Invalid code'];
+    
+    // Example 1: SAVE10 (10% off subtotal)
+    if ($code === 'SAVE10') {
+        $_SESSION['applied_promo'] = ['code' => 'SAVE10', 'type' => 'percent', 'value' => 10];
+        $response = ['success' => true, 'message' => 'Promo applied: 10% Off!'];
+    } 
+    // Example 2: FLAT50 ($50 off)
+    elseif ($code === 'FLAT50') {
+        $_SESSION['applied_promo'] = ['code' => 'FLAT50', 'type' => 'fixed', 'value' => 50];
+        $response = ['success' => true, 'message' => 'Promo applied: $50 Off!'];
+    }
+    
+    header('Content-Type: application/json');
+    echo json_encode($response);
+    exit;
+}
+
+// Handle remove promo
+if (isset($_POST['action']) && $_POST['action'] === 'remove_promo') {
+    unset($_SESSION['applied_promo']);
+    header('Content-Type: application/json');
+    echo json_encode(['success' => true]);
+    exit;
+}
+
 // Get selected shipping method (Priority: POST > GET > SESSION > default)
 $selectedShipping = 'standard';
 if (isset($_POST['shipping_method'])) {
@@ -186,7 +215,6 @@ if (isset($_POST['shipping_method'])) {
     $selectedShipping = $_SESSION['selected_shipping'];
 }
 
-// Ensure the selected method is valid
 // Ensure the selected method is valid
 $validMethods = ['standard', 'express', 'whiteglove', 'freight'];
 
@@ -210,12 +238,35 @@ if (!in_array($selectedShipping, $validMethods)) {
 // Calculate shipping cost
 $shippingCost = calculateShippingCost($selectedShipping, $subtotal);
 
-// Calculate tax (18% on Subtotal - Discount + Shipping)
-$taxableAmount = $subtotal - $discount + $shippingCost;
+// Calculate Promo Discount
+$promoDiscount = 0;
+$appliedPromo = isset($_SESSION['applied_promo']) ? $_SESSION['applied_promo'] : null;
+
+if ($appliedPromo) {
+    if ($appliedPromo['type'] === 'percent') {
+        $promoDiscount = $subtotal * ($appliedPromo['value'] / 100);
+    } elseif ($appliedPromo['type'] === 'fixed') {
+        $promoDiscount = $appliedPromo['value'];
+    }
+    // Ensure discount doesn't exceed subtotal
+    $promoDiscount = min($promoDiscount, $subtotal - $discount); 
+    // Wait, discount is bulk discount. Subtotal is full price.
+    // Really we should ensure ($subtotal - $discount - $promoDiscount) >= 0
+    // Let's cap promoDiscount at ($subtotal - $discount)
+    if (($subtotal - $discount - $promoDiscount) < 0) {
+        $promoDiscount = max(0, $subtotal - $discount);
+    }
+}
+
+// Calculate tax (18% on Subtotal - (BulkDiscount + PromoDiscount) + Shipping)
+$taxableAmount = $subtotal - $discount - $promoDiscount + $shippingCost;
 $tax = max(0, $taxableAmount) * 0.18;
 
 // Calculate final total
-$total = ($subtotal - $discount) + $shippingCost + $tax;
+$total = ($subtotal - $discount - $promoDiscount) + $shippingCost + $tax;
+
+// Pass promo to JS
+echo "<script>window.activePromo = " . json_encode($appliedPromo) . ";</script>";
 
 // Define shipping options for display
 $shippingOptions = [
@@ -277,13 +328,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             }
         }
         $finalShippingCost = calculateShippingCost($finalShippingMethod, $subtotal);
-        $finalTaxableAmount = $subtotal - $discount + $finalShippingCost;
+        // Recalculate Promo Discount for Final Order
+        $promoDiscount = 0;
+        if (isset($_SESSION['applied_promo'])) {
+            $appliedPromo = $_SESSION['applied_promo'];
+            if ($appliedPromo['type'] === 'percent') {
+                $promoDiscount = $subtotal * ($appliedPromo['value'] / 100);
+            } elseif ($appliedPromo['type'] === 'fixed') {
+                $promoDiscount = $appliedPromo['value'];
+            }
+            if (($subtotal - $discount - $promoDiscount) < 0) {
+                $promoDiscount = max(0, $subtotal - $discount);
+            }
+        }
+
+        $finalTaxableAmount = $subtotal - $discount - $promoDiscount + $finalShippingCost;
         $finalTax = max(0, $finalTaxableAmount) * 0.18;
-        $finalTotal = $subtotal - $discount + $finalShippingCost + $finalTax;
+        $finalTotal = $subtotal - $discount - $promoDiscount + $finalShippingCost + $finalTax;
         
         $_SESSION['last_order'] = [
             'subtotal' => $subtotal,
             'discount' => $discount,
+            'promo_discount' => $promoDiscount,
             'shipping_method' => $finalShippingMethod,
             'shipping_method_name' => $shippingOptions[$finalShippingMethod]['name'],
             'shipping_cost' => $finalShippingCost,
@@ -721,8 +787,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                         <!-- Promo Code -->
                         <div class="promo-section">
                             <div class="promo-input-wrapper">
-                                <input type="text" placeholder="Promo code" class="promo-input">
-                                <button type="button" class="promo-btn">Apply</button>
+                                <input type="text" placeholder="Promo code" class="promo-input" id="promo-code-input" value="<?php echo $appliedPromo ? htmlspecialchars($appliedPromo['code']) : ''; ?>" <?php echo $appliedPromo ? 'disabled' : ''; ?>>
+                                <button type="button" class="promo-btn" id="promo-btn" onclick="<?php echo $appliedPromo ? 'removePromoCode()' : 'applyPromoCode()'; ?>"><?php echo $appliedPromo ? 'Remove' : 'Apply'; ?></button>
+                            </div>
+                            <div id="promo-message" style="margin-top: 8px; font-size: 13px; color: <?php echo $appliedPromo ? '#10b981' : 'inherit'; ?>;">
+                                <?php echo $appliedPromo ? 'Promo applied: ' . ($appliedPromo['type'] == 'percent' ? $appliedPromo['value'] . '%' : '$' . $appliedPromo['value']) . ' Off' : ''; ?>
                             </div>
                         </div>
 
@@ -736,6 +805,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                                 <span>Bulk Discount</span>
                                 <span id="checkout-discount" data-value="<?php echo $discount; ?>">-<?php echo formatPrice($discount); ?></span>
                             </div>
+                            <div class="total-row promo-row" style="color: #10b981; display: <?php echo $appliedPromo ? 'flex' : 'none'; ?>;" id="promo-row">
+                                <span>Promo Discount</span>
+                                <span id="checkout-promo" data-value="<?php echo $promoDiscount; ?>">-<?php echo formatPrice($promoDiscount); ?></span>
+                            </div>
+                            
+                            <hr style="border: 0; border-top: 1px solid #e5e7eb; margin: 10px 0;">
+                            
+                            <div class="total-row">
+                                <span style="font-weight: 600;">Discounted Subtotal</span>
+                                <span id="checkout-discounted-subtotal" style="font-weight: 600;"><?php echo formatPrice($subtotal - $discount - $promoDiscount); ?></span>
+                            </div>
+
                             <div class="total-row shipping-row">
                                 <span>
                                     Shipping
@@ -748,7 +829,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                             <div class="total-row">
                                 <span>
                                     Tax (18%)
-                                    <small>on Subtotal + Shipping</small>
+                                    <small>on Discounted Subtotal + Shipping</small>
                                 </span>
                                 <span id="checkout-tax" data-value="<?php echo $tax; ?>"><?php echo formatPrice($tax); ?></span>
                             </div>
