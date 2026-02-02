@@ -49,9 +49,10 @@ if (isset($_REQUEST['product_id']) && isset($_REQUEST['qty'])) {
     // Capture the intended quantity
     $targetQty = intval($_REQUEST['qty']);
 
-    // RESET SHIPPING METHOD: If checking out a different product, reset to standard
-    if (isset($_SESSION['checkout_product_id']) && $_SESSION['checkout_product_id'] !== $pid) {
+    // RESET SHIPPING & PROMO: If checking out a different product, or starting fresh Buy Now
+    if (!isset($_SESSION['checkout_product_id']) || $_SESSION['checkout_product_id'] !== $pid) {
         unset($_SESSION['selected_shipping']);
+        unset($_SESSION['applied_promo']);
     }
     $_SESSION['checkout_product_id'] = $pid;
 
@@ -371,6 +372,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             'items' => $cartItemsWithDetails,
             'date' => date('Y-m-d H:i:s')
         ];
+
+        // Save Order to Database
+        if (isset($_SESSION['user_id'])) {
+            $dbOrderData = [
+                'order_number' => $_SESSION['last_order']['order_number'],
+                'subtotal' => $subtotal,
+                'tax' => $finalTax,
+                'shipping_cost' => $finalShippingCost,
+                'discount' => $discount + $promoDiscount,
+                'total' => $finalTotal,
+                'status' => 'Processing',
+                'shipping_method' => $finalShippingMethod
+            ];
+            createOrder($_SESSION['user_id'], $dbOrderData, $cartItemsWithDetails);
+        }
         
         // Clear cart ONLY if checking out from cart (not Buy Now)
         if (!$isBuyNow) {

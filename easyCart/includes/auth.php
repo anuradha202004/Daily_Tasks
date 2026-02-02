@@ -1,63 +1,16 @@
 <?php
 /**
- * Authentication Management for EasyCart
- * Handles user login, signup, and session management
+ * Authentication Management (Database Integrated)
+ * Handles user login, signup, and session management via PostgreSQL
  */
 
-// Path to users data file
-$usersDataFile = __DIR__ . '/../data/users.json';
+require_once 'db.php';
 
-// Ensure data directory exists
-if (!is_dir(__DIR__ . '/../data')) {
-    mkdir(__DIR__ . '/../data', 0755, true);
+if (!isset($pdo)) {
+    $pdo = getDBConnection();
 }
 
-// Load registered users from file
-function loadRegisteredUsers() {
-    global $usersDataFile;
-    
-    $defaultUsers = [
-        'demo@example.com' => [
-            'email' => 'demo@example.com',
-            'password' => 'password123',
-            'name' => 'Demo User',
-            'created' => '2026-01-01'
-        ]
-    ];
-    
-    // If file doesn't exist or is empty, use default users
-    if (!file_exists($usersDataFile) || filesize($usersDataFile) == 0) {
-        return $defaultUsers;
-    }
-    
-    // Load users from file
-    $fileContent = file_get_contents($usersDataFile);
-    $users = json_decode($fileContent, true);
-    
-    // Merge with default users (to ensure demo user always exists)
-    if (is_array($users)) {
-        return array_merge($defaultUsers, $users);
-    }
-    
-    return $defaultUsers;
-}
-
-// Save registered users to file
-function saveRegisteredUsers($users) {
-    global $usersDataFile;
-    
-    // Write users to file
-    $jsonData = json_encode($users, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
-    file_put_contents($usersDataFile, $jsonData);
-}
-
-// Load users at the start
-$registeredUsers = loadRegisteredUsers();
-
-// ADD THIS LINE BELOW:
-if (session_status() === PHP_SESSION_ACTIVE) {
-    $_SESSION['all_users_from_json'] = $registeredUsers;
-}
+// Remove JSON file logic as we are now fully DB-driven
 
 /**
  * Check if user is logged in
@@ -84,8 +37,8 @@ function getCurrentUser() {
  * Register new user
  */
 function registerUser($email, $password, $name, $confirmPassword) {
-    global $registeredUsers;
-    
+    global $pdo;
+
     $errors = [];
     
     // Validate input
@@ -109,9 +62,15 @@ function registerUser($email, $password, $name, $confirmPassword) {
         $errors[] = 'Full name is required';
     }
     
-    // Check if email already exists
-    if (isset($registeredUsers[$email])) {
-        $errors[] = 'Email already registered';
+    // Check if email already exists in DB
+    try {
+        $stmt = $pdo->prepare("SELECT id FROM users WHERE email = :email");
+        $stmt->execute([':email' => $email]);
+        if ($stmt->fetch()) {
+            $errors[] = 'Email already registered';
+        }
+    } catch (PDOException $e) {
+        $errors[] = 'Database error: ' . $e->getMessage();
     }
     
     if (count($errors) > 0) {
@@ -122,132 +81,137 @@ function registerUser($email, $password, $name, $confirmPassword) {
     $guestCart = isset($_SESSION['cart']) ? $_SESSION['cart'] : [];
     $guestWishlist = isset($_SESSION['wishlist']) ? $_SESSION['wishlist'] : [];
     
-    // Register user
-    $registeredUsers[$email] = [
-        'email' => $email,
-        'password' => $password, // In production: password_hash($password, PASSWORD_BCRYPT)
-        'name' => $name,
-        'created' => date('Y-m-d H:i:s')
-    ];
-    
-    // Save users to file
-    saveRegisteredUsers($registeredUsers);
-    
-    // Create session
-    $_SESSION['user_id'] = md5($email);
-    $_SESSION['user_email'] = $email;
-    $_SESSION['user_name'] = $name;
-    $_SESSION['login_time'] = date('Y-m-d H:i:s');
-    
-    // Load cart and wishlist from files for this user
-    require_once __DIR__ . '/data.php';
-    $_SESSION['cart'] = loadUserCart($email);
-    $_SESSION['wishlist'] = loadUserWishlist($email);
-    
-    // Merge guest cart items into user cart
-    if (!empty($guestCart)) {
-        foreach ($guestCart as $productId => $guestItem) {
-            if (isset($_SESSION['cart'][$productId])) {
-                // If product already exists in user cart, add quantities
-                $_SESSION['cart'][$productId]['quantity'] += $guestItem['quantity'];
-            } else {
-                // If product doesn't exist, add it from guest cart
-                $_SESSION['cart'][$productId] = $guestItem;
-            }
+    // Insert new user
+    try {
+        $stmt = $pdo->prepare("INSERT INTO users (email, password, name, created_at) VALUES (:email, :password, :name, NOW())");
+        // Store plaintext password for compatibility with migrated data, or use password_hash() if preferred for new users
+        // For consistency with setup_database.php and existing login, we stick to plaintext (or update login to check both)
+        // Let's stick to what the user had: plaintext for this phase.
+        $stmt->execute([
+            ':email' => $email, 
+            ':password' => $password, 
+            ':name' => $name
+        ]);
+        
+        // Get limits ID
+        $newUserId = $pdo->lastInsertId(); // Should work for SERIAL with PDO Postgres if sequence is right, or query fetch
+        
+        // If lastInsertId fails (sometimes on Pg), query it
+        if (!$newUserId) {
+            $stmt = $pdo->prepare("SELECT id FROM users WHERE email = :email");
+            $stmt->execute([':email' => $email]);
+            $newUserId = $stmt->fetchColumn();
         }
-        // Save merged cart to file
-        saveUserCart($email, $_SESSION['cart']);
-    }
-    
-    // Merge guest wishlist items into user wishlist
-    if (!empty($guestWishlist)) {
-        foreach ($guestWishlist as $productId => $guestWishItem) {
-            if (!isset($_SESSION['wishlist'][$productId])) {
-                $_SESSION['wishlist'][$productId] = $guestWishItem;
+        
+        // Create session
+        $_SESSION['user_id'] = $newUserId; // INTEGER ID
+        $_SESSION['user_email'] = $email;
+        $_SESSION['user_name'] = $name;
+        $_SESSION['login_time'] = date('Y-m-d H:i:s');
+        
+        // Load cart and wishlist (file based, using Email as identifier)
+        require_once __DIR__ . '/data.php';
+        $_SESSION['cart'] = loadUserCart($email);
+        $_SESSION['wishlist'] = loadUserWishlist($email);
+        
+        // Merge guest cart items
+        if (!empty($guestCart)) {
+            foreach ($guestCart as $productId => $guestItem) {
+                if (isset($_SESSION['cart'][$productId])) {
+                    $_SESSION['cart'][$productId]['quantity'] += $guestItem['quantity'];
+                } else {
+                    $_SESSION['cart'][$productId] = $guestItem;
+                }
             }
+            saveUserCart($email, $_SESSION['cart']);
         }
-        // Save merged wishlist to file
-        saveUserWishlist($email, $_SESSION['wishlist']);
+        
+        // Merge guest wishlist items
+        if (!empty($guestWishlist)) {
+            foreach ($guestWishlist as $productId => $guestWishItem) {
+                if (!isset($_SESSION['wishlist'][$productId])) {
+                    $_SESSION['wishlist'][$productId] = $guestWishItem;
+                }
+            }
+            saveUserWishlist($email, $_SESSION['wishlist']);
+        }
+        
+        return ['success' => true, 'message' => 'Account created successfully!'];
+
+    } catch (PDOException $e) {
+        return ['success' => false, 'errors' => ['Registration failed: ' . $e->getMessage()]];
     }
-    
-    return ['success' => true, 'message' => 'Account created successfully!'];
 }
 
 /**
  * Login user
  */
 function loginUser($email, $password) {
-    global $registeredUsers;
-    
+    global $pdo;
+
     $errors = [];
     
-    // Validate input
-    if (empty($email)) {
-        $errors[] = 'Email is required';
-    }
+    if (empty($email)) $errors[] = 'Email is required';
+    if (empty($password)) $errors[] = 'Password is required';
     
-    if (empty($password)) {
-        $errors[] = 'Password is required';
-    }
+    if (count($errors) > 0) return ['success' => false, 'errors' => $errors];
     
-    if (count($errors) > 0) {
-        return ['success' => false, 'errors' => $errors];
-    }
-    
-    // Check credentials
-    if (!isset($registeredUsers[$email])) {
-        return ['success' => false, 'errors' => ['Email not found']];
-    }
-    
-    $user = $registeredUsers[$email];
-    
-    // In production: password_verify($password, $user['password'])
-    if ($password !== $user['password']) {
-        return ['success' => false, 'errors' => ['Invalid password']];
-    }
-    
-    // Save guest cart items before clearing session
-    $guestCart = isset($_SESSION['cart']) ? $_SESSION['cart'] : [];
-    $guestWishlist = isset($_SESSION['wishlist']) ? $_SESSION['wishlist'] : [];
-    
-    // Create session
-    $_SESSION['user_id'] = md5($email);
-    $_SESSION['user_email'] = $email;
-    $_SESSION['user_name'] = $user['name'];
-    $_SESSION['login_time'] = date('Y-m-d H:i:s');
-    
-    // Load cart and wishlist from files for this user
-    require_once __DIR__ . '/data.php';
-    $_SESSION['cart'] = loadUserCart($email);
-    $_SESSION['wishlist'] = loadUserWishlist($email);
-    
-    // Merge guest cart items into user cart
-    if (!empty($guestCart)) {
-        foreach ($guestCart as $productId => $guestItem) {
-            if (isset($_SESSION['cart'][$productId])) {
-                // If product already exists in user cart, add quantities
-                $_SESSION['cart'][$productId]['quantity'] += $guestItem['quantity'];
-            } else {
-                // If product doesn't exist, add it from guest cart
-                $_SESSION['cart'][$productId] = $guestItem;
-            }
+    try {
+        $stmt = $pdo->prepare("SELECT * FROM users WHERE email = :email");
+        $stmt->execute([':email' => $email]);
+        $user = $stmt->fetch();
+        
+        if (!$user) {
+            return ['success' => false, 'errors' => ['Email not found']];
         }
-        // Save merged cart to file
-        saveUserCart($email, $_SESSION['cart']);
-    }
-    
-    // Merge guest wishlist items into user wishlist
-    if (!empty($guestWishlist)) {
-        foreach ($guestWishlist as $productId => $guestWishItem) {
-            if (!isset($_SESSION['wishlist'][$productId])) {
-                $_SESSION['wishlist'][$productId] = $guestWishItem;
-            }
+        
+        // Verify Password (Plaintext check for now as per migration)
+        if ($password !== $user['password']) {
+            return ['success' => false, 'errors' => ['Invalid password']];
         }
-        // Save merged wishlist to file
-        saveUserWishlist($email, $_SESSION['wishlist']);
+        
+        // Valid Login
+        // Save guest cart items
+        $guestCart = isset($_SESSION['cart']) ? $_SESSION['cart'] : [];
+        $guestWishlist = isset($_SESSION['wishlist']) ? $_SESSION['wishlist'] : [];
+        
+        // Set Session
+        $_SESSION['user_id'] = $user['id']; // INTEGER ID
+        $_SESSION['user_email'] = $user['email'];
+        $_SESSION['user_name'] = $user['name'];
+        $_SESSION['login_time'] = date('Y-m-d H:i:s');
+        
+        // Load Cart/Wishlist
+        require_once __DIR__ . '/data.php';
+        $_SESSION['cart'] = loadUserCart($email);
+        $_SESSION['wishlist'] = loadUserWishlist($email);
+        
+        // Merge guest items
+        if (!empty($guestCart)) {
+            foreach ($guestCart as $productId => $guestItem) {
+                if (isset($_SESSION['cart'][$productId])) {
+                    $_SESSION['cart'][$productId]['quantity'] += $guestItem['quantity'];
+                } else {
+                    $_SESSION['cart'][$productId] = $guestItem;
+                }
+            }
+            saveUserCart($email, $_SESSION['cart']);
+        }
+        
+        if (!empty($guestWishlist)) {
+            foreach ($guestWishlist as $productId => $guestWishItem) {
+                if (!isset($_SESSION['wishlist'][$productId])) {
+                    $_SESSION['wishlist'][$productId] = $guestWishItem;
+                }
+            }
+            saveUserWishlist($email, $_SESSION['wishlist']);
+        }
+        
+        return ['success' => true, 'message' => 'Logged in successfully!'];
+        
+    } catch (PDOException $e) {
+        return ['success' => false, 'errors' => ['Login error: ' . $e->getMessage()]];
     }
-    
-    return ['success' => true, 'message' => 'Logged in successfully!'];
 }
 
 /**

@@ -1,451 +1,58 @@
 <?php
 /**
- * Static Data File for EasyCart
- * Contains all product, category, and brand data
+ * Data Management for EasyCart (Database Integrated)
+ * Handles Products, Categories, Brands, and Orders via PostgreSQL
  */
 
-// Categories Data
-$categories = [
-    1 => [
-        'id' => 1,
-        'name' => 'Electronics',
-        'slug' => 'electronics',
-        'description' => 'Electronic gadgets and devices'
-    ],
-    2 => [
-        'id' => 2,
-        'name' => 'Fashion',
-        'slug' => 'fashion',
-        'description' => 'Clothing and accessories'
-    ],
-    3 => [
-        'id' => 3,
-        'name' => 'Home & Living',
-        'slug' => 'home-living',
-        'description' => 'Home and lifestyle products'
-    ],
-    4 => [
-        'id' => 4,
-        'name' => 'Sports & Outdoors',
-        'slug' => 'sports-outdoors',
-        'description' => 'Sports and outdoor equipment'
-    ],
-    5 => [
-        'id' => 5,
-        'name' => 'Books & Media',
-        'slug' => 'books-media',
-        'description' => 'Books and multimedia content'
-    ]
-];
+require_once 'db.php';
+require_once 'auth.php'; // Needed for User ID in cart functions if used
 
-// Brands Data
-$brands = [
-    1 => ['id' => 1, 'name' => 'TechPro'],
-    2 => ['id' => 2, 'name' => 'StyleMax'],
-    3 => ['id' => 3, 'name' => 'HomeComfort'],
-    4 => ['id' => 4, 'name' => 'SportZone'],
-    5 => ['id' => 5, 'name' => 'MediaHub']
-];
+// Initialize DB Connection
+if (!isset($pdo)) {
+    $pdo = getDBConnection();
+}
 
-// Products Data
-$products = [
-    1 => [
-        'id' => 1,
-        'name' => 'wireless headphone',
-        'description' => 'Premium wireless headphones with noise cancellation',
-        'price' => 89.99,
-        'category_id' => 1,
-        'brand_id' => 1,
-        'stock' => 45,
-        'rating' => 4.5,
-        'reviews' => 234,
-        'emoji' => '🎧'
-    ],
-    2 => [
-        'id' => 2,
-        'name' => 'Smart Watch',
-        'description' => 'Feature-rich smartwatch with health tracking',
-        'price' => 199.99,
-        'category_id' => 1,
-        'brand_id' => 1,
-        'stock' => 30,
-        'rating' => 4.7,
-        'reviews' => 189,
-        'emoji' => '⌚'
-    ],
-    3 => [
-        'id' => 3,
-        'name' => 'Running Shoes',
-        'description' => 'Comfortable running shoes for all terrains',
-        'price' => 79.99,
-        'category_id' => 2,
-        'brand_id' => 2,
-        'stock' => 120,
-        'rating' => 4.3,
-        'reviews' => 456,
-        'emoji' => '👟'
-    ],
-    4 => [
-        'id' => 4,
-        'name' => 'Designer Handbag',
-        'description' => 'Elegant designer handbag with premium materials',
-        'price' => 149.99,
-        'category_id' => 2,
-        'brand_id' => 2,
-        'stock' => 25,
-        'rating' => 4.6,
-        'reviews' => 98,
-        'emoji' => '👜'
-    ],
-    5 => [
-        'id' => 5,
-        'name' => 'Coffee Maker',
-        'description' => 'Automatic coffee maker with programmable features',
-        'price' => 69.99,
-        'category_id' => 3,
-        'brand_id' => 3,
-        'stock' => 55,
-        'rating' => 4.4,
-        'reviews' => 312,
-        'emoji' => '☕'
-    ],
-    6 => [
-        'id' => 6,
-        'name' => 'Yoga Mat',
-        'description' => 'Non-slip yoga mat with extra cushioning',
-        'price' => 29.99,
-        'category_id' => 4,
-        'brand_id' => 4,
-        'stock' => 200,
-        'rating' => 4.5,
-        'reviews' => 521,
-        'emoji' => '🧘'
-    ],
-    7 => [
-        'id' => 7,
-        'name' => 'Bluetooth Speaker',
-        'description' => 'Portable Bluetooth speaker with rich sound',
-        'price' => 59.99,
-        'category_id' => 1,
-        'brand_id' => 1,
-        'stock' => 80,
-        'rating' => 4.4,
-        'reviews' => 267,
-        'emoji' => '🔊'
-    ],
-    8 => [
-        'id' => 8,
-        'name' => 'Novel Collection',
-        'description' => 'Bestselling novel collection bundle',
-        'price' => 24.99,
-        'category_id' => 5,
-        'brand_id' => 5,
-        'stock' => 150,
-        'rating' => 4.8,
-        'reviews' => 445,
-        'emoji' => '📚'
-    ],
-    9 => [
-        'id' => 9,
-        'name' => 'Desk Lamp',
-        'description' => 'LED desk lamp with adjustable brightness',
-        'price' => 39.99,
-        'category_id' => 3,
-        'brand_id' => 3,
-        'stock' => 90,
-        'rating' => 4.2,
-        'reviews' => 178,
-        'emoji' => '💡'
-    ],
-    10 => [
-        'id' => 10,
-        'name' => 'Backpack',
-        'description' => 'Durable backpack with laptop compartment',
-        'price' => 54.99,
-        'category_id' => 2,
-        'brand_id' => 2,
-        'stock' => 65,
-        'rating' => 4.5,
-        'reviews' => 334,
-        'emoji' => '🎒'
-    ],
-    11 => [
-        'id' => 11,
-        'name' => 'Fitness Tracker',
-        'description' => 'Water-resistant fitness tracker with GPS',
-        'price' => 49.99,
-        'category_id' => 1,
-        'brand_id' => 1,
-        'stock' => 110,
-        'rating' => 4.3,
-        'reviews' => 289,
-        'emoji' => '⌚'
-    ],
-    12 => [
-        'id' => 12,
-        'name' => 'Table Clock',
-        'description' => 'Modern table clock with alarm features',
-        'price' => 19.99,
-        'category_id' => 3,
-        'brand_id' => 3,
-        'stock' => 75,
-        'rating' => 4.1,
-        'reviews' => 156,
-        'emoji' => '⏰'
-    ],
-    13 => [
-        'id' => 13,
-        'name' => 'Wireless Mouse',
-        'description' => 'Ergonomic wireless mouse with precision control',
-        'price' => 34.99,
-        'category_id' => 1,
-        'brand_id' => 1,
-        'stock' => 140,
-        'rating' => 4.4,
-        'reviews' => 278,
-        'emoji' => '🖱️'
-    ],
-    14 => [
-        'id' => 14,
-        'name' => 'USB-C Cable',
-        'description' => 'Fast charging USB-C cable (1m)',
-        'price' => 14.99,
-        'category_id' => 1,
-        'brand_id' => 1,
-        'stock' => 300,
-        'rating' => 4.6,
-        'reviews' => 512,
-        'emoji' => '🔌'
-    ],
-    15 => [
-        'id' => 15,
-        'name' => 'Phone Stand',
-        'description' => 'Adjustable phone stand for desk',
-        'price' => 12.99,
-        'category_id' => 1,
-        'brand_id' => 1,
-        'stock' => 250,
-        'rating' => 4.3,
-        'reviews' => 423,
-        'emoji' => '📱'
-    ],
-    16 => [
-        'id' => 16,
-        'name' => 'Winter Jacket',
-        'description' => 'Waterproof winter jacket with thermal lining',
-        'price' => 129.99,
-        'category_id' => 2,
-        'brand_id' => 2,
-        'stock' => 45,
-        'rating' => 4.7,
-        'reviews' => 189,
-        'emoji' => '🧥'
-    ],
-    17 => [
-        'id' => 17,
-        'name' => 'Jeans',
-        'description' => 'Classic blue denim jeans',
-        'price' => 59.99,
-        'category_id' => 2,
-        'brand_id' => 2,
-        'stock' => 180,
-        'rating' => 4.4,
-        'reviews' => 567,
-        'emoji' => '👖'
-    ],
-    18 => [
-        'id' => 18,
-        'name' => 'Sunglasses',
-        'description' => 'UV protection designer sunglasses',
-        'price' => 89.99,
-        'category_id' => 2,
-        'brand_id' => 2,
-        'stock' => 95,
-        'rating' => 4.5,
-        'reviews' => 234,
-        'emoji' => '😎'
-    ],
-    19 => [
-        'id' => 19,
-        'name' => 'Bed Pillow',
-        'description' => 'Memory foam pillow for better sleep',
-        'price' => 44.99,
-        'category_id' => 3,
-        'brand_id' => 3,
-        'stock' => 120,
-        'rating' => 4.6,
-        'reviews' => 456,
-        'emoji' => '🛏️'
-    ],
-    20 => [
-        'id' => 20,
-        'name' => 'Blanket',
-        'description' => 'Soft and warm fleece blanket',
-        'price' => 32.99,
-        'category_id' => 3,
-        'brand_id' => 3,
-        'stock' => 200,
-        'rating' => 4.5,
-        'reviews' => 389,
-        'emoji' => '🛁'
-    ],
-    21 => [
-        'id' => 21,
-        'name' => 'Kitchen Knife Set',
-        'description' => 'Professional 5-piece kitchen knife set',
-        'price' => 74.99,
-        'category_id' => 3,
-        'brand_id' => 3,
-        'stock' => 60,
-        'rating' => 4.7,
-        'reviews' => 234,
-        'emoji' => '🔪'
-    ],
-    22 => [
-        'id' => 22,
-        'name' => 'Dumbbells Set',
-        'description' => 'Adjustable dumbbells (5-25 lbs)',
-        'price' => 99.99,
-        'category_id' => 4,
-        'brand_id' => 4,
-        'stock' => 40,
-        'rating' => 4.6,
-        'reviews' => 312,
-        'emoji' => '🏋️'
-    ],
-    23 => [
-        'id' => 23,
-        'name' => 'Bicycle',
-        'description' => 'Mountain bike with 21 gears',
-        'price' => 249.99,
-        'category_id' => 4,
-        'brand_id' => 4,
-        'stock' => 25,
-        'rating' => 4.5,
-        'reviews' => 178,
-        'emoji' => '🚴'
-    ],
-    24 => [
-        'id' => 24,
-        'name' => 'Basketball',
-        'description' => 'Official size professional basketball',
-        'price' => 29.99,
-        'category_id' => 4,
-        'brand_id' => 4,
-        'stock' => 85,
-        'rating' => 4.4,
-        'reviews' => 156,
-        'emoji' => '🏀'
-    ],
-    25 => [
-        'id' => 25,
-        'name' => 'Tent',
-        'description' => '2-person camping tent with rain fly',
-        'price' => 139.99,
-        'category_id' => 4,
-        'brand_id' => 4,
-        'stock' => 35,
-        'rating' => 4.6,
-        'reviews' => 267,
-        'emoji' => '⛺'
-    ],
-    26 => [
-        'id' => 26,
-        'name' => 'Gaming PC',
-        'description' => 'High-end gaming desktop with RTX 4080',
-        'price' => 2499.99,
-        'category_id' => 1,
-        'brand_id' => 1,
-        'stock' => 15,
-        'rating' => 4.9,
-        'reviews' => 89,
-        'emoji' => '🖥️'
-    ],
-    27 => [
-        'id' => 27,
-        'name' => 'Smart Refrigerator',
-        'description' => 'Double-door smart fridge with touch screen',
-        'price' => 1899.00,
-        'category_id' => 3,
-        'brand_id' => 3,
-        'stock' => 12,
-        'rating' => 4.8,
-        'reviews' => 45,
-        'emoji' => '🧊'
-    ],
-    28 => [
-        'id' => 28,
-        'name' => 'OLED 4K TV',
-        'description' => '65-inch OLED 4K Smart TV',
-        'price' => 1299.99,
-        'category_id' => 1,
-        'brand_id' => 1,
-        'stock' => 20,
-        'rating' => 4.7,
-        'reviews' => 156,
-        'emoji' => '📺'
-    ],
-    29 => [
-        'id' => 29,
-        'name' => 'Professional Treadmill',
-        'description' => 'Gym-grade treadmill with incline',
-        'price' => 899.99,
-        'category_id' => 4,
-        'brand_id' => 4,
-        'stock' => 8,
-        'rating' => 4.6,
-        'reviews' => 34,
-        'emoji' => '🏃'
-    ],
-    30 => [
-        'id' => 30,
-        'name' => 'Luxury Chronograph',
-        'description' => 'Premium Swiss-movement chronograph watch',
-        'price' => 4500.00,
-        'category_id' => 2,
-        'brand_id' => 2,
-        'stock' => 5,
-        'rating' => 5.0,
-        'reviews' => 12,
-        'emoji' => '⌚'
-    ]
-];
+// 1. Fetch Categories from Database
+$categories = [];
+try {
+    $stmt = $pdo->query("SELECT * FROM categories ORDER BY id");
+    while ($row = $stmt->fetch()) {
+        $categories[$row['id']] = $row;
+    }
+} catch (PDOException $e) { /* Fail silently or log */ }
 
-// Static Order History Data (Single User)
-$orders = [
-    1 => [
-        'id' => 1,
-        'order_number' => '#ORD-001',
-        'date' => '2026-01-15',
-        'items' => [
-            ['product_id' => 1, 'quantity' => 1, 'price' => 89.99],
-            ['product_id' => 6, 'quantity' => 2, 'price' => 29.99]
-        ],
-        'subtotal' => 149.97,
-        'status' => 'Delivered'
-    ],
-    2 => [
-        'id' => 2,
-        'order_number' => '#ORD-002',
-        'date' => '2026-01-10',
-        'items' => [
-            ['product_id' => 3, 'quantity' => 1, 'price' => 79.99]
-        ],
-        'subtotal' => 79.99,
-        'status' => 'Delivered'
-    ],
-    3 => [
-        'id' => 3,
-        'order_number' => '#ORD-003',
-        'date' => '2026-01-05',
-        'items' => [
-            ['product_id' => 4, 'quantity' => 1, 'price' => 149.99],
-            ['product_id' => 5, 'quantity' => 1, 'price' => 69.99]
-        ],
-        'subtotal' => 219.98,
-        'status' => 'Processing'
-    ]
-];
+// 2. Fetch Brands from Database
+$brands = [];
+try {
+    $stmt = $pdo->query("SELECT * FROM brands ORDER BY id");
+    while ($row = $stmt->fetch()) {
+        $brands[$row['id']] = $row;
+    }
+} catch (PDOException $e) { /* Fail silently */ }
+
+// 3. Fetch Products from Database
+$products = [];
+try {
+    $stmt = $pdo->query("SELECT * FROM products ORDER BY id");
+    while ($row = $stmt->fetch()) {
+        // Cast types to match original static data structure
+        $row['price'] = (float)$row['price'];
+        $row['stock'] = (int)$row['stock'];
+        $row['rating'] = (float)$row['rating'];
+        $row['reviews'] = (int)$row['reviews_count']; // Map reviews_count back to 'reviews' key
+        unset($row['reviews_count']);
+        
+        $products[$row['id']] = $row;
+    }
+} catch (PDOException $e) { /* Fail silently */ }
+
+// Placeholder for orders (for backward compatibility if anything accessed $orders directly, though mostly unused)
+$orders = []; 
+
+
+// ============================================
+// HELPER FUNCTIONS
+// ============================================
 
 // Helper function to get product by ID
 function getProductById($id) {
@@ -532,6 +139,72 @@ function renderStars($rating) {
 }
 
 // ============================================
+// ORDER MANAGEMENT (DB)
+// ============================================
+
+/**
+ * Create a new order in the database
+ */
+function createOrder($userId, $orderData, $items) {
+    global $pdo;
+    
+    try {
+        $pdo->beginTransaction();
+        
+        // 1. Insert Order
+        $stmt = $pdo->prepare("
+            INSERT INTO orders 
+            (user_id, order_number, subtotal, tax, shipping_cost, discount, total, status, shipping_method, created_at)
+            VALUES 
+            (:user_id, :order_number, :subtotal, :tax, :shipping_cost, :discount, :total, :status, :shipping_method, NOW())
+            RETURNING id
+        ");
+        
+        $stmt->execute([
+            ':user_id' => $userId, // Can be NULL for guest checkout
+            ':order_number' => $orderData['order_number'],
+            ':subtotal' => $orderData['subtotal'],
+            ':tax' => $orderData['tax'],
+            ':shipping_cost' => $orderData['shipping_cost'],
+            ':discount' => $orderData['discount'], // Includes bulk + promo
+            ':total' => $orderData['total'],
+            ':status' => $orderData['status'],
+            ':shipping_method' => $orderData['shipping_method']
+        ]);
+        
+        $orderId = $stmt->fetchColumn();
+        
+        // 2. Insert Order Items
+        $itemStmt = $pdo->prepare("
+            INSERT INTO order_items (order_id, product_id, quantity, price, item_total)
+            VALUES (:order_id, :product_id, :quantity, :price, :item_total)
+        ");
+        
+        foreach ($items as $item) {
+            $itemStmt->execute([
+                ':order_id' => $orderId,
+                ':product_id' => $item['product']['id'],
+                ':quantity' => $item['quantity'],
+                ':price' => $item['product']['price'],
+                ':item_total' => $item['itemTotal']
+            ]);
+            
+            // Optional: Update Stock
+            // $pdo->exec("UPDATE products SET stock = stock - {$item['quantity']} WHERE id = {$item['product']['id']}");
+        }
+        
+        $pdo->commit();
+        return true;
+        
+    } catch (PDOException $e) {
+        $pdo->rollBack();
+        error_log("Order Creation Failed: " . $e->getMessage());
+        return false;
+    }
+}
+
+
+// ============================================
 // CART & WISHLIST PERSISTENCE FUNCTIONS
 // ============================================
 
@@ -599,19 +272,23 @@ function saveUserWishlist($userId, $wishlist) {
     file_put_contents($wishlistFile, $jsonData);
 }
 
-// Initialize cart from file on login
+// Initialize cart from file (called in index.php)
 function initializeCartFromFile() {
     if (isLoggedIn() && isset($_SESSION['user_email'])) {
-        $cart = loadUserCart($_SESSION['user_email']);
-        $_SESSION['cart'] = $cart;
+        $savedCart = loadUserCart($_SESSION['user_email']);
+        if (!empty($savedCart)) {
+            $_SESSION['cart'] = $savedCart;
+        }
     }
 }
 
-// Initialize wishlist from file on login
+// Initialize wishlist from file (called in index.php)
 function initializeWishlistFromFile() {
     if (isLoggedIn() && isset($_SESSION['user_email'])) {
-        $wishlist = loadUserWishlist($_SESSION['user_email']);
-        $_SESSION['wishlist'] = $wishlist;
+        $savedWishlist = loadUserWishlist($_SESSION['user_email']);
+        if (!empty($savedWishlist)) {
+            $_SESSION['wishlist'] = $savedWishlist;
+        }
     }
 }
 ?>
