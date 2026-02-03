@@ -374,26 +374,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         ];
 
         // Save Order to Database
-        if (isset($_SESSION['user_id'])) {
-            $dbOrderData = [
-                'order_number' => $_SESSION['last_order']['order_number'],
-                'subtotal' => $subtotal,
-                'tax' => $finalTax,
-                'shipping_cost' => $finalShippingCost,
-                'discount' => $discount + $promoDiscount,
-                'total' => $finalTotal,
-                'status' => 'Processing',
-                'shipping_method' => $finalShippingMethod
-            ];
-            createOrder($_SESSION['user_id'], $dbOrderData, $cartItemsWithDetails);
-        }
+        // Note: createOrder handles guests (user_id = null)
+        $userId = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
+        
+        $dbOrderData = [
+            'order_number' => $_SESSION['last_order']['order_number'],
+            'subtotal' => $subtotal,
+            'tax' => $finalTax,
+            'shipping_cost' => $finalShippingCost,
+            'discount' => $discount + $promoDiscount,
+            'total' => $finalTotal,
+            'status' => 'Processing',
+            'shipping_method' => $finalShippingMethod,
+            'customer' => $_SESSION['last_order']['customer'], // Pass customer data for address saving
+            'customer_email' => $_SESSION['last_order']['customer']['email'] // Explicit email for guests
+        ];
+        
+        createOrder($userId, $dbOrderData, $cartItemsWithDetails);
         
         // Clear cart ONLY if checking out from cart (not Buy Now)
         if (!$isBuyNow) {
             $_SESSION['cart'] = [];
-            if (isLoggedIn() && isset($_SESSION['user_email'])) {
-                saveUserCart($_SESSION['user_email'], $_SESSION['cart']);
-            }
+            // Clear in DB too (for both guests and users)
+            saveUserCart(isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null, []);
         }
         
         // Clear shipping selection for the next order

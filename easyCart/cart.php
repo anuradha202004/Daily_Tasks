@@ -57,10 +57,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'quantity' => min($quantity, $product['stock'])
         ];
         
-        // Save cart for logged-in users
-        if (isLoggedIn() && isset($_SESSION['user_email'])) {
-            saveUserCart($_SESSION['user_email'], $_SESSION['cart']);
-        }
+        // Save cart (DB sync handles guest/user distinction)
+        saveUserCart(null, $_SESSION['cart']);
         
         header('Content-Type: application/json');
         echo json_encode([
@@ -75,9 +73,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($action === 'remove' && isset($_POST['product_id'])) {
         $productId = intval($_POST['product_id']);
         unset($_SESSION['cart'][$productId]);
-        if (isLoggedIn() && isset($_SESSION['user_email'])) {
-            saveUserCart($_SESSION['user_email'], $_SESSION['cart']);
-        }
+        // Save cart
+        saveUserCart(null, $_SESSION['cart']);
         
         if ($isAjax) {
             $summary = calculateCartSummary();
@@ -101,9 +98,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $_SESSION['cart'][$productId]['quantity'] = $quantity;
             }
         }
-        if (isLoggedIn() && isset($_SESSION['user_email'])) {
-            saveUserCart($_SESSION['user_email'], $_SESSION['cart']);
-        }
+        // Save cart
+        saveUserCart(null, $_SESSION['cart']);
         
         if ($isAjax) {
             $summary = calculateCartSummary();
@@ -113,9 +109,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     } elseif ($action === 'clear') {
         $_SESSION['cart'] = [];
-        if (isLoggedIn() && isset($_SESSION['user_email'])) {
-            saveUserCart($_SESSION['user_email'], $_SESSION['cart']);
-        }
+        // Save cart
+        saveUserCart(null, $_SESSION['cart']);
         if ($isAjax) {
             header('Content-Type: application/json');
             echo json_encode(['success' => true, 'cartCount' => 0]);
