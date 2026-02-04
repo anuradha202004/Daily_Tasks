@@ -29,11 +29,16 @@
         "name": "Preety Patil",
         "created": "2026-01-29 05:25:23"
     },
-
-     "patil978@gmail.com": {
+    "patil978@gmail.com": {
         "email": "patilpreety978@gmail.com",
         "password": "1234567",
         "name": "Preety Patil",
         "created": "2026-01-29 05:25:23"
+    },
+    "anu123456@gmail.com": {
+        "email": "anu123456@gmail.com",
+        "password": "1234567",
+        "name": "Anuradha Patil",
+        "created": "2026-02-04 04:19:32"
     }
 }

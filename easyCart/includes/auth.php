@@ -10,8 +10,6 @@ if (!isset($pdo)) {
     $pdo = getDBConnection();
 }
 
-// Remove JSON file logic as we are now fully DB-driven
-
 /**
  * Check if user is logged in
  */
@@ -81,35 +79,27 @@ function registerUser($email, $password, $name, $confirmPassword) {
     $guestCart = isset($_SESSION['cart']) ? $_SESSION['cart'] : [];
     $guestWishlist = isset($_SESSION['wishlist']) ? $_SESSION['wishlist'] : [];
     
-    // Insert new user
+    // Insert new user with hashed password
     try {
-        $stmt = $pdo->prepare("INSERT INTO users (email, password, name, created_at) VALUES (:email, :password, :name, NOW())");
-        // Store plaintext password for compatibility with migrated data, or use password_hash() if preferred for new users
-        // For consistency with setup_database.php and existing login, we stick to plaintext (or update login to check both)
-        // Let's stick to what the user had: plaintext for this phase.
+        // Hash password using bcrypt
+        $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
+        
+        $stmt = $pdo->prepare("INSERT INTO users (email, password, name, created_at) VALUES (:email, :password, :name, NOW()) RETURNING id");
         $stmt->execute([
             ':email' => $email, 
-            ':password' => $password, 
+            ':password' => $hashedPassword, 
             ':name' => $name
         ]);
         
-        // Get limits ID
-        $newUserId = $pdo->lastInsertId(); // Should work for SERIAL with PDO Postgres if sequence is right, or query fetch
-        
-        // If lastInsertId fails (sometimes on Pg), query it
-        if (!$newUserId) {
-            $stmt = $pdo->prepare("SELECT id FROM users WHERE email = :email");
-            $stmt->execute([':email' => $email]);
-            $newUserId = $stmt->fetchColumn();
-        }
+        $newUserId = $stmt->fetchColumn();
         
         // Create session
-        $_SESSION['user_id'] = $newUserId; // INTEGER ID
+        $_SESSION['user_id'] = $newUserId;
         $_SESSION['user_email'] = $email;
         $_SESSION['user_name'] = $name;
         $_SESSION['login_time'] = date('Y-m-d H:i:s');
         
-        // Load cart and wishlist (file based, using Email as identifier)
+        // Load cart and wishlist
         require_once __DIR__ . '/data.php';
         $_SESSION['cart'] = loadUserCart($email);
         $_SESSION['wishlist'] = loadUserWishlist($email);
@@ -165,18 +155,17 @@ function loginUser($email, $password) {
             return ['success' => false, 'errors' => ['Email not found']];
         }
         
-        // Verify Password (Plaintext check for now as per migration)
-        if ($password !== $user['password']) {
+        // Verify Password using password_verify()
+        if (!password_verify($password, $user['password'])) {
             return ['success' => false, 'errors' => ['Invalid password']];
         }
         
         // Valid Login
-        // Save guest cart items
         $guestCart = isset($_SESSION['cart']) ? $_SESSION['cart'] : [];
         $guestWishlist = isset($_SESSION['wishlist']) ? $_SESSION['wishlist'] : [];
         
         // Set Session
-        $_SESSION['user_id'] = $user['id']; // INTEGER ID
+        $_SESSION['user_id'] = $user['id'];
         $_SESSION['user_email'] = $user['email'];
         $_SESSION['user_name'] = $user['name'];
         $_SESSION['login_time'] = date('Y-m-d H:i:s');
