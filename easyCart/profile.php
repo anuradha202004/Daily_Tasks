@@ -235,6 +235,46 @@ $orders = getUserOrders($currentUser['id']) ?? [];
     margin: 0;
 }
 
+/* Chart Card */
+.chart-card {
+    background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+    border-radius: 20px;
+    padding: 30px;
+    margin-top: 20px;
+    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.1);
+    border: 1px solid rgba(102, 126, 234, 0.2);
+    animation: fadeInRight 0.7s ease-out;
+}
+
+.chart-card-header {
+    font-size: 1.5rem;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #333;
+}
+
+.chart-card-subtitle {
+    font-size: 0.95rem;
+    color: #6b7280;
+    margin-bottom: 25px;
+}
+
+.chart-container {
+    position: relative;
+    height: 300px;
+    background: white;
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.empty-chart-state {
+    text-align: center;
+    padding: 60px 20px;
+    background: white;
+    border-radius: 15px;
+}
+
 /* Help Card */
 .help-card {
     background: linear-gradient(135deg, #78b8f0ff 0%, #62ecf3ff 100%);
@@ -565,6 +605,23 @@ $orders = getUserOrders($currentUser['id']) ?? [];
                     </div>
                 </div>
 
+                <!-- Order Analytics Chart -->
+                <div class="chart-card">
+                    <h3 class="chart-card-header">📈 Order Analytics</h3>
+                    <p class="chart-card-subtitle">Your spending trends over time</p>
+                    
+                    <?php if (count($orders) > 0): ?>
+                        <div class="chart-container">
+                            <canvas id="orderChart"></canvas>
+                        </div>
+                    <?php else: ?>
+                        <div class="empty-chart-state">
+                            <div style="font-size: 3rem; margin-bottom: 10px; opacity: 0.5;">📊</div>
+                            <p style="color: #6b7280; margin: 0;">No order data available yet</p>
+                        </div>
+                    <?php endif; ?>
+                </div>
+
                 <!-- Help Card -->
                 <div class="help-card">
                     <h4 class="help-card-title">Need Help?</h4>
@@ -622,6 +679,144 @@ $orders = getUserOrders($currentUser['id']) ?? [];
                 </div>
             <?php endif; ?>
         </section>
+
+        <!-- Chart.js Library -->
+        <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+        
+        <!-- Order Analytics Chart Script -->
+        <script>
+        <?php if (count($orders) > 0): ?>
+            // Prepare chart data from PHP backend
+            const orderData = <?php 
+                // Sort orders by date
+                usort($orders, function($a, $b) {
+                    return strtotime($a['date']) - strtotime($b['date']);
+                });
+                
+                // Prepare data for chart
+                $chartData = array_map(function($order) {
+                    return [
+                        'date' => date('M d, Y', strtotime($order['date'])),
+                        'amount' => floatval($order['subtotal'] + ($order['tax'] ?? 0) + ($order['shipping'] ?? 0)),
+                        'orderNumber' => $order['order_number']
+                    ];
+                }, $orders);
+                
+                echo json_encode($chartData);
+            ?>;
+
+            // Extract labels and data
+            const labels = orderData.map(item => item.date);
+            const amounts = orderData.map(item => item.amount);
+            const orderNumbers = orderData.map(item => item.orderNumber);
+
+            // Create gradient
+            const ctx = document.getElementById('orderChart').getContext('2d');
+            const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+            gradient.addColorStop(0, 'rgba(102, 126, 234, 0.8)');
+            gradient.addColorStop(1, 'rgba(118, 75, 162, 0.2)');
+
+            // Initialize Chart
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Order Amount ($)',
+                        data: amounts,
+                        backgroundColor: gradient,
+                        borderColor: '#667eea',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: '#667eea',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointRadius: 6,
+                        pointHoverRadius: 8,
+                        pointHoverBackgroundColor: '#764ba2',
+                        pointHoverBorderColor: '#fff',
+                        pointHoverBorderWidth: 3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                            labels: {
+                                font: {
+                                    size: 14,
+                                    weight: '600'
+                                },
+                                color: '#333',
+                                usePointStyle: true,
+                                padding: 20
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            titleColor: '#fff',
+                            bodyColor: '#fff',
+                            padding: 12,
+                            borderColor: '#667eea',
+                            borderWidth: 1,
+                            displayColors: false,
+                            callbacks: {
+                                title: function(context) {
+                                    return orderNumbers[context[0].dataIndex];
+                                },
+                                label: function(context) {
+                                    return 'Amount: $' + context.parsed.y.toFixed(2);
+                                },
+                                afterLabel: function(context) {
+                                    return 'Date: ' + labels[context.dataIndex];
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return '$' + value.toFixed(0);
+                                },
+                                font: {
+                                    size: 12
+                                },
+                                color: '#6b7280'
+                            },
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)',
+                                drawBorder: false
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                font: {
+                                    size: 11
+                                },
+                                color: '#6b7280',
+                                maxRotation: 45,
+                                minRotation: 45
+                            },
+                            grid: {
+                                display: false,
+                                drawBorder: false
+                            }
+                        }
+                    },
+                    interaction: {
+                        intersect: false,
+                        mode: 'index'
+                    }
+                }
+            });
+        <?php endif; ?>
+        </script>
     </section>
 
 <?php include TEMPLATES_PATH . '/footer.php'; ?>

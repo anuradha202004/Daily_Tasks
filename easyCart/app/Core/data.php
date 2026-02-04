@@ -73,21 +73,10 @@ try {
         $row['reviews'] = 10;
         $row['emoji'] = $row['emoji'] ?? '📦';
         
-        // Assign generated images based on keywords (Mocking real-world data)
-        $row['image'] = null;
-        $lcName = strtolower($row['name']);
-        if (strpos($lcName, 'laptop') !== false) {
+        // Use image from database (already fetched in JOIN at line 65)
+        // If no image in DB, use a default fallback
+        if (!$row['image']) {
             $row['image'] = 'public/img/products/laptop.png';
-        } elseif (strpos($lcName, 'headphone') !== false) {
-            $row['image'] = 'public/img/products/headphones.png';
-        } elseif (strpos($lcName, 'watch') !== false) {
-            $row['image'] = 'public/img/products/smartwatch.png';
-        } elseif (strpos($lcName, 'shoe') !== false || strpos($lcName, 'sneaker') !== false) {
-            $row['image'] = 'public/img/products/sneakers.png';
-        } else {
-             // Random fallback for demo
-             $demos = ['public/img/products/laptop.png', 'public/img/products/headphones.png', 'public/img/products/smartwatch.png', 'public/img/products/sneakers.png'];
-             $row['image'] = $demos[$row['id'] % count($demos)];
         }
         
         // Get category for this product
