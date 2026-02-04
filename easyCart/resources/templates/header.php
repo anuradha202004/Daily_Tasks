@@ -1,6 +1,6 @@
 <?php
 // Header Component - Used in all pages
-require_once __DIR__ . '/auth.php';
+// require_once __DIR__ . '/auth.php'; // Handled by bootstrap.php
 $isUserLoggedIn = isLoggedIn();
 $currentUser = getCurrentUser();
 ?>
@@ -10,9 +10,9 @@ $currentUser = getCurrentUser();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo isset($pageTitle) ? htmlspecialchars($pageTitle) . ' - EasyCart' : 'EasyCart'; ?></title>
-    <link rel="stylesheet" href="css/style.css">
-    <script src="js/common.js"></script>
-    <script src="js/header.js"></script>
+    <link rel="stylesheet" href="public/css/style.css">
+    <script src="public/js/common.js"></script>
+    <script src="public/js/header.js"></script>
 </head>
 <body>
     <!-- Header -->

@@ -250,7 +250,7 @@ function getUserEmail($userId) {
 }
 
 // Cart and Wishlist (File-based for compatibility)
-$dataDir = __DIR__ . '/../data';
+$dataDir = defined('STORAGE_PATH') ? STORAGE_PATH . '/data' : __DIR__ . '/../../storage/data';
 if (!is_dir($dataDir)) {
     mkdir($dataDir, 0755, true);
 }

@@ -1,8 +1,8 @@
 <?php
 session_start();
 
-require_once 'includes/auth.php';
-require_once 'includes/data.php';
+// Load Application Bootstrap
+require_once 'app/bootstrap.php';
 
 $pageTitle = 'My Profile';
 
@@ -11,7 +11,7 @@ requireLogin();
 
 $currentUser = getCurrentUser();
 ?>
-<?php include 'includes/header.php'; ?>
+<?php include TEMPLATES_PATH . '/header.php'; ?>
 
 <style>
 /* ========================================
@@ -623,4 +623,4 @@ $currentUser = getCurrentUser();
         </section>
     </section>
 
-<?php include 'includes/footer.php'; ?>
+<?php include TEMPLATES_PATH . '/footer.php'; ?>

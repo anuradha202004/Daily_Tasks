@@ -1,8 +1,8 @@
 <?php
 session_start();
 
-require_once 'includes/data.php';
-require_once 'includes/auth.php';
+// Load Application Bootstrap
+require_once 'app/bootstrap.php';
 
 // Load cart and wishlist from file if user is logged in
 if (isLoggedIn()) {
@@ -19,9 +19,9 @@ $searchResults = searchProducts($query);
 
 $pageTitle = $query ? "Search: $query" : "Search Products";
 ?>
-<?php include 'includes/header.php'; ?>
-    <script src="js/toast.js"></script>
-    <script src="js/wishlist.js"></script>
+<?php include TEMPLATES_PATH . '/header.php'; ?>
+    <script src="public/js/toast.js"></script>
+    <script src="public/js/wishlist.js"></script>
 
     <!-- Search Results Page -->
     <section class="container" style="padding: 40px 0;">
@@ -78,4 +78,4 @@ $pageTitle = $query ? "Search: $query" : "Search Products";
         <?php endif; ?>
     </section>
 
-<?php include 'includes/footer.php'; ?>
+<?php include TEMPLATES_PATH . '/footer.php'; ?>

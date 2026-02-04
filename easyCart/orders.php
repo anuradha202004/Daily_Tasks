@@ -2,8 +2,8 @@
 session_start();
 
 // Include data and auth
-require_once 'includes/data.php';
-require_once 'includes/auth.php';
+// Load Application Bootstrap
+require_once 'app/bootstrap.php';
 
 $pageTitle = 'My Orders';
 
@@ -33,7 +33,7 @@ if (isset($_SESSION['last_order'])) {
     array_unshift($allOrders, $lastOrderData);
 }
 ?>
-<?php include 'includes/header.php'; ?>
+<?php include TEMPLATES_PATH . '/header.php'; ?>
 
     <!-- My Orders Page -->
     <section class="container" style="padding: 40px 0;">
@@ -282,4 +282,4 @@ if (isset($_SESSION['last_order'])) {
         <?php endif; ?>
     </section>
 
-<?php include 'includes/footer.php'; ?>
+<?php include TEMPLATES_PATH . '/footer.php'; ?>

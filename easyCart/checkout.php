@@ -2,8 +2,8 @@
 session_start();
 
 // Include data and auth
-require_once 'includes/data.php';
-require_once 'includes/auth.php';
+// Load Application Bootstrap
+require_once 'app/bootstrap.php';
 
 $pageTitle = 'Checkout';
 
@@ -409,9 +409,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     }
 }
 ?>
-<?php include 'includes/header.php'; ?>
-    <script src="js/validation.js"></script>
-    <script src="js/checkout.js"></script>
+<?php include TEMPLATES_PATH . '/header.php'; ?>
+    <script src="public/js/validation.js"></script>
+    <script src="public/js/checkout.js"></script>
 
     <style>
         /* Shipping Options Card Styling */
@@ -879,4 +879,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         </div>
     </section>
 
-<?php include 'includes/footer.php'; ?>
+<?php include TEMPLATES_PATH . '/footer.php'; ?>

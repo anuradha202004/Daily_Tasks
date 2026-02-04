@@ -1,5 +1,6 @@
 <?php
-session_start();
+// Load Application Bootstrap
+require_once 'app/bootstrap.php';
 
 $pageTitle = 'Order Confirmation';
 
@@ -27,8 +28,8 @@ if (!isset($_SESSION['last_order']['status'])) {
     $_SESSION['last_order']['order_number'] = 'ORD' . str_pad(rand(100000, 999999), 6, '0', STR_PAD_LEFT);
 }
 ?>
-<?php include 'includes/header.php'; ?>
-    <script src="js/order-confirmation.js"></script>
+<?php include TEMPLATES_PATH . '/header.php'; ?>
+    <script src="public/js/order-confirmation.js"></script>
 
     <!-- Order Confirmation Page -->
     <section class="container" style="padding: 40px 0;">
@@ -463,4 +464,4 @@ if (!isset($_SESSION['last_order']['status'])) {
         </div>
     </div>
 
-<?php include 'includes/footer.php'; ?>
+<?php include TEMPLATES_PATH . '/footer.php'; ?>

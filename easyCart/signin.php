@@ -1,7 +1,8 @@
 <?php
 session_start();
 
-require_once 'includes/auth.php';
+// Load Application Bootstrap
+require_once 'app/bootstrap.php';
 
 $pageTitle = 'Sign In';
 
@@ -36,8 +37,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     }
 }
 ?>
-<?php include 'includes/header.php'; ?>
-    <script src="js/validation.js"></script>
+<?php include TEMPLATES_PATH . '/header.php'; ?>
+    <script src="public/js/validation.js"></script>
 
     <!-- Sign In Page -->
     <section class="container" style="padding: 60px 20px;">
@@ -125,4 +126,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         </div>
     </section>
 
-<?php include 'includes/footer.php'; ?>
+<?php include TEMPLATES_PATH . '/footer.php'; ?>

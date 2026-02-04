@@ -2,8 +2,8 @@
 session_start();
 
 // Include data and auth
-require_once 'includes/data.php';
-require_once 'includes/auth.php';
+// Load Application Bootstrap
+require_once 'app/bootstrap.php';
 
 $pageTitle = 'Products';
 
@@ -28,10 +28,10 @@ $displayProducts = $selectedCategory
 // Sort by latest (or by ID for consistency)
 $displayProducts = array_reverse($displayProducts, true);
 ?>
-<?php include 'includes/header.php'; ?>
-    <script src="js/wishlist.js"></script>
-    <script src="js/cart.js"></script>
-    <script src="js/toast.js"></script>
+<?php include TEMPLATES_PATH . '/header.php'; ?>
+    <script src="public/js/wishlist.js"></script>
+    <script src="public/js/cart.js"></script>
+    <script src="public/js/toast.js"></script>
 
     <!-- Products Page -->
     <section class="container" style="padding: 40px 0;">
@@ -104,4 +104,4 @@ $displayProducts = array_reverse($displayProducts, true);
         <?php endif; ?>
     </section>
 
-<?php include 'includes/footer.php'; ?>
+<?php include TEMPLATES_PATH . '/footer.php'; ?>

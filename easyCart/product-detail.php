@@ -2,8 +2,8 @@
 session_start();
 
 // Include data and auth
-require_once 'includes/data.php';
-require_once 'includes/auth.php';
+// Load Application Bootstrap
+require_once 'app/bootstrap.php';
 
 // Get product ID from URL
 $productId = isset($_GET['id']) ? intval($_GET['id']) : null;
@@ -56,10 +56,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     }
 }
 ?>
-<?php include 'includes/header.php'; ?>
-    <script src="js/product-detail.js"></script>
-    <script src="js/wishlist.js"></script>
-    <script src="js/toast.js"></script>
+<?php include TEMPLATES_PATH . '/header.php'; ?>
+    <script src="public/js/product-detail.js"></script>
+    <script src="public/js/wishlist.js"></script>
+    <script src="public/js/toast.js"></script>
 
     <?php if ($addToCartMessage): ?>
         <script>
@@ -272,4 +272,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     </section>
                        
 
-<?php include 'includes/footer.php'; ?>
+<?php include TEMPLATES_PATH . '/footer.php'; ?>

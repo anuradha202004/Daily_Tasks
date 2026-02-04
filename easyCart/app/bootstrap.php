@@ -10,12 +10,15 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 // Define base paths
+// Define base paths
 define('BASE_PATH', dirname(__DIR__));
 define('APP_PATH', BASE_PATH . '/app');
+define('CORE_PATH', APP_PATH . '/Core');
 define('CONFIG_PATH', BASE_PATH . '/config');
 define('PUBLIC_PATH', BASE_PATH . '/public');
 define('STORAGE_PATH', BASE_PATH . '/storage');
-define('VIEWS_PATH', APP_PATH . '/Views');
+define('RESOURCES_PATH', BASE_PATH . '/resources');
+define('TEMPLATES_PATH', RESOURCES_PATH . '/templates');
 
 // Error reporting
 error_reporting(E_ALL);
@@ -35,10 +38,24 @@ spl_autoload_register(function ($class) {
 });
 
 // Load configuration
-require_once CONFIG_PATH . '/database/config.php';
+if (file_exists(CONFIG_PATH . '/database/config.php')) {
+    require_once CONFIG_PATH . '/database/config.php';
+}
+
+// Load Core Components
+require_once CORE_PATH . '/db.php';
+require_once CORE_PATH . '/data.php';
+
+// Initialize database connection
+// getDBConnection() is defined in db.php
+try {
+    $pdo = getDBConnection();
+} catch (Exception $e) {
+    // Handle connection error safely
+}
+
+// Load Auth after DB
+require_once CORE_PATH . '/auth.php';
 
 // Load helper functions
 require_once APP_PATH . '/helpers.php';
-
-// Initialize database connection
-$pdo = getDBConnection();

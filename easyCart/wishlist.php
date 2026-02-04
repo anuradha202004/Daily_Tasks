@@ -5,8 +5,8 @@
  */
 
 session_start();
-require_once 'includes/data.php';
-require_once 'includes/auth.php';
+// Load Application Bootstrap
+require_once 'app/bootstrap.php';
 
 $pageTitle = 'My Wishlist';
 
@@ -81,10 +81,10 @@ if (!empty($_SESSION['wishlist'])) {
     }
 }
 ?>
-<?php include 'includes/header.php'; ?>
-    <script src="js/wishlist.js"></script>
-    <script src="js/toast.js"></script>
-    <script src="js/cart.js"></script>
+<?php include TEMPLATES_PATH . '/header.php'; ?>
+    <script src="public/js/wishlist.js"></script>
+    <script src="public/js/toast.js"></script>
+    <script src="public/js/cart.js"></script>
 
     <style>
         /* Wishlist-specific styles - Only for this page */
@@ -198,4 +198,4 @@ if (!empty($_SESSION['wishlist'])) {
         <?php endif; ?>
     </section>
 
-<?php include 'includes/footer.php'; ?>
+<?php include TEMPLATES_PATH . '/footer.php'; ?>

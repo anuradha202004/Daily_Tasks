@@ -10,8 +10,8 @@ session_start();
 // echo "<pre>" . json_encode(json_decode(file_get_contents('data/users.json')), 128) . "</pre>";
 // die;
 // Include data and auth
-require_once 'includes/data.php';
-require_once 'includes/auth.php';
+// Load Application Bootstrap
+require_once 'app/bootstrap.php';
 
 // Load cart and wishlist from file if user is logged in
 if (isLoggedIn()) {
@@ -28,11 +28,11 @@ $pageTitle = 'Home';
 // Get featured products (first 4 products)
 $featuredProducts = array_slice($products, 0, 4, true);
 ?>
-<?php include 'includes/header.php'; ?>
-    <script src="js/carousel.js"></script>
-    <script src="js/wishlist.js"></script>
-    <script src="js/cart.js"></script>
-    <script src="js/toast.js"></script>
+<?php include TEMPLATES_PATH . '/header.php'; ?>
+    <script src="public/js/carousel.js"></script>
+    <script src="public/js/wishlist.js"></script>
+    <script src="public/js/cart.js"></script>
+    <script src="public/js/toast.js"></script>
 
     <!-- Modern Hero Section - Split Design with Glassmorphism -->
     <!-- Modern Interactive Ad Hero Section -->
@@ -307,6 +307,6 @@ $featuredProducts = array_slice($products, 0, 4, true);
             </div>
         </div>
     </section>
-    <script src="js/contact.js"></script>
+    <script src="public/js/contact.js"></script>
 
-<?php include 'includes/footer.php'; ?>
+<?php include TEMPLATES_PATH . '/footer.php'; ?>

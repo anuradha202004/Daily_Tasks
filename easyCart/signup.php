@@ -1,7 +1,8 @@
 <?php
 session_start();
 
-require_once 'includes/auth.php';
+// Load Application Bootstrap
+require_once 'app/bootstrap.php';
 
 $pageTitle = 'Sign Up';
 
@@ -30,8 +31,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     }
 }
 ?>
-<?php include 'includes/header.php'; ?>
-    <script src="js/validation.js"></script>
+<?php include TEMPLATES_PATH . '/header.php'; ?>
+    <script src="public/js/validation.js"></script>
 
     <section class="container" style="padding: 60px 0; display: flex; justify-content: center;">
         <div class="modal-content" style="display: block; position: static; transform: none; box-shadow: 0 4px 20px rgba(0,0,0,0.1); width: 100%; max-width: 450px;">
@@ -84,4 +85,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         </div>
     </section>
 
-<?php include 'includes/footer.php'; ?>
+<?php include TEMPLATES_PATH . '/footer.php'; ?>

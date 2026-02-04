@@ -4,8 +4,8 @@ session_start();
 // print_r($_SESSION);
 // echo "</pre>";
 // Include data and auth
-require_once 'includes/data.php';
-require_once 'includes/auth.php';
+// Load Application Bootstrap
+require_once 'app/bootstrap.php';
 
 $pageTitle = 'Shopping Cart';
 // Load cart from file on page load (for logged-in users)
@@ -183,7 +183,7 @@ $shipping = 0; // Calculated at checkout
 $tax = 0; // Calculated at checkout
 $total = $subtotal - $discount;
 ?>
-<?php include 'includes/header.php'; ?>
+<?php include TEMPLATES_PATH . '/header.php'; ?>
 
     <!-- Shopping Cart Page -->
     <section class="container" style="padding: 40px 0;">
@@ -336,5 +336,5 @@ $total = $subtotal - $discount;
         <?php endif; ?>
     </section>
 
-    <script src="js/cart.js"></script>
-    <?php include 'includes/footer.php'; ?>
+    <script src="public/js/cart.js"></script>
+    <?php include TEMPLATES_PATH . '/footer.php'; ?>
