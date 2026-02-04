@@ -1,6 +1,10 @@
 {
-    "102": {
-        "product_id": 102,
+    "3": {
+        "product_id": 3,
+        "quantity": 1
+    },
+    "5": {
+        "product_id": 5,
         "quantity": 1
     }
 }

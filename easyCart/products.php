@@ -76,7 +76,13 @@ $displayProducts = array_reverse($displayProducts, true);
                             <?php echo $isWishlisted ? '❤️' : '🤍'; ?>
                         </div>
                         <?php endif; ?>
-                        <div class="product-image"><?php echo $product['emoji']; ?></div>
+                        <div class="product-image" style="overflow: hidden; display: flex; align-items: center; justify-content: center; background: #fff;">
+                            <?php if (!empty($product['image'])): ?>
+                                <img src="<?php echo $product['image']; ?>" alt="<?php echo htmlspecialchars($product['name']); ?>" style="width: 100%; height: 100%; object-fit: contain; transition: transform 0.3s ease;">
+                            <?php else: ?>
+                                <?php echo $product['emoji']; ?>
+                            <?php endif; ?>
+                        </div>
                         <h3 class="product-title"><?php echo htmlspecialchars($product['name']); ?></h3>
                         <div class="product-rating"><?php echo renderStars($product['rating']); ?> <?php echo $product['rating']; ?> (<?php echo $product['reviews']; ?> reviews)</div>
                         <p class="product-description"><?php echo htmlspecialchars($product['description']); ?></p>

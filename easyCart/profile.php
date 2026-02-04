@@ -10,6 +10,7 @@ $pageTitle = 'My Profile';
 requireLogin();
 
 $currentUser = getCurrentUser();
+$orders = getUserOrders($currentUser['id']) ?? [];
 ?>
 <?php include TEMPLATES_PATH . '/header.php'; ?>
 

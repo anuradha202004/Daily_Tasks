@@ -46,7 +46,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             <div style="text-align: center; margin-bottom: 40px;">
                 <div style="font-size: 48px; margin-bottom: 15px;">🔐</div>
                 <h1 style="color: #2563eb; margin-bottom: 10px;">Welcome Back</h1>
-                <p style="color: #666;">Sign in to your EasyCart account</p>
+                <p style="color: #666;">
+                    <?php if (isset($_GET['redirect']) || isset($_SESSION['redirect_after_login'])): ?>
+                        Sign in to complete your checkout
+                    <?php else: ?>
+                        Sign in to your EasyCart account
+                    <?php endif; ?>
+                </p>
             </div>
 
             <!-- Display Errors -->

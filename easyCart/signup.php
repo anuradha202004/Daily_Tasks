@@ -24,7 +24,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     $result = registerUser($email, $password, $name, $confirmPassword);
     
     if ($result['success']) {
-        header('Location: products.php');
+        if (isset($_SESSION['redirect_after_login'])) {
+            $redirect = $_SESSION['redirect_after_login'];
+            unset($_SESSION['redirect_after_login']);
+            header('Location: ' . $redirect);
+        } else {
+            header('Location: products.php');
+        }
         exit;
     } else {
         $errors = $result['errors'];

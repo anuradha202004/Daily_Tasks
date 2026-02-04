@@ -49,47 +49,47 @@ $featuredProducts = array_slice($products, 0, 4, true);
             <div class="ads-carousel-container">
                 <div class="ads-carousel">
                     <!-- Ad 1 -->
-                    <div class="ad-slide active" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                    <div class="ad-slide active" style="background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('public/img/hero_shopping.png') center/cover no-repeat;">
                         <div class="ad-content">
                             <div class="ad-badge">✨ NEW COLLECTION</div>
                             <h2 class="ad-title">Summer Collection 2026</h2>
                             <p class="ad-description">Discover the latest trending products</p>
                             <a href="products.php?category=1" class="ad-cta">Shop Collection →</a>
                         </div>
-                        <div class="ad-visual">👕</div>
+                        <div class="ad-visual"></div>
                     </div>
 
                     <!-- Ad 2 -->
-                    <div class="ad-slide" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                    <div class="ad-slide" style="background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('public/img/hero_laptop.png') center/cover no-repeat;">
                         <div class="ad-content">
                             <div class="ad-badge">🔥 HOT DEALS</div>
                             <h2 class="ad-title">Up to 70% OFF</h2>
                             <p class="ad-description">Limited time exclusive offers</p>
                             <a href="products.php" class="ad-cta">Grab Deals →</a>
                         </div>
-                        <div class="ad-visual">🎁</div>
+                        <div class="ad-visual"></div>
                     </div>
 
                     <!-- Ad 3 -->
-                    <div class="ad-slide" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                    <div class="ad-slide" style="background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('public/img/hero_music.png') center/cover no-repeat;">
                         <div class="ad-content">
                             <div class="ad-badge">⭐ PREMIUM QUALITY</div>
                             <h2 class="ad-title">Best Sellers</h2>
                             <p class="ad-description">Top-rated products at best prices</p>
                             <a href="products.php" class="ad-cta">View Best Sellers →</a>
                         </div>
-                        <div class="ad-visual">🏆</div>
+                        <div class="ad-visual"></div>
                     </div>
 
                     <!-- Ad 4 -->
-                    <div class="ad-slide" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
+                    <div class="ad-slide" style="background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('public/img/hero_vip.png') center/cover no-repeat;">
                         <div class="ad-content">
                             <div class="ad-badge">💎 EXCLUSIVE</div>
                             <h2 class="ad-title">VIP Member Benefits</h2>
                             <p class="ad-description">Unlock premium rewards today</p>
                             <a href="products.php" class="ad-cta">Join VIP →</a>
                         </div>
-                        <div class="ad-visual">👑</div>
+                        <div class="ad-visual"></div>
                     </div>
                 </div>
 
@@ -153,7 +153,13 @@ $featuredProducts = array_slice($products, 0, 4, true);
                         <?php echo $isWishlisted ? '❤️' : '🤍'; ?>
                     </div>
                     <?php endif; ?>
-                    <div class="product-image"><?php echo $product['emoji']; ?></div>
+                    <div class="product-image" style="overflow: hidden; display: flex; align-items: center; justify-content: center; background: #fff;">
+                        <?php if (!empty($product['image'])): ?>
+                            <img src="<?php echo $product['image']; ?>" alt="<?php echo htmlspecialchars($product['name']); ?>" style="width: 100%; height: 100%; object-fit: contain; transition: transform 0.3s ease;">
+                        <?php else: ?>
+                            <?php echo $product['emoji']; ?>
+                        <?php endif; ?>
+                    </div>
                     <h3 class="product-title"><?php echo htmlspecialchars($product['name']); ?></h3>
                     <div class="product-rating"><?php echo renderStars($product['rating']); ?> <?php echo $product['rating']; ?> (<?php echo $product['reviews']; ?> reviews)</div>
                     <p class="product-description"><?php echo htmlspecialchars($product['description']); ?></p>
@@ -203,7 +209,13 @@ $featuredProducts = array_slice($products, 0, 4, true);
                         <?php echo $isWishlisted ? '❤️' : '🤍'; ?>
                     </div>
                     <?php endif; ?>
-                    <div class="product-image"><?php echo $product['emoji']; ?></div>
+                    <div class="product-image" style="overflow: hidden; display: flex; align-items: center; justify-content: center; background: #fff;">
+                        <?php if (!empty($product['image'])): ?>
+                            <img src="<?php echo $product['image']; ?>" alt="<?php echo htmlspecialchars($product['name']); ?>" style="width: 100%; height: 100%; object-fit: contain; transition: transform 0.3s ease;">
+                        <?php else: ?>
+                            <?php echo $product['emoji']; ?>
+                        <?php endif; ?>
+                    </div>
                     <h3 class="product-title"><?php echo htmlspecialchars($product['name']); ?></h3>
                     <div class="product-rating"><?php echo renderStars($product['rating']); ?> <?php echo $product['rating']; ?> (<?php echo $product['reviews']; ?> reviews)</div>
                     <p class="product-description"><?php echo htmlspecialchars($product['description']); ?></p>

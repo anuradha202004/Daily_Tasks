@@ -31,14 +31,14 @@ function toggleWishlist(event, productId) {
                     setTimeout(() => {
                         heartIcon.style.transform = 'scale(1)';
                     }, 200);
-                    showToast('Added to wishlist!', 'success');
+                    showToast('❤️ Added to wishlist!', 'success', 3000);
                 } else {
                     heartIcon.textContent = '🤍';
                     heartIcon.style.transform = 'scale(0.8)';
                     setTimeout(() => {
                         heartIcon.style.transform = 'scale(1)';
                     }, 200);
-                    showToast('Removed from wishlist', 'info');
+                    showToast('💔 Removed from wishlist', 'info', 3000);
 
                     // If on wishlist page, remove the product card
                     if (window.location.pathname.includes('wishlist.php')) {
@@ -66,7 +66,7 @@ function toggleWishlist(event, productId) {
                     updateWishlistBadge(action === 'add' ? 1 : -1);
                 }
             } else {
-                showToast('Error: ' + (data.message || 'Could not update wishlist'), 'error');
+                showToast('❌ Error: ' + (data.message || 'Could not update wishlist'), 'error');
             }
         })
         .catch(error => {
@@ -75,7 +75,7 @@ function toggleWishlist(event, productId) {
             if (error.message && error.message.includes('login')) {
                 window.location.href = 'signin.php?redirect=1';
             } else {
-                showToast('Please login to use wishlist', 'error');
+                showToast('⚠️ Please login to use wishlist', 'error');
                 setTimeout(() => {
                     window.location.href = 'signin.php?redirect=1';
                 }, 1500);
@@ -124,65 +124,7 @@ function updateWishlistCount() {
     }
 }
 
-/**
- * Show toast notification
- */
-function showToast(message, type = 'info') {
-    // Remove existing toast
-    const existingToast = document.querySelector('.wishlist-toast');
-    if (existingToast) {
-        existingToast.remove();
-    }
-
-    // Create toast element
-    const toast = document.createElement('div');
-    toast.className = 'wishlist-toast';
-    toast.style.cssText = `
-        position: fixed;
-        bottom: 30px;
-        left: 50%;
-        transform: translateX(-50%) translateY(100px);
-        padding: 14px 28px;
-        border-radius: 12px;
-        font-weight: 600;
-        font-size: 14px;
-        z-index: 10000;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    `;
-
-    // Set style based on type
-    if (type === 'success') {
-        toast.style.background = 'linear-gradient(135deg, #10b981, #059669)';
-        toast.style.color = 'white';
-        toast.innerHTML = `<span>❤️</span> ${message}`;
-    } else if (type === 'error') {
-        toast.style.background = 'linear-gradient(135deg, #ef4444, #dc2626)';
-        toast.style.color = 'white';
-        toast.innerHTML = `<span>⚠️</span> ${message}`;
-    } else {
-        toast.style.background = 'linear-gradient(135deg, #3b82f6, #2563eb)';
-        toast.style.color = 'white';
-        toast.innerHTML = `<span>💔</span> ${message}`;
-    }
-
-    document.body.appendChild(toast);
-
-    // Animate in
-    setTimeout(() => {
-        toast.style.transform = 'translateX(-50%) translateY(0)';
-    }, 10);
-
-    // Remove after 3 seconds
-    setTimeout(() => {
-        toast.style.transform = 'translateX(-50%) translateY(100px)';
-        toast.style.opacity = '0';
-        setTimeout(() => toast.remove(), 300);
-    }, 3000);
-}
+// showToast is now handled by the global public/js/toast.js
 
 /**
  * Initialize wishlist icons on page load

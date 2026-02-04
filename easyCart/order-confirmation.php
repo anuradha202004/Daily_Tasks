@@ -382,6 +382,9 @@ if (!isset($_SESSION['last_order']['status'])) {
                         <a href="orders.php" class="btn btn-primary" style="display: block; text-align: center; padding: 12px; text-decoration: none; margin-bottom: 10px;">
                             View My Orders
                         </a>
+                        <a href="invoice.php?latest=true" target="_blank" class="btn" style="display: block; text-align: center; padding: 12px; text-decoration: none; margin-bottom: 10px; background: #4b5563; color: white; border-radius: 4px;">
+                            📄 Download Invoice
+                        </a>
                         <a href="products.php" style="display: block; text-align: center; padding: 12px; color: #2563eb; text-decoration: none; border: 1px solid #2563eb; border-radius: 4px;">
                             Continue Shopping
                         </a>

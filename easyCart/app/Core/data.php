@@ -73,6 +73,23 @@ try {
         $row['reviews'] = 10;
         $row['emoji'] = $row['emoji'] ?? '📦';
         
+        // Assign generated images based on keywords (Mocking real-world data)
+        $row['image'] = null;
+        $lcName = strtolower($row['name']);
+        if (strpos($lcName, 'laptop') !== false) {
+            $row['image'] = 'public/img/products/laptop.png';
+        } elseif (strpos($lcName, 'headphone') !== false) {
+            $row['image'] = 'public/img/products/headphones.png';
+        } elseif (strpos($lcName, 'watch') !== false) {
+            $row['image'] = 'public/img/products/smartwatch.png';
+        } elseif (strpos($lcName, 'shoe') !== false || strpos($lcName, 'sneaker') !== false) {
+            $row['image'] = 'public/img/products/sneakers.png';
+        } else {
+             // Random fallback for demo
+             $demos = ['public/img/products/laptop.png', 'public/img/products/headphones.png', 'public/img/products/smartwatch.png', 'public/img/products/sneakers.png'];
+             $row['image'] = $demos[$row['id'] % count($demos)];
+        }
+        
         // Get category for this product
         $catStmt = $pdo->prepare("SELECT category_id FROM catalog_category_products WHERE product_id = ? LIMIT 1");
         $catStmt->execute([$row['id']]);
@@ -212,7 +229,7 @@ function createOrder($userId, $orderData, $items) {
             $updateStock->execute([':qty' => $item['quantity'], ':pid' => $item['product']['id']]);
         }
         
-        // 3. Insert Order Address
+        // 3. Insert Shipping Address
         if (isset($orderData['customer'])) {
             $cust = $orderData['customer'];
             $addrStmt = $pdo->prepare("
@@ -229,6 +246,26 @@ function createOrder($userId, $orderData, $items) {
                 ':city' => $cust['city'],
                 ':reg' => $cust['state'],
                 ':zip' => $cust['zip']
+            ]);
+        }
+
+        // 4. Insert Billing Address
+        if (isset($orderData['billing_customer'])) {
+            $bill = $orderData['billing_customer'];
+            $billStmt = $pdo->prepare("
+                INSERT INTO sales_order_address (parent_id, address_type, firstname, lastname, email, telephone, street, city, region, postcode)
+                VALUES (:pid, 'billing', :fn, :ln, :email, :tel, :str, :city, :reg, :zip)
+            ");
+            $billStmt->execute([
+                ':pid' => $orderId,
+                ':fn' => $bill['first_name'],
+                ':ln' => $bill['last_name'],
+                ':email' => $bill['email'],
+                ':tel' => $bill['phone'],
+                ':str' => $bill['address'],
+                ':city' => $bill['city'],
+                ':reg' => $bill['state'],
+                ':zip' => $bill['zip']
             ]);
         }
         
@@ -249,50 +286,152 @@ function getUserEmail($userId) {
     return $stmt->fetchColumn();
 }
 
-// Cart and Wishlist (File-based for compatibility)
-$dataDir = defined('STORAGE_PATH') ? STORAGE_PATH . '/data' : __DIR__ . '/../../storage/data';
-if (!is_dir($dataDir)) {
-    mkdir($dataDir, 0755, true);
-}
+// Cart and Wishlist (Database-backed)
 
-function getCartFilePath($userId) {
-    global $dataDir;
-    return $dataDir . '/cart_' . md5($userId) . '.json';
-}
-
-function getWishlistFilePath($userId) {
-    global $dataDir;
-    return $dataDir . '/wishlist_' . md5($userId) . '.json';
-}
-
+/**
+ * Load user's cart from database
+ * Returns array in format: [product_id => ['product_id' => id, 'quantity' => qty]]
+ */
 function loadUserCart($userId) {
-    $cartFile = getCartFilePath($userId);
-    if (file_exists($cartFile)) {
-        $content = file_get_contents($cartFile);
-        $data = json_decode($content, true);
-        return is_array($data) ? $data : [];
+    global $pdo;
+    
+    if (!$userId) {
+        return [];
     }
-    return [];
+    
+    try {
+        $stmt = $pdo->prepare("
+            SELECT product_id, quantity 
+            FROM checkout_cart 
+            WHERE user_id = ?
+        ");
+        $stmt->execute([$userId]);
+        
+        $cart = [];
+        while ($row = $stmt->fetch()) {
+            $cart[$row['product_id']] = [
+                'product_id' => $row['product_id'],
+                'quantity' => (int)$row['quantity']
+            ];
+        }
+        return $cart;
+    } catch (PDOException $e) {
+        error_log("Load Cart Error: " . $e->getMessage());
+        return [];
+    }
 }
 
+/**
+ * Save user's cart to database
+ * Cart format: [product_id => ['product_id' => id, 'quantity' => qty]]
+ */
 function saveUserCart($userId, $cart) {
-    $cartFile = getCartFilePath($userId);
-    file_put_contents($cartFile, json_encode($cart, JSON_PRETTY_PRINT));
-}
-
-function loadUserWishlist($userId) {
-    $wishlistFile = getWishlistFilePath($userId);
-    if (file_exists($wishlistFile)) {
-        $content = file_get_contents($wishlistFile);
-        $data = json_decode($content, true);
-        return is_array($data) ? $data : [];
+    global $pdo;
+    
+    if (!$userId) {
+        return;
     }
-    return [];
+    
+    try {
+        $pdo->beginTransaction();
+        
+        // Clear existing cart items
+        $stmt = $pdo->prepare("DELETE FROM checkout_cart WHERE user_id = ?");
+        $stmt->execute([$userId]);
+        
+        // Insert new cart items
+        if (!empty($cart)) {
+            $insertStmt = $pdo->prepare("
+                INSERT INTO checkout_cart (user_id, product_id, quantity, updated_at)
+                VALUES (?, ?, ?, NOW())
+            ");
+            
+            foreach ($cart as $item) {
+                $productId = $item['product_id'] ?? null;
+                $quantity = $item['quantity'] ?? 1;
+                
+                if ($productId && $quantity > 0) {
+                    $insertStmt->execute([$userId, $productId, $quantity]);
+                }
+            }
+        }
+        
+        $pdo->commit();
+    } catch (PDOException $e) {
+        $pdo->rollBack();
+        error_log("Save Cart Error: " . $e->getMessage());
+    }
 }
 
+/**
+ * Load user's wishlist from database
+ * Returns array of product IDs: [product_id1, product_id2, ...]
+ */
+function loadUserWishlist($userId) {
+    global $pdo;
+    
+    if (!$userId) {
+        return [];
+    }
+    
+    try {
+        $stmt = $pdo->prepare("
+            SELECT product_id 
+            FROM wishlist 
+            WHERE user_id = ?
+            ORDER BY added_at DESC
+        ");
+        $stmt->execute([$userId]);
+        
+        $wishlist = [];
+        while ($row = $stmt->fetch()) {
+            $wishlist[] = (int)$row['product_id'];
+        }
+        return $wishlist;
+    } catch (PDOException $e) {
+        error_log("Load Wishlist Error: " . $e->getMessage());
+        return [];
+    }
+}
+
+/**
+ * Save user's wishlist to database
+ * Wishlist format: [product_id1, product_id2, ...]
+ */
 function saveUserWishlist($userId, $wishlist) {
-    $wishlistFile = getWishlistFilePath($userId);
-    file_put_contents($wishlistFile, json_encode($wishlist, JSON_PRETTY_PRINT));
+    global $pdo;
+    
+    if (!$userId) {
+        return;
+    }
+    
+    try {
+        $pdo->beginTransaction();
+        
+        // Clear existing wishlist
+        $stmt = $pdo->prepare("DELETE FROM wishlist WHERE user_id = ?");
+        $stmt->execute([$userId]);
+        
+        // Insert new wishlist items
+        if (!empty($wishlist)) {
+            $insertStmt = $pdo->prepare("
+                INSERT INTO wishlist (user_id, product_id, added_at)
+                VALUES (?, ?, NOW())
+                ON CONFLICT (user_id, product_id) DO NOTHING
+            ");
+            
+            foreach ($wishlist as $productId) {
+                if ($productId) {
+                    $insertStmt->execute([$userId, $productId]);
+                }
+            }
+        }
+        
+        $pdo->commit();
+    } catch (PDOException $e) {
+        $pdo->rollBack();
+        error_log("Save Wishlist Error: " . $e->getMessage());
+    }
 }
 
 function getUserOrders($userId) {
@@ -310,13 +449,15 @@ function getUserOrders($userId) {
                 o.grand_total as total,
                 o.status,
                 o.shipping_method,
-                o.created_at
+                o.shipping_method,
+                o.created_at as date
             FROM sales_order o
             WHERE o.user_id = ?
             ORDER BY o.created_at DESC
         ");
         $stmt->execute([$userId]);
-        return $stmt->fetchAll();
+        $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return is_array($orders) ? $orders : [];
     } catch (PDOException $e) {
         error_log("Get User Orders Error: " . $e->getMessage());
         return [];

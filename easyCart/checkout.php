@@ -369,6 +369,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 'state' => htmlspecialchars($_POST['state']),
                 'zip' => htmlspecialchars($_POST['zip'])
             ],
+            'billing_customer' => isset($_POST['billing_same']) ? [
+                'first_name' => htmlspecialchars($_POST['first_name']),
+                'last_name' => htmlspecialchars($_POST['last_name']),
+                'email' => htmlspecialchars($_POST['email']),
+                'phone' => htmlspecialchars($_POST['phone']),
+                'address' => htmlspecialchars($_POST['address']),
+                'city' => htmlspecialchars($_POST['city']),
+                'state' => htmlspecialchars($_POST['state']),
+                'zip' => htmlspecialchars($_POST['zip'])
+            ] : [
+                'first_name' => htmlspecialchars($_POST['first_name']),
+                'last_name' => htmlspecialchars($_POST['last_name']),
+                'email' => htmlspecialchars($_POST['email']),
+                'phone' => htmlspecialchars($_POST['phone']),
+                'address' => htmlspecialchars($_POST['billing_address']),
+                'city' => htmlspecialchars($_POST['billing_city']),
+                'state' => htmlspecialchars($_POST['billing_state']),
+                'zip' => htmlspecialchars($_POST['billing_zip'])
+            ],
             'items' => $cartItemsWithDetails,
             'date' => date('Y-m-d H:i:s')
         ];
@@ -387,6 +406,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             'status' => 'Processing',
             'shipping_method' => $finalShippingMethod,
             'customer' => $_SESSION['last_order']['customer'], // Pass customer data for address saving
+            'billing_customer' => $_SESSION['last_order']['billing_customer'], // Pass billing data
             'customer_email' => $_SESSION['last_order']['customer']['email'] // Explicit email for guests
         ];
         
@@ -662,6 +682,64 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                             </div>
                         </div>
 
+                        <!-- Billing Address Card -->
+                        <div class="checkout-card">
+                            <div class="card-header">
+                                <span class="card-icon">🧾</span>
+                                <h3>Billing Address</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="form-field full-width" style="margin-bottom: 20px;">
+                                    <label class="checkbox-container">
+                                        <input type="checkbox" name="billing_same" id="billing_same" checked onchange="toggleBilling()">
+                                        <span class="checkmark"></span>
+                                        <span style="margin-left: 10px; font-weight: 500;">Same as shipping address</span>
+                                    </label>
+                                </div>
+
+                                <div id="billing-address-section" style="display: none; border-top: 1px solid #eee; padding-top: 20px;">
+                                    <div class="form-field full-width">
+                                        <label class="field-label">Billing Street Address <span class="required">*</span></label>
+                                        <div class="input-with-icon">
+                                            <span class="input-icon">🏠</span>
+                                            <input type="text" name="billing_address" class="checkout-input with-icon" placeholder="123 Billing St">
+                                        </div>
+                                    </div>
+                                    <div class="form-row three-cols">
+                                        <div class="form-field">
+                                            <label class="field-label">City <span class="required">*</span></label>
+                                            <input type="text" name="billing_city" class="checkout-input" placeholder="New York">
+                                        </div>
+                                        <div class="form-field">
+                                            <label class="field-label">State <span class="required">*</span></label>
+                                            <input type="text" name="billing_state" class="checkout-input" placeholder="NY">
+                                        </div>
+                                        <div class="form-field">
+                                            <label class="field-label">Zip Code <span class="required">*</span></label>
+                                            <input type="text" name="billing_zip" class="checkout-input" placeholder="10001">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Add Javascript for Billing Toggle -->
+                        <script>
+                        function toggleBilling() {
+                            const isSame = document.getElementById('billing_same').checked;
+                            const billingSection = document.getElementById('billing-address-section');
+                            const billingInputs = billingSection.querySelectorAll('input');
+                            
+                            if (isSame) {
+                                billingSection.style.display = 'none';
+                                billingInputs.forEach(input => input.removeAttribute('required'));
+                            } else {
+                                billingSection.style.display = 'block';
+                                billingInputs.forEach(input => input.setAttribute('required', 'required'));
+                            }
+                        }
+                        </script>
+
                         <!-- Shipping Options Card -->
                         <div class="checkout-card">
                             <div class="card-header">
@@ -789,7 +867,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                         <div class="summary-items">
                             <?php foreach ($cartItemsWithDetails as $index => $item): ?>
                                 <div class="summary-item" data-product-id="<?php echo $item['product']['id']; ?>" data-product-price="<?php echo $item['product']['price']; ?>" data-stock="<?php echo $item['product']['stock']; ?>">
-                                    <div class="item-emoji"><?php echo $item['product']['emoji']; ?></div>
+                                    <div class="item-emoji" style="overflow: hidden; display: flex; align-items: center; justify-content: center; background: #fff;">
+                                        <?php if (!empty($item['product']['image'])): ?>
+                                            <img src="<?php echo $item['product']['image']; ?>" alt="<?php echo htmlspecialchars($item['product']['name']); ?>" style="width: 100%; height: 100%; object-fit: contain;">
+                                        <?php else: ?>
+                                            <?php echo $item['product']['emoji']; ?>
+                                        <?php endif; ?>
+                                    </div>
                                     <div class="item-details">
                                         <span class="item-name"><?php echo htmlspecialchars($item['product']['name']); ?></span>
                                         <div class="item-qty-controls">

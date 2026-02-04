@@ -92,7 +92,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                     <div class="product-visual-container" style="position: relative;">
 
 
-                        <div class="product-emoji-large"><?php echo $product['emoji']; ?></div>
+                        <div class="product-emoji-large" style="display: flex; align-items: center; justify-content: center; overflow: hidden; background: #fff;">
+                            <?php if (!empty($product['image'])): ?>
+                                <img src="<?php echo $product['image']; ?>" alt="<?php echo htmlspecialchars($product['name']); ?>" style="width: 100%; height: 100%; object-fit: contain;">
+                            <?php else: ?>
+                                <?php echo $product['emoji']; ?>
+                            <?php endif; ?>
+                        </div>
                     </div>
                     
                     <!-- Product Info Box -->

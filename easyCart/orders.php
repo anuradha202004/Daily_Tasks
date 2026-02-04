@@ -10,11 +10,9 @@ $pageTitle = 'My Orders';
 // Require login
 requireLogin();
 
-// Get static order history from data
-global $orders;
-
-// Add last order to the orders list
-$allOrders = $orders;
+// Get order history from database
+$currentUser = getCurrentUser();
+$allOrders = getUserOrders($currentUser['id']) ?? [];
 if (isset($_SESSION['last_order'])) {
     // Add latest order from session
     $lastOrderData = [
@@ -216,7 +214,7 @@ if (isset($_SESSION['last_order'])) {
                                     <a href="order-confirmation.php" style="color: #2563eb; text-decoration: none; margin-right: 20px; font-size: 14px; font-weight: 500;">
                                         View Details
                                     </a>
-                                    <a href="#" style="color: #2563eb; text-decoration: none; margin-right: 20px; font-size: 14px; font-weight: 500;">
+                                    <a href="invoice.php?order_number=<?php echo $order['order_number']; ?>" style="color: #2563eb; text-decoration: none; margin-right: 20px; font-size: 14px; font-weight: 500;" target="_blank">
                                         Download Invoice
                                     </a>
                                     <?php if ($order['status'] === 'Delivered'): ?>

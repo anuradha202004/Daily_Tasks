@@ -6,11 +6,15 @@ session_start();
 // Include data and auth
 // Load Application Bootstrap
 require_once 'app/bootstrap.php';
+// Disable error display to prevent JSON corruption
+ini_set('display_errors', 0);
+ini_set('log_errors', 1);
 
 $pageTitle = 'Shopping Cart';
 // Load cart from file on page load (for logged-in users)
 if (isLoggedIn() && !isset($_SESSION['cart'])) {
-    initializeCartFromFile();
+    $currentUser = getCurrentUser();
+    $_SESSION['cart'] = loadUserCart($currentUser['id']);
 }
 
 // Initialize empty cart for non-logged-in users
@@ -24,6 +28,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $isAjax = isset($_SERVER['HTTP_X_REQUESTED_WITH']) || 
               (isset($_SERVER['HTTP_ACCEPT']) && strpos($_SERVER['HTTP_ACCEPT'], 'application/json') !== false) ||
               ($action === 'add' && isset($_POST['product_id']));
+    
+    // Determine User ID for saving cart
+    $userId = null;
+    if (isLoggedIn()) {
+        $currentUser = getCurrentUser();
+        $userId = $currentUser['id'];
+    }
     
     // Handle add action (AJAX)
     if ($action === 'add' && isset($_POST['product_id'])) {
@@ -58,7 +69,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ];
         
         // Save cart (DB sync handles guest/user distinction)
-        saveUserCart(null, $_SESSION['cart']);
+        saveUserCart($userId, $_SESSION['cart']);
         
         header('Content-Type: application/json');
         echo json_encode([
@@ -74,7 +85,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $productId = intval($_POST['product_id']);
         unset($_SESSION['cart'][$productId]);
         // Save cart
-        saveUserCart(null, $_SESSION['cart']);
+        saveUserCart($userId, $_SESSION['cart']);
         
         if ($isAjax) {
             $summary = calculateCartSummary();
@@ -99,7 +110,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
         // Save cart
-        saveUserCart(null, $_SESSION['cart']);
+        // Save cart
+        saveUserCart($userId, $_SESSION['cart']);
         
         if ($isAjax) {
             $summary = calculateCartSummary();
@@ -110,7 +122,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif ($action === 'clear') {
         $_SESSION['cart'] = [];
         // Save cart
-        saveUserCart(null, $_SESSION['cart']);
+        // Save cart
+        saveUserCart($userId, $_SESSION['cart']);
         if ($isAjax) {
             header('Content-Type: application/json');
             echo json_encode(['success' => true, 'cartCount' => 0]);
@@ -226,8 +239,12 @@ $total = $subtotal - $discount;
                                 <!-- Product Image & Name -->
                                 <div style="display: flex; gap: 15px; align-items: center; flex: 1;">
                                     <!-- Product Image -->
-                                    <div style="font-size: 60px; flex-shrink: 0; background: linear-gradient(135deg, #e3f2fd 0%, #f0f7ff 100%); width: 90px; height: 90px; border-radius: 12px; display: flex; align-items: center; justify-content: center; ">
-                                        <?php echo $item['product']['emoji']; ?>
+                                    <div style="font-size: 60px; flex-shrink: 0; background: linear-gradient(135deg, #e3f2fd 0%, #f0f7ff 100%); width: 90px; height: 90px; border-radius: 12px; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+                                        <?php if (!empty($item['product']['image'])): ?>
+                                            <img src="<?php echo $item['product']['image']; ?>" alt="<?php echo htmlspecialchars($item['product']['name']); ?>" style="width: 100%; height: 100%; object-fit: contain;">
+                                        <?php else: ?>
+                                            <?php echo $item['product']['emoji']; ?>
+                                        <?php endif; ?>
                                     </div>
 
                                     <!-- Product Details -->
