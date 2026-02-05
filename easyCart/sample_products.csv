@@ -1,0 +1,4 @@
+sku,name,price,description,stock,color,size,brand,emoji,image
+TEST-001,MacBook Air M3,1099.00,"The latest MacBook Air with M3 chip.",50,Silver,13-inch,Apple,💻,public/img/products/laptop.png
+TEST-002,Sony WH-1000XM5,349.99,"Industry leading noise canceling headphones.",100,Black,Universal,Sony,🎧,public/img/products/headphones.png
+TEST-003,Yeti Water Bottle,40.00,"Double-wall vacuum insulation.",200,Navy,26oz,Yeti,🥤,public/img/products/bottle.png
