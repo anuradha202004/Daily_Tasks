@@ -357,7 +357,7 @@ switch ($sortBy) {
             🔍 Show Filters & Sort
         </button>
 
-        <form id="filterForm" class="products-layout" method="GET" action="products.php">
+        <form id="filterForm" class="products-layout" method="GET" action="products">
             
             <!-- Sidebar -->
             <aside class="filters-sidebar">
@@ -385,7 +385,7 @@ switch ($sortBy) {
 
                 <div class="filter-group">
                     <button type="submit" class="btn-apply">Apply Filters</button>
-                    <a href="products.php" class="btn-reset">Reset Filters</a>
+                    <a href="products" class="btn-reset">Reset Filters</a>
                 </div>
             </aside>
 
@@ -414,7 +414,7 @@ switch ($sortBy) {
                     <div class="products-grid">
                         <?php foreach ($displayProducts as $product): ?>
                             <?php $isWishlisted = isset($_SESSION['wishlist']) && in_array($product['id'], $_SESSION['wishlist']); ?>
-                            <div class="product-card" style="position: relative; cursor: pointer;" onclick="window.location.href='product-detail.php?id=<?php echo $product['id']; ?>'">
+                            <div class="product-card" style="position: relative; cursor: pointer;" onclick="window.location.href='product-detail?id=<?php echo $product['id']; ?>'">
                                 <?php if (isLoggedIn()): ?>
                                 <div onclick="event.stopPropagation(); toggleWishlist(event, <?php echo $product['id']; ?>)" 
                                      style="position: absolute; top: 10px; right: 10px; font-size: 24px; cursor: pointer; z-index: 10; background: white; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.15); transition: all 0.3s ease;"
@@ -438,10 +438,10 @@ switch ($sortBy) {
                                     <span class="stock-info">Stock: <?php echo $product['stock']; ?></span>
                                     <div class="product-actions" onclick="event.stopPropagation();">
                                         <?php if ($product['stock'] > 0): ?>
-                                            <button type="button" onclick="(function(e, id, name){ e.preventDefault(); e.stopPropagation(); var fd = new FormData(); fd.append('action', 'add'); fd.append('product_id', id); fd.append('quantity', 1); fetch('cart.php', {method: 'POST', body: fd}).then(res => res.json()).then(data => { if(data.success) { showToast('🛒 ' + name + ' added to cart!', 'success', 3500); var badge = document.querySelector('.badge'); if(badge){ badge.textContent = data.cartCount || (parseInt(badge.textContent) + 1); badge.style.display = 'flex'; } } else if(data.alreadyInCart) { showToast('ℹ️ ' + name + ' is already in your cart!', 'info', 3500); } else { showToast('❌ ' + (data.message || 'Error adding to cart'), 'error', 3000); } }).catch(() => showToast('❌ Error adding to cart', 'error', 3000)); return false; })(event, <?php echo $product['id']; ?>, '<?php echo addslashes($product['name']); ?>')" class="btn btn-primary btn-add-cart" data-product-id="<?php echo $product['id']; ?>">
+                                            <button type="button" onclick="(function(e, id, name){ e.preventDefault(); e.stopPropagation(); var fd = new FormData(); fd.append('action', 'add'); fd.append('product_id', id); fd.append('quantity', 1); fetch('cart', {method: 'POST', body: fd}).then(res => res.json()).then(data => { if(data.success) { showToast('🛒 ' + name + ' added to cart!', 'success', 3500); var badge = document.querySelector('.badge'); if(badge){ badge.textContent = data.cartCount || (parseInt(badge.textContent) + 1); badge.style.display = 'flex'; } } else if(data.alreadyInCart) { showToast('ℹ️ ' + name + ' is already in your cart!', 'info', 3500); } else { showToast('❌ ' + (data.message || 'Error adding to cart'), 'error', 3000); } }).catch(() => showToast('❌ Error adding to cart', 'error', 3000)); return false; })(event, <?php echo $product['id']; ?>, '<?php echo addslashes($product['name']); ?>')" class="btn btn-primary btn-add-cart" data-product-id="<?php echo $product['id']; ?>">
                                                 Add to Cart
                                             </button>
-                                            <a href="checkout.php?product_id=<?php echo $product['id']; ?>&qty=1&reset_shipping=1" class="btn btn-buy-now">Buy Now</a>
+                                            <a href="checkout?product_id=<?php echo $product['id']; ?>&qty=1&reset_shipping=1" class="btn btn-buy-now">Buy Now</a>
                                         <?php else: ?>
                                             <button class="btn btn-disabled" disabled>Out of Stock</button>
                                         <?php endif; ?>
@@ -455,7 +455,7 @@ switch ($sortBy) {
                         <div style="font-size: 40px; margin-bottom: 20px;">🔍</div>
                         <h3 style="color: #333; margin-bottom: 10px;">No products found</h3>
                         <p style="color: #666; margin-bottom: 20px;">Try adjusting your filters or price range.</p>
-                        <a href="products.php" class="btn btn-primary" style="display: inline-block;">Clear All Filters</a>
+                        <a href="products" class="btn btn-primary" style="display: inline-block;">Clear All Filters</a>
                     </div>
                 <?php endif; ?>
             </main>

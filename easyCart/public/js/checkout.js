@@ -45,6 +45,11 @@ function incrementCheckoutQty(button) {
     if (currentQty < maxStock) {
         currentQty++;
         qtyInput.value = currentQty;
+
+        // Update hidden input for Buy Now flow
+        const hiddenQty = document.querySelector('input[name="qty"]');
+        if (hiddenQty) hiddenQty.value = currentQty;
+
         updateCheckoutPrices();
         syncQuantityWithSession(productId, currentQty);
     }
@@ -62,6 +67,11 @@ function decrementCheckoutQty(button) {
     if (currentQty > 1) {
         currentQty--;
         qtyInput.value = currentQty;
+
+        // Update hidden input for Buy Now flow
+        const hiddenQty = document.querySelector('input[name="qty"]');
+        if (hiddenQty) hiddenQty.value = currentQty;
+
         updateCheckoutPrices();
         syncQuantityWithSession(productId, currentQty);
     }

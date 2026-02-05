@@ -379,8 +379,8 @@ if (!isset($_SESSION['last_order']['status'])) {
 
                     <!-- Action Buttons -->
                     <div style="margin-top: 20px;">
-                        <a href="orders.php" class="btn btn-primary" style="display: block; text-align: center; padding: 12px; text-decoration: none; margin-bottom: 10px;">
-                            View My Orders
+                        <a href="profile.php" class="btn btn-primary" style="display: block; text-align: center; padding: 12px; text-decoration: none; margin-bottom: 10px;">
+                            Go to Dashboard
                         </a>
                         <a href="invoice.php?latest=true" target="_blank" class="btn" style="display: block; text-align: center; padding: 12px; text-decoration: none; margin-bottom: 10px; background: #4b5563; color: white; border-radius: 4px;">
                             📄 Download Invoice

@@ -1,0 +1,43 @@
+RewriteEngine On
+
+# 1. Security: Prevent Directory Listings
+# This stops people from seeing a list of all files in your folders
+Options -Indexes
+
+# 2. Security: Protect Sensitive Files
+# Block access to hidden files/directories (starting with dot) and dependency files
+<FilesMatch "^\.">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+<FilesMatch "^(composer\.json|composer\.lock|package\.json|package-lock\.json|README\.md)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# 3. Clean URLs
+# Redirect external .php requests to extensionless URL
+
+# Specific: Redirect index.php to root (/)
+RewriteCond %{THE_REQUEST} ^\s*(GET|HEAD)\s+/index\.php(\?|\s) [NC]
+RewriteRule ^index\.php$ / [R=301,L]
+
+# Generic: Redirect other .php requests (GET/HEAD) -> 301
+RewriteCond %{THE_REQUEST} ^\s*(GET|HEAD)\s+(.+?)\.php(\?|\s) [NC]
+RewriteRule ^(.+)\.php$ /$1 [R=301,L]
+
+# Generic: Redirect other .php requests (POST/Other) -> 307
+RewriteCond %{THE_REQUEST} ^\s*(POST|PUT|DELETE)\s+(.+?)\.php(\?|\s) [NC]
+RewriteRule ^(.+)\.php$ /$1 [R=307,L]
+
+# Internal Rewrite: Map extensionless URL to .php file (supports subdirectories)
+RewriteCond %{REQUEST_FILENAME} !-d
+# Skip if request is for root (empty) to let DirectoryIndex handle it
+RewriteCond %{REQUEST_URI} !^/$
+RewriteCond %{REQUEST_FILENAME}.php -f
+RewriteRule ^(.+?)/?$ $1.php [L,QSA]
+
+# 4. Routing for logical clean URLs (if needed in future)
+# RewriteCond %{REQUEST_FILENAME} !-f
+# RewriteCond %{REQUEST_FILENAME} !-d
+# RewriteRule ^ index.php [L]

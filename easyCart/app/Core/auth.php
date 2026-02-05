@@ -101,8 +101,8 @@ function registerUser($email, $password, $name, $confirmPassword) {
         
         // Load cart and wishlist
         require_once __DIR__ . '/data.php';
-        $_SESSION['cart'] = loadUserCart($email);
-        $_SESSION['wishlist'] = loadUserWishlist($email);
+        $_SESSION['cart'] = loadUserCart($newUserId);
+        $_SESSION['wishlist'] = loadUserWishlist($newUserId);
         
         // Merge guest cart items
         if (!empty($guestCart)) {
@@ -113,7 +113,7 @@ function registerUser($email, $password, $name, $confirmPassword) {
                     $_SESSION['cart'][$productId] = $guestItem;
                 }
             }
-            saveUserCart($email, $_SESSION['cart']);
+            saveUserCart($newUserId, $_SESSION['cart']);
         }
         
         // Merge guest wishlist items
@@ -123,7 +123,7 @@ function registerUser($email, $password, $name, $confirmPassword) {
                     $_SESSION['wishlist'][$productId] = $guestWishItem;
                 }
             }
-            saveUserWishlist($email, $_SESSION['wishlist']);
+            saveUserWishlist($newUserId, $_SESSION['wishlist']);
         }
         
         return ['success' => true, 'message' => 'Account created successfully!'];
@@ -172,8 +172,8 @@ function loginUser($email, $password) {
         
         // Load Cart/Wishlist
         require_once __DIR__ . '/data.php';
-        $_SESSION['cart'] = loadUserCart($email);
-        $_SESSION['wishlist'] = loadUserWishlist($email);
+        $_SESSION['cart'] = loadUserCart($user['id']);
+        $_SESSION['wishlist'] = loadUserWishlist($user['id']);
         
         // Merge guest items
         if (!empty($guestCart)) {
@@ -184,7 +184,7 @@ function loginUser($email, $password) {
                     $_SESSION['cart'][$productId] = $guestItem;
                 }
             }
-            saveUserCart($email, $_SESSION['cart']);
+            saveUserCart($user['id'], $_SESSION['cart']);
         }
         
         if (!empty($guestWishlist)) {
@@ -193,7 +193,7 @@ function loginUser($email, $password) {
                     $_SESSION['wishlist'][$productId] = $guestWishItem;
                 }
             }
-            saveUserWishlist($email, $_SESSION['wishlist']);
+            saveUserWishlist($user['id'], $_SESSION['wishlist']);
         }
         
         return ['success' => true, 'message' => 'Logged in successfully!'];

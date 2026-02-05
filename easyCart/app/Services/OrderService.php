@@ -26,9 +26,10 @@ class OrderService {
      * @param int|null $userId
      * @param array $orderData
      * @param array $items
+     * @param bool $deactivateCart
      * @return bool
      */
-    public function createOrder($userId, $orderData, $items) {
+    public function createOrder($userId, $orderData, $items, $deactivateCart = true) {
         try {
             $this->orderModel->beginTransaction();
             
@@ -70,7 +71,7 @@ class OrderService {
             }
             
             // Deactivate cart
-            if (isset($_SESSION['cart_id'])) {
+            if ($deactivateCart && isset($_SESSION['cart_id'])) {
                 $this->cartModel->deactivateCart($_SESSION['cart_id']);
                 unset($_SESSION['cart_id']);
             }

@@ -21,18 +21,11 @@ $directQuantity = 1;
 $isBuyNow = false;
 
 // RESET SHIPPING: Force standard if reset_shipping is requested
+// RESET SHIPPING: Force standard if reset_shipping is requested
 if (isset($_GET['reset_shipping']) && $_GET['reset_shipping'] == '1') {
     unset($_SESSION['selected_shipping']);
-    
-    // Redirect to the same page without the reset_shipping parameter
-    // This ensures that refreshing the page doesn't trigger the reset again
-    $params = $_GET;
-    unset($params['reset_shipping']);
-    $queryString = http_build_query($params);
-    $redirectUrl = 'checkout.php' . ($queryString ? '?' . $queryString : '');
-    
-    header("Location: " . $redirectUrl);
-    exit;
+    // Removed redirect to prevent parameter loss and infinite loops.
+    // The script will continue processing the Buy Now request immediately.
 }
 
 // Handle both GET (initial load) and POST (form submission)
@@ -62,22 +55,12 @@ if (isset($_REQUEST['product_id']) && isset($_REQUEST['qty'])) {
         $_SESSION['cart'] = [];
     }
 
-    // If a session quantity already exists for this product (e.g. after a refresh), 
-    // we use that. Otherwise, we use the one from the URL.
-    if (isset($_SESSION['cart'][$pid])) {
-        $directQuantity = $_SESSION['cart'][$pid]['quantity'];
-    } else {
-        $directQuantity = $targetQty;
-        $_SESSION['cart'][$pid] = [
-            'product_id' => $pid,
-            'quantity' => $directQuantity
-        ];
-        
-        // Save for logged-in users
-        if (isLoggedIn() && isset($_SESSION['user_email'])) {
-            saveUserCart($_SESSION['user_email'], $_SESSION['cart']);
-        }
-    }
+    // SYNC WITH SESSION: If it's a Buy Now, we DO NOT add to the global session cart
+    // This allows the user to buy a single item without affecting their main cart.
+    // We just set the quantity to use for this request.
+    $directQuantity = $targetQty;
+    
+    // We intentionally DO NOT update $_SESSION['cart'] here.
 } else {
     // If not a Buy Now (e.g. multi-item cart), we might want to track the total item count
     // to detect changes, but usually, resetting isn't needed unless it's a fresh cart entry.
@@ -91,20 +74,17 @@ if (isset($_REQUEST['product_id']) && isset($_REQUEST['qty'])) {
 $cartItems = isset($_SESSION['cart']) ? $_SESSION['cart'] : [];
 
 // If coming from Buy Now, ONLY show the direct product in the UI (ignore other cart items for now)
+// If coming from Buy Now, ONLY show the direct product in the UI (ignore other cart items for now)
 if ($isBuyNow && $directProduct) {
-    if (isset($cartItems[$directProduct['id']])) {
-        $cartItems = [
-            $directProduct['id'] => $cartItems[$directProduct['id']]
-        ];
-    } else {
-        // Fallback
-        $cartItems = [
-            $directProduct['id'] => [
-                'product_id' => $directProduct['id'],
-                'quantity' => $directQuantity
-            ]
-        ];
-    }
+    // Construct a temporary cart with ONLY this product and the requested quantity
+    // We ignore $_SESSION['cart'] content completely for this item to ensure
+    // we use the exact quantity requested by "Buy Now".
+    $cartItems = [
+        $directProduct['id'] => [
+            'product_id' => $directProduct['id'],
+            'quantity' => $directQuantity
+        ]
+    ];
 }
 
 // If cart is empty and no direct product, redirect to cart page
@@ -410,20 +390,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             'customer_email' => $_SESSION['last_order']['customer']['email'] // Explicit email for guests
         ];
         
-        createOrder($userId, $dbOrderData, $cartItemsWithDetails);
-        
-        // Clear cart ONLY if checking out from cart (not Buy Now)
-        if (!$isBuyNow) {
-            $_SESSION['cart'] = [];
-            // Clear in DB too (for both guests and users)
-            saveUserCart(isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null, []);
+        if (createOrder($userId, $dbOrderData, $cartItemsWithDetails)) {
+            // Clear cart handling
+            if (!$isBuyNow) {
+                // Standard Checktout: clear entire cart and deactivate it
+                $_SESSION['cart'] = [];
+                // Clear in DB too
+                saveUserCart(isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null, []);
+            }
+            
+            // Clear shipping selection for the next order
+            unset($_SESSION['selected_shipping']);
+            
+            header('Location: order-confirmation.php');
+            exit;
+        } else {
+            $checkoutMessage = 'Order creation failed. Please try again or contact support.';
+            // Log for debugging (server-side only, but helpful if we could see logs)
+            // error_log("Checkout failed for User ID: $userId");
         }
-        
-        // Clear shipping selection for the next order
-        unset($_SESSION['selected_shipping']);
-        
-        header('Location: order-confirmation.php');
-        exit;
     } else {
         $checkoutMessage = 'Please fill in all required fields.';
     }

@@ -11,6 +11,50 @@ requireLogin();
 
 $currentUser = getCurrentUser();
 $orders = getUserOrders($currentUser['id']) ?? [];
+
+// Merge session order if not already in list (ensures immediate dashboard update)
+if (isset($_SESSION['last_order'])) {
+    $lastOrderNum = $_SESSION['last_order']['order_number'];
+    $exists = false;
+    foreach ($orders as $o) {
+        if (isset($o['order_number']) && $o['order_number'] === $lastOrderNum) {
+            $exists = true;
+            break;
+        }
+    }
+    if (!$exists) {
+        $sessionOrder = $_SESSION['last_order'];
+        // Ensure consistent structure
+        $sessionOrder['id'] = $sessionOrder['id'] ?? 'session_' . time();
+        $sessionOrder['subtotal'] = $sessionOrder['subtotal'] ?? 0;
+        $sessionOrder['tax'] = $sessionOrder['tax'] ?? 0;
+        $sessionOrder['shipping'] = $sessionOrder['shipping_cost'] ?? 0;
+        array_unshift($orders, $sessionOrder);
+    }
+}
+
+// Merge session order if not already in list (ensures immediate dashboard update)
+if (isset($_SESSION['last_order'])) {
+    $lastOrderNum = $_SESSION['last_order']['order_number'];
+    $exists = false;
+    foreach ($orders as $o) {
+        if (isset($o['order_number']) && $o['order_number'] === $lastOrderNum) {
+            $exists = true;
+            break;
+        }
+    }
+    if (!$exists) {
+        $sessionOrder = $_SESSION['last_order'];
+        // Ensure consistent structure
+        $sessionOrder['id'] = $sessionOrder['id'] ?? 'session_' . time();
+        $sessionOrder['subtotal'] = $sessionOrder['subtotal'] ?? 0;
+        $sessionOrder['tax'] = $sessionOrder['tax'] ?? 0;
+        $sessionOrder['shipping'] = $sessionOrder['shipping_cost'] ?? 0;
+        array_unshift($orders, $sessionOrder);
+    }
+}
+
+
 ?>
 <?php include TEMPLATES_PATH . '/header.php'; ?>
 
@@ -586,7 +630,11 @@ $orders = getUserOrders($currentUser['id']) ?? [];
                             <?php 
                             $totalSpent = 0;
                             foreach ($orders as $order) {
-                                $totalSpent += $order['subtotal'];
+                                if (isset($order['total'])) {
+                                    $totalSpent += $order['total'];
+                                } else {
+                                    $totalSpent += $order['subtotal'] + ($order['tax'] ?? 0) + ($order['shipping'] ?? 0);
+                                }
                             }
                             echo formatPrice($totalSpent);
                             ?>

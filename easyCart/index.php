@@ -171,7 +171,7 @@ $featuredProducts = array_slice($products, 0, 4, true);
                                 <button type="button" onclick="(function(e, id, name){ e.preventDefault(); e.stopPropagation(); var fd = new FormData(); fd.append('action', 'add'); fd.append('product_id', id); fd.append('quantity', 1); fetch('cart.php', {method: 'POST', body: fd}).then(res => res.json()).then(data => { if(data.success) { showToast('🛒 ' + name + ' added to cart!', 'success', 3500); var badge = document.querySelector('.badge'); if(badge){ badge.textContent = data.cartCount || (parseInt(badge.textContent) + 1); badge.style.display = 'flex'; } } else if(data.alreadyInCart) { showToast('ℹ️ ' + name + ' is already in your cart!', 'info', 3500); } else { showToast('❌ ' + (data.message || 'Error adding to cart'), 'error', 3000); } }).catch(() => showToast('❌ Error adding to cart', 'error', 3000)); return false; })(event, <?php echo $product['id']; ?>, '<?php echo addslashes($product['name']); ?>')" class="btn btn-primary btn-add-cart" data-product-id="<?php echo $product['id']; ?>">
                                     Add to Cart
                                 </button>
-                                <a href="checkout.php?product_id=<?php echo $product['id']; ?>&qty=1&reset_shipping=1" class="btn btn-buy-now">Buy Now</a>
+                                <a href="checkout?product_id=<?php echo $product['id']; ?>&qty=1&reset_shipping=1" class="btn btn-buy-now">Buy Now</a>
                             <?php else: ?>
                                 <button class="btn btn-disabled" disabled>Out of Stock</button>
                             <?php endif; ?>
@@ -227,7 +227,7 @@ $featuredProducts = array_slice($products, 0, 4, true);
                                 <button type="button" onclick="(function(e, id, name){ e.preventDefault(); e.stopPropagation(); var fd = new FormData(); fd.append('action', 'add'); fd.append('product_id', id); fd.append('quantity', 1); fetch('cart.php', {method: 'POST', body: fd}).then(res => res.json()).then(data => { if(data.success) { showToast('🛒 ' + name + ' added to cart!', 'success', 3500); var badge = document.querySelector('.badge'); if(badge){ badge.textContent = data.cartCount || (parseInt(badge.textContent) + 1); badge.style.display = 'flex'; } } else if(data.alreadyInCart) { showToast('ℹ️ ' + name + ' is already in your cart!', 'info', 3500); } else { showToast('❌ ' + (data.message || 'Error adding to cart'), 'error', 3000); } }).catch(() => showToast('❌ Error adding to cart', 'error', 3000)); return false; })(event, <?php echo $product['id']; ?>, '<?php echo addslashes($product['name']); ?>')" class="btn btn-primary btn-add-cart" data-product-id="<?php echo $product['id']; ?>">
                                      Add to Cart
                                 </button>
-                                <a href="checkout.php?product_id=<?php echo $product['id']; ?>&qty=1&reset_shipping=1" class="btn btn-buy-now">Buy Now</a>
+                                <a href="checkout?product_id=<?php echo $product['id']; ?>&qty=1&reset_shipping=1" class="btn btn-buy-now">Buy Now</a>
                             <?php else: ?>
                                 <button class="btn btn-disabled" disabled>Out of Stock</button>
                             <?php endif; ?>
@@ -237,88 +237,71 @@ $featuredProducts = array_slice($products, 0, 4, true);
             <?php endforeach; ?>
         </div>
     </section>
-
-    <!-- About Section -->
-    <section id="about" class="container">
+    
+    <!-- About Section (Home Page) -->
+    <section id="about" class="container" style="padding: 60px 20px;">
         <h2 class="section-title">About EasyCart</h2>
-        <div class="about-section">
-            <p>EasyCart is a professional e-commerce platform designed to provide seamless online shopping experiences for businesses and customers alike. Built with modern web technologies, our platform offers a comprehensive solution for digital commerce.</p>
-            
-            <h3>Our Mission</h3>
-            <p>To empower businesses with cutting-edge e-commerce tools while delivering exceptional shopping experiences to customers through innovative technology and user-centric design.</p>
-            
-            <h3>Key Features</h3>
-            <ul>
-                <li>Intuitive product browsing with advanced filtering and search capabilities</li>
-                <li>Seamless shopping cart and wishlist management</li>
-                <li>Secure checkout process with multiple payment options</li>
-                <li>Responsive design optimized for all devices</li>
-                <li>Real-time inventory tracking and management</li>
-                <li>Customer reviews and ratings system</li>
-                <li>Fast and reliable delivery services</li>
-                <li>24/7 customer support</li>
-            </ul>
+        <div class="about-section" style="background: white; padding: 40px; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center;">
+                <div>
+                    <h3 style="margin-bottom: 20px; font-size: 1.5rem;">Our Mission</h3>
+                    <p style="color: #4b5563; line-height: 1.7; margin-bottom: 20px;">
+                        EasyCart is a professional e-commerce platform designed to provide seamless online shopping experiences. 
+                        Started in 2024, we built this on a simple premise: online shopping shouldn't be complicated.
+                    </p>
+                    <div style="display: flex; gap: 20px;">
+                        <div style="text-align: center;">
+                            <strong style="display: block; font-size: 1.5rem; color: #4f46e5;">50K+</strong>
+                            <span style="font-size: 0.9rem; color: #6b7280;">Customers</span>
+                        </div>
+                        <div style="text-align: center;">
+                            <strong style="display: block; font-size: 1.5rem; color: #4f46e5;">100+</strong>
+                            <span style="font-size: 0.9rem; color: #6b7280;">Brands</span>
+                        </div>
+                    </div>
+                </div>
+                <div style="background: #f3f4f6; padding: 40px; border-radius: 20px; text-align: center; font-size: 5rem;">
+                    🛍️
+                </div>
+            </div>
         </div>
     </section>
 
-    <!-- Contact Section -->
-    <section id="contact" class="container">
+    <!-- Contact Section (Home Page) -->
+    <section id="contact" class="container" style="padding: 60px 20px;">
         <h2 class="section-title">Contact Us</h2>
-        <div class="contact-grid">
-            <div class="contact-card">
-                <h3>Get in Touch</h3>
-                <form id="contactForm">
-                    <div class="form-group">
-                        <label for="name">Name</label>
-                        <input type="text" id="name" name="name" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="email">Email</label>
-                        <input type="email" id="email" name="email" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="subject">Subject</label>
-                        <select id="subject" name="subject" required>
-                            <option value="">Select a subject</option>
-                            <option value="order">Order Inquiry</option>
-                            <option value="product">Product Question</option>
-                            <option value="support">Technical Support</option>
-                            <option value="feedback">Feedback</option>
-                            <option value="other">Other</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="message">Message</label>
-                        <textarea id="message" name="message" rows="4" required></textarea>
-                    </div>
-                    <button type="submit" id="submitBtn" class="btn btn-primary" style="width: 100%;">Send Message</button>
-                </form>
-                <div id="formMessage" style="margin-top: 15px; padding: 12px; border-radius: 8px; display: none;"></div>
+        <div class="contact-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+            <div class="contact-card" style="background: #4f46e5; color: white; padding: 40px; border-radius: 16px;">
+                <h3 style="margin-bottom: 20px; font-size: 1.5rem;">Get in Touch</h3>
+                <div style="margin-bottom: 20px;">
+                    <strong>📍 Address</strong>
+                    <p style="opacity: 0.9;">123 Commerce St, Tech City</p>
+                </div>
+                <div style="margin-bottom: 20px;">
+                    <strong>📧 Email</strong>
+                    <p style="opacity: 0.9;">support@easycart.com</p>
+                </div>
+                <div>
+                    <strong>📞 Phone</strong>
+                    <p style="opacity: 0.9;">+1 (555) 123-4567</p>
+                </div>
             </div>
 
-            <div class="contact-card">
-                <h3>Contact Information</h3>
-                <div class="info-item">
-                    <h4>Address</h4>
-                    <p>123 Commerce Street<br>Business District<br>City, State 12345</p>
-                </div>
-                <div class="info-item">
-                    <h4>Phone</h4>
-                    <p>+1 (555) 123-4567</p>
-                </div>
-                <div class="info-item">
-                    <h4>Email</h4>
-                    <p>support@easycart.com</p>
-                </div>
-                <div class="info-item">
-                    <h4>Business Hours</h4>
-                    <p>Monday - Friday: 9:00 AM - 6:00 PM<br>
-                    Saturday: 10:00 AM - 4:00 PM<br>
-                    Sunday: Closed</p>
-                </div>
+            <div class="contact-card" style="background: white; padding: 40px; border-radius: 16px; border: 1px solid #e5e7eb;">
+                <h3 style="margin-bottom: 20px; font-size: 1.5rem; color: #111827;">Send Message</h3>
+                <form onsubmit="event.preventDefault(); showToast('✅ Message sent!', 'success'); this.reset();">
+                    <div style="margin-bottom: 15px;">
+                        <label style="display: block; margin-bottom: 5px; color: #374151;">Name</label>
+                        <input type="text" required style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 8px;">
+                    </div>
+                    <div style="margin-bottom: 15px;">
+                        <label style="display: block; margin-bottom: 5px; color: #374151;">Message</label>
+                        <textarea required rows="3" style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 8px;"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">Send</button>
+                </form>
             </div>
         </div>
     </section>
-    <script src="public/js/contact.js"></script>
 
 <?php include TEMPLATES_PATH . '/footer.php'; ?>

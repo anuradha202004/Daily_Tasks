@@ -41,62 +41,76 @@ try {
     error_log("Data loading error: " . $e->getMessage());
 }
 
-function getProductById($id) {
-    global $products;
-    return $products[$id] ?? null;
-}
-
-function getCategoryById($id) {
-    global $categories;
-    return $categories[$id] ?? null;
-}
-
-function getBrandById($id) {
-    global $brands;
-    return $brands[$id] ?? null;
-}
-
-function getProductsByCategory($category_id) {
-    global $products;
-    return array_filter($products, function($product) use ($category_id) {
-        return $product['category_id'] == $category_id;
-    });
-}
-
-function searchProducts($query) {
-    global $products;
-    $query = strtolower(trim($query));
-    
-    if (empty($query)) {
-        return $products;
+if (!function_exists('getProductById')) {
+    function getProductById($id) {
+        global $products;
+        return $products[$id] ?? null;
     }
-    
-    return array_filter($products, function($product) use ($query) {
-        return strpos(strtolower($product['name']), $query) !== false ||
-               strpos(strtolower($product['description']), $query) !== false;
-    });
 }
 
-function renderStars($rating) {
-    $full_stars = floor($rating);
-    $has_half = ($rating - $full_stars) >= 0.5;
-    
-    $stars = str_repeat('★', $full_stars);
-    if ($has_half && $full_stars < 5) {
-        $stars .= '☆';
-        $stars .= str_repeat('☆', 4 - $full_stars);
-    } else {
-        $stars .= str_repeat('☆', 5 - $full_stars);
+if (!function_exists('getCategoryById')) {
+    function getCategoryById($id) {
+        global $categories;
+        return $categories[$id] ?? null;
     }
-    
-    return $stars;
 }
 
-function isProductInWishlist($productId) {
-    if (!isset($_SESSION['wishlist'])) {
-        $_SESSION['wishlist'] = [];
+if (!function_exists('getBrandById')) {
+    function getBrandById($id) {
+        global $brands;
+        return $brands[$id] ?? null;
     }
-    return in_array($productId, $_SESSION['wishlist']);
+}
+
+if (!function_exists('getProductsByCategory')) {
+    function getProductsByCategory($category_id) {
+        global $products;
+        return array_filter($products, function($product) use ($category_id) {
+            return $product['category_id'] == $category_id;
+        });
+    }
+}
+
+if (!function_exists('searchProducts')) {
+    function searchProducts($query) {
+        global $products;
+        $query = strtolower(trim($query));
+        
+        if (empty($query)) {
+            return $products;
+        }
+        
+        return array_filter($products, function($product) use ($query) {
+            return strpos(strtolower($product['name']), $query) !== false ||
+                   strpos(strtolower($product['description']), $query) !== false;
+        });
+    }
+}
+
+if (!function_exists('renderStars')) {
+    function renderStars($rating) {
+        $full_stars = floor($rating);
+        $has_half = ($rating - $full_stars) >= 0.5;
+        
+        $stars = str_repeat('★', $full_stars);
+        if ($has_half && $full_stars < 5) {
+            $stars .= '☆';
+            $stars .= str_repeat('☆', 4 - $full_stars);
+        } else {
+            $stars .= str_repeat('☆', 5 - $full_stars);
+        }
+        
+        return $stars;
+    }
+}
+
+if (!function_exists('isProductInWishlist')) {
+    function isProductInWishlist($productId) {
+        if (!isset($_SESSION['wishlist'])) {
+            $_SESSION['wishlist'] = [];
+        }
+        return in_array($productId, $_SESSION['wishlist']);
+    }
 }
 
 // ============================================
@@ -200,9 +214,9 @@ function initializeWishlistFromFile() {
 // ORDER FUNCTIONS
 // ============================================
 
-function createOrder($userId, $orderData, $items) {
+function createOrder($userId, $orderData, $items, $deactivateCart = true) {
     global $orderService;
-    return $orderService->createOrder($userId, $orderData, $items);
+    return $orderService->createOrder($userId, $orderData, $items, $deactivateCart);
 }
 
 function getUserEmail($userId) {

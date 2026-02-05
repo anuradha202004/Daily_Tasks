@@ -461,7 +461,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 
         function buyNow(id, stock) {
             const qty = document.getElementById('qtyInput').value;
-            window.location.href = `checkout.php?product_id=${id}&qty=${qty}&reset_shipping=1`;
+            window.location.href = `checkout?product_id=${id}&qty=${qty}&reset_shipping=1`;
         }
 
         function addToCartAjax(e, id, name) {

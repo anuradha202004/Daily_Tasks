@@ -13,6 +13,16 @@ $currentUser = getCurrentUser();
     <link rel="stylesheet" href="public/css/style.css">
     <script src="public/js/common.js"></script>
     <script src="public/js/header.js"></script>
+    <script>
+        // Enforce Clean URLs visually (Client-side fallback)
+        (function() {
+            if (window.location.pathname.endsWith('.php')) {
+                var clean = window.location.pathname.slice(0, -4);
+                if (clean.endsWith('/index')) clean = clean.slice(0, -6) || '/';
+                window.history.replaceState(null, '', clean + window.location.search);
+            }
+        })();
+    </script>
 </head>
 <body>
     <!-- Header -->
@@ -20,15 +30,15 @@ $currentUser = getCurrentUser();
         <div class="header-wrapper">
             <!-- Logo (Left) -->
             <div class="header-logo">
-                <a href="index.php" class="logo">🛒 EasyCart</a>
+                <a href="./" class="logo">🛒 EasyCart</a>
             </div>
 
             <!-- Navigation (Center-Left) -->
             <nav class="header-nav">
-                <a href="index.php" class="nav-link">Home</a>
+                <a href="./" class="nav-link">Home</a>
                 <a href="products.php" class="nav-link">Products</a>
-                <a href="index.php#about" class="nav-link">About</a>
-                <a href="index.php#contact" class="nav-link">Contact</a>
+                <a href="./#about" class="nav-link">About</a>
+                <a href="./#contact" class="nav-link">Contact</a>
             </nav>
 
             <!-- Search Bar (Center) -->

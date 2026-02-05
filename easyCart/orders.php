@@ -226,25 +226,65 @@ if (isset($_SESSION['last_order'])) {
                             </div>
 
                             <!-- Right: Order Total -->
-                            <div style="text-align: right; padding: 15px 0;">
-                                <div style="margin-bottom: 15px;">
-                                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 14px;">
-                                        <span>Subtotal:</span>
-                                        <span>$<?php echo number_format($order['subtotal'], 2); ?></span>
+                            <!-- Right: Payment Summary Card -->
+                            <div style="padding-left: 20px;">
+                                <div style="background: #f8fafc; padding: 20px; border-radius: 12px; border: 1px solid #f1f5f9;">
+                                    <h5 style="margin: 0 0 20px 0; font-size: 13px; text-transform: uppercase; color: #64748b; font-weight: 700; letter-spacing: 0.05em;">Payment Summary</h5>
+                                    
+                                    <?php 
+                                        $itemCount = 0;
+                                        if (isset($order['items'])) {
+                                            foreach($order['items'] as $item) {
+                                                $itemCount += $item['quantity'];
+                                            }
+                                        }
+                                    ?>
+                                    
+                                    <!-- Subtotal -->
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 14px; color: #475569;">
+                                        <span>Subtotal (<?php echo $itemCount; ?> items)</span>
+                                        <span style="font-weight: 500; color: #1e293b;">$<?php echo number_format($order['subtotal'], 2); ?></span>
                                     </div>
-                                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 14px;">
-                                        <span>Tax:</span>
-                                        <span>$<?php echo number_format($order['tax'] ?? 0, 2); ?></span>
+
+                                    <!-- Shipping -->
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 14px; color: #475569;">
+                                        <div>
+                                            <span>Shipping</span>
+                                            <?php if (isset($order['shipping_method_name'])): ?>
+                                                <div style="font-size: 11px; color: #94a3b8; margin-top: 2px;">
+                                                    via <?php echo htmlspecialchars($order['shipping_method_name']); ?>
+                                                </div>
+                                            <?php endif; ?>
+                                        </div>
+                                        <span style="font-weight: 500; color: #1e293b;">$<?php echo number_format($order['shipping'] ?? 0, 2); ?></span>
                                     </div>
-                                    <div style="display: flex; justify-content: space-between; margin-bottom: 15px; font-size: 14px;">
-                                        <span>Shipping<?php echo isset($order['shipping_method_name']) ? ' ('.htmlspecialchars($order['shipping_method_name']).')' : ''; ?>:</span>
-                                        <span>$<?php echo number_format($order['shipping'] ?? 0, 2); ?></span>
+
+                                    <!-- Tax -->
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 14px; color: #475569;">
+                                        <span>Tax</span>
+                                        <span style="font-weight: 500; color: #1e293b;">$<?php echo number_format($order['tax'] ?? 0, 2); ?></span>
                                     </div>
-                                    <div style="display: flex; justify-content: space-between; font-size: 18px; font-weight: bold; padding-top: 15px; border-top: 2px solid #eee;">
-                                        <span>Total:</span>
-                                        <span style="color: #d32f2f;">
+
+                                    <!-- Discount (if any) -->
+                                    <?php if (isset($order['discount_amount']) && $order['discount_amount'] > 0): ?>
+                                        <div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 14px; color: #059669;">
+                                            <span>Discount</span>
+                                            <span style="font-weight: 500;">-$<?php echo number_format($order['discount_amount'], 2); ?></span>
+                                        </div>
+                                    <?php endif; ?>
+
+                                    <!-- Divider -->
+                                    <div style="border-top: 1px dashed #cbd5e1; margin: 15px 0;"></div>
+
+                                    <!-- Total -->
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <span style="font-size: 15px; font-weight: 700; color: #0f172a;">Total Order</span>
+                                        <span style="font-size: 20px; font-weight: 800; color: #0f172a; letter-spacing: -0.025em;">
                                             $<?php echo number_format($order['subtotal'] + ($order['tax'] ?? 0) + ($order['shipping'] ?? 0), 2); ?>
                                         </span>
+                                    </div>
+                                    <div style="text-align: right; margin-top: 5px;">
+                                        <span style="font-size: 11px; color: #94a3b8;">Include all taxes</span>
                                     </div>
                                 </div>
                             </div>
