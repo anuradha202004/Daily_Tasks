@@ -37,109 +37,146 @@ $pageTitle = 'Home';
 $featuredProducts = array_slice($products, 0, 4, true);
 ?>
 <?php include TEMPLATES_PATH . '/header.php'; ?>
-    <script src="public/js/carousel.js"></script>
+
     <script src="public/js/wishlist.js"></script>
     <script src="public/js/cart.js"></script>
     <script src="public/js/toast.js"></script>
 
     <!-- Modern Hero Section - Split Design with Glassmorphism -->
     <!-- Modern Interactive Ad Hero Section -->
-    <section id="home" class="interactive-hero">
-        <!-- Animated Background -->
-        <div class="hero-bg-animated">
-            <div class="animated-shape shape-1"></div>
-            <div class="animated-shape shape-2"></div>
-            <div class="animated-shape shape-3"></div>
-        </div>
-
-        <div class="hero-wrapper">
-            <!-- Main Ad Display -->
-            <div class="ads-carousel-container">
-                <div class="ads-carousel">
-                    <!-- Ad 1 -->
-                    <div class="ad-slide active" style="background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('public/img/hero_shopping.png') center/cover no-repeat;">
-                        <div class="ad-content">
-                            <div class="ad-badge">✨ NEW COLLECTION</div>
-                            <h2 class="ad-title">Summer Collection 2026</h2>
-                            <p class="ad-description">Discover the latest trending products</p>
-                            <a href="products.php?category=1" class="ad-cta">Shop Collection →</a>
-                        </div>
-                        <div class="ad-visual"></div>
-                    </div>
-
-                    <!-- Ad 2 -->
-                    <div class="ad-slide" style="background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('public/img/hero_laptop.png') center/cover no-repeat;">
-                        <div class="ad-content">
-                            <div class="ad-badge">🔥 HOT DEALS</div>
-                            <h2 class="ad-title">Up to 70% OFF</h2>
-                            <p class="ad-description">Limited time exclusive offers</p>
-                            <a href="products.php" class="ad-cta">Grab Deals →</a>
-                        </div>
-                        <div class="ad-visual"></div>
-                    </div>
-
-                    <!-- Ad 3 -->
-                    <div class="ad-slide" style="background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('public/img/hero_music.png') center/cover no-repeat;">
-                        <div class="ad-content">
-                            <div class="ad-badge">⭐ PREMIUM QUALITY</div>
-                            <h2 class="ad-title">Best Sellers</h2>
-                            <p class="ad-description">Top-rated products at best prices</p>
-                            <a href="products.php" class="ad-cta">View Best Sellers →</a>
-                        </div>
-                        <div class="ad-visual"></div>
-                    </div>
-
-                    <!-- Ad 4 -->
-                    <div class="ad-slide" style="background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('public/img/hero_vip.png') center/cover no-repeat;">
-                        <div class="ad-content">
-                            <div class="ad-badge">💎 EXCLUSIVE</div>
-                            <h2 class="ad-title">VIP Member Benefits</h2>
-                            <p class="ad-description">Unlock premium rewards today</p>
-                            <a href="products.php" class="ad-cta">Join VIP →</a>
-                        </div>
-                        <div class="ad-visual"></div>
-                    </div>
-                </div>
-
-                <!-- Navigation Controls -->
-                <div class="carousel-controls">
-                    <button class="nav-btn prev-btn" onclick="prevAd()">❮</button>
-                    <button class="nav-btn next-btn" onclick="nextAd()">❯</button>
-                </div>
-
-                <!-- Interactive Dots -->
-                <div class="carousel-dots">
-                    <span class="dot active" onclick="goToAd(0)"></span>
-                    <span class="dot" onclick="goToAd(1)"></span>
-                    <span class="dot" onclick="goToAd(2)"></span>
-                    <span class="dot" onclick="goToAd(3)"></span>
-                </div>
-
-                <!-- Progress Bar -->
-                <div class="progress-bar"><div class="progress-fill"></div></div>
+    <!-- Modern Clean Hero Section -->
+    <section class="hero-section" style="background: #ffffff; padding: 20px 0 40px; position: relative; overflow: hidden;">
+        <div class="container" style="display: flex; align-items: center; gap: 40px; min-height: 450px;">
+            
+            <!-- Left: Image (Person) -->
+            <div class="hero-image" style="flex: 1; text-align: center; position: relative;">
+                <!-- Using hero_model.png as placeholder for the person image -->
+                <img src="public/img/hero_model.png" alt="Happy Shopper" style="
+                    position: relative;
+                    z-index: 1;
+                    max-width: 100%;
+                    height: auto;
+                ">
             </div>
 
-            <!-- Quick Access Section -->
-            <div class="quick-access">
-                <div class="access-item">
-                    <div class="access-icon">🚚</div>
-                    <h3>Fast Shipping</h3>
-                    <p>Free on orders over $50</p>
+            <!-- Right: Content -->
+            <div class="hero-content" style="flex: 1; padding-left: 20px;">
+                <span style="
+                    display: inline-block;
+                    padding: 8px 16px;
+                    background: #ebf5ff;
+                    color: #2563eb;
+                    border-radius: 30px;
+                    font-weight: 700;
+                    font-size: 0.9rem;
+                    margin-bottom: 24px;
+                ">
+                    ✨ NEW COLLECTION 2026
+                </span>
+                
+                <h1 style="
+                    font-size: 4.5rem;
+                    line-height: 1.1;
+                    font-weight: 800;
+                    color: #111827;
+                    margin-bottom: 24px;
+                    letter-spacing: -0.02em;
+                ">
+                    Discover Your <br>
+                    <span style="color: #2563eb;">Style Today.</span>
+                </h1>
+                
+                <p style="
+                    font-size: 1.25rem;
+                    line-height: 1.7;
+                    color: #6b7280;
+                    margin-bottom: 40px;
+                    max-width: 500px;
+                ">
+                    Explore our latest arrivals and find the perfect look for any occasion. Premium quality, best prices.
+                </p>
+                
+                <div style="display: flex; gap: 20px; align-items: center;">
+                    <button onclick="window.location.href='products.php'" style="
+                        cursor: pointer;
+                        padding: 18px 40px;
+                        background: #2563eb;
+                        color: white;
+                        border: none;
+                        border-radius: 50px;
+                        font-size: 1.1rem;
+                        font-weight: 600;
+                        box-shadow: 0 10px 25px rgba(37, 99, 235, 0.3);
+                        transition: transform 0.2s, box-shadow 0.2s;
+                    " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 15px 30px rgba(37, 99, 235, 0.4)'"
+                      onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 10px 25px rgba(37, 99, 235, 0.3)'">
+                        Shop Now
+                    </button>
+                    
+                    <a href="#about" style="
+                        color: #4b5563;
+                        text-decoration: none;
+                        font-weight: 500;
+                        font-size: 1.1rem;
+                        display: flex;
+                        align-items: center;
+                        gap: 8px;
+                        transition: color 0.2s;
+                    " onmouseover="this.style.color='#111827'" onmouseout="this.style.color='#4b5563'">
+                        <span>Learn More</span>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                    </a>
                 </div>
-                <div class="access-item">
-                    <div class="access-icon">🛡️</div>
-                    <h3>Secure Payment</h3>
-                    <p>100% protected checkout</p>
+
+                <!-- Trust Indicators -->
+                <div style="margin-top: 60px; display: flex; gap: 40px; border-top: 1px solid #f3f4f6; padding-top: 1px;">
+                    <div>
+                        <strong style="display: block; font-size: 1.5rem; color: #111827;">50k+</strong>
+                        <span style="color: #6b7280; font-size: 0.95rem;">Happy Customers</span>
+                    </div>
+                    <div>
+                        <strong style="display: block; font-size: 1.5rem; color: #111827;">2k+</strong>
+                        <span style="color: #6b7280; font-size: 0.95rem;">Top Products</span>
+                    </div>
+                    <div>
+                        <strong style="display: block; font-size: 1.5rem; color: #111827;">24/7</strong>
+                        <span style="color: #6b7280; font-size: 0.95rem;">Customer Support</span>
+                    </div>
                 </div>
-                <div class="access-item">
-                    <div class="access-icon">↩️</div>
-                    <h3>Easy Returns</h3>
-                    <p>30-day return policy</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Quick Access / Services Section -->
+    <section style="padding: 0 0 80px; background: #ffffff;">
+        <div class="container">
+            <div style="
+                display: grid;
+                grid-template-columns: repeat(4, 1fr);
+                gap: 30px;
+                background: #f8fafc;
+                padding: 40px;
+                border-radius: 20px;
+            ">
+                <div style="text-align: center;">
+                    <div style="font-size: 2.5rem; margin-bottom: 15px;">🚚</div>
+                    <h3 style="margin-bottom: 10px; color: #1e293b;">Fast Shipping</h3>
+                    <p style="color: #64748b; font-size: 0.95rem;">Free delivery on orders over $50</p>
                 </div>
-                <div class="access-item">
-                    <div class="access-icon">💬</div>
-                    <h3>24/7 Support</h3>
-                    <p>Always here to help</p>
+                <div style="text-align: center;">
+                    <div style="font-size: 2.5rem; margin-bottom: 15px;">🛡️</div>
+                    <h3 style="margin-bottom: 10px; color: #1e293b;">Secure Payment</h3>
+                    <p style="color: #64748b; font-size: 0.95rem;">100% secure payment processing</p>
+                </div>
+                <div style="text-align: center;">
+                    <div style="font-size: 2.5rem; margin-bottom: 15px;">↩️</div>
+                    <h3 style="margin-bottom: 10px; color: #1e293b;">Easy Returns</h3>
+                    <p style="color: #64748b; font-size: 0.95rem;">Hassle-free 30-day return policy</p>
+                </div>
+                <div style="text-align: center;">
+                    <div style="font-size: 2.5rem; margin-bottom: 15px;">💬</div>
+                    <h3 style="margin-bottom: 10px; color: #1e293b;">24/7 Support</h3>
+                    <p style="color: #64748b; font-size: 0.95rem;">Dedicated support anytime</p>
                 </div>
             </div>
         </div>

@@ -1,0 +1,87 @@
+/* User Menu Button */
+.user-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: transparent;
+    border: none;
+    color: #4b5563;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 8px 12px;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.user-btn:hover {
+    background-color: #f3f4f6;
+    color: #2563eb;
+}
+
+.user-btn svg {
+    width: 20px;
+    height: 20px;
+    stroke: currentColor;
+    stroke-width: 2;
+}
+
+/* User Menu Container */
+.user-menu {
+    position: relative;
+    display: inline-block;
+}
+
+.user-dropdown {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    width: 220px;
+    background: white;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    padding: 8px 0;
+    z-index: 1001;
+    margin-top: 10px;
+    border: 1px solid #f3f4f6;
+    animation: slideUp 0.2s ease-out;
+}
+
+.user-dropdown.show {
+    display: block;
+}
+
+.user-dropdown .dropdown-item {
+    display: block;
+    padding: 10px 16px;
+    color: #4b5563;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.user-dropdown .dropdown-item:hover {
+    background-color: #f3f4f6;
+    color: #2563eb;
+    padding-left: 20px;
+}
+
+.user-dropdown .dropdown-divider {
+    height: 1px;
+    background-color: #f3f4f6;
+    margin: 6px 0;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
