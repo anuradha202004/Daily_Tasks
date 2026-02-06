@@ -4,6 +4,51 @@ require_once 'app/bootstrap.php';
 
 $pageTitle = 'Order Confirmation';
 
+// Get order from DB if ID is provided (for viewing history)
+if (isset($_GET['id'])) {
+    $fetchedOrder = getOrderByNumber($_GET['id']);
+    if ($fetchedOrder) {
+        $mappedOrder = [
+             'order_number' => $fetchedOrder['increment_id'],
+             'date' => $fetchedOrder['created_at'],
+             'status' => $fetchedOrder['status'],
+             'total' => $fetchedOrder['grand_total'],
+             'subtotal' => $fetchedOrder['subtotal'],
+             'tax' => $fetchedOrder['tax_amount'],
+             'shipping_cost' => $fetchedOrder['shipping_amount'],
+             'promo_discount' => $fetchedOrder['discount_amount'],
+             'shipping_method_name' => $fetchedOrder['shipping_method'] ?? 'Standard',
+             'customer' => [
+                 'first_name' => $fetchedOrder['first_name'],
+                 'last_name' => $fetchedOrder['last_name'],
+                 'email' => $fetchedOrder['email'],
+                 'phone' => $fetchedOrder['phone'],
+                 'address' => $fetchedOrder['address'],
+                 'city' => $fetchedOrder['city'],
+                 'state' => $fetchedOrder['state'],
+                 'zip' => $fetchedOrder['zip']
+             ],
+             'items' => []
+        ];
+        
+        // Fetch items details
+        foreach ($fetchedOrder['items'] as $item) {
+             $productDetails = getProductById($item['product_id']);
+             $mappedOrder['items'][] = [
+                 'product_id' => $item['product_id'],
+                 'quantity' => $item['qty_ordered'] ?? $item['quantity'] ?? 1,
+                 'itemTotal' => $item['price'] * ($item['qty_ordered'] ?? $item['quantity'] ?? 1),
+                 'product' => [
+                     'name' => $item['name'] ?? $productDetails['name'],
+                     'emoji' => $productDetails['emoji'] ?? '📦'
+                 ]
+             ];
+        }
+        
+        $_SESSION['last_order'] = $mappedOrder;
+    }
+}
+
 // Get last order from session
 $lastOrder = isset($_SESSION['last_order']) ? $_SESSION['last_order'] : null;
 
@@ -15,7 +60,13 @@ if (!$lastOrder) {
 
 // Handle cancel order request
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'cancel_order') {
-    // Set order status to cancelled
+    // Update Database Status
+    $orderNumber = $_SESSION['last_order']['order_number'];
+    global $pdo;
+    $stmt = $pdo->prepare("UPDATE sales_order SET status = 'Cancelled' WHERE increment_id = ?");
+    $stmt->execute([$orderNumber]);
+
+    // Update Session Status
     $_SESSION['last_order']['status'] = 'Cancelled';
     $_SESSION['last_order']['cancelled_date'] = date('Y-m-d H:i:s');
     $cancellationMessage = 'Order has been cancelled successfully. You will receive a refund within 5-7 business days.';
@@ -34,9 +85,15 @@ if (!isset($_SESSION['last_order']['status'])) {
     <!-- Order Confirmation Page -->
     <section class="container" style="padding: 40px 0;">
         <div style="text-align: center; margin-bottom: 40px;">
-            <div style="font-size: 60px; margin-bottom: 20px; color: #28a745;">✓</div>
-            <h1 style="margin-bottom: 10px;">Order Confirmed!</h1>
-            <p style="color: #666; font-size: 18px;">Thank you for your purchase</p>
+            <?php if (isset($_SESSION['last_order']['status']) && $_SESSION['last_order']['status'] === 'Cancelled'): ?>
+                <div style="font-size: 60px; margin-bottom: 20px; color: #dc2626;">✗</div>
+                <h1 style="margin-bottom: 10px;">Order Cancelled</h1>
+                <p style="color: #666; font-size: 18px;">This order has been cancelled.</p>
+            <?php else: ?>
+                <div style="font-size: 60px; margin-bottom: 20px; color: #28a745;">✓</div>
+                <h1 style="margin-bottom: 10px;">Order Confirmed!</h1>
+                <p style="color: #666; font-size: 18px;">Thank you for your purchase</p>
+            <?php endif; ?>
             <p style="color: #999; font-size: 14px;">Order Number: <strong><?php echo htmlspecialchars($_SESSION['last_order']['order_number']); ?></strong></p>
         </div>
 
@@ -166,118 +223,7 @@ if (!isset($_SESSION['last_order']['status'])) {
                 </div>
             <?php endif; ?>
 
-            <!-- Cancel Order Button -->
-            <?php if ($currentStatus === 'Processing'): ?>
-                <div style="margin-top: 20px;">
-                    <button onclick="openCancelModal()" style="
-                        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-                        color: white;
-                        border: none;
-                        padding: 12px 24px;
-                        border-radius: 8px;
-                        cursor: pointer;
-                        font-weight: 500;
-                        font-size: 14px;
-                        transition: transform 0.2s ease;
-                    " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
-                        ❌ Cancel Order
-                    </button>
-                </div>
-            <?php endif; ?>
 
-            <!-- Order Status Simulation (Demo Feature) -->
-            <?php if ($currentStatus !== 'Cancelled' && $currentStatus !== 'Completed'): ?>
-                <div style="margin-top: 30px; padding: 20px; background: #f0f4f8; border-radius: 8px; border: 2px dashed #cbd5e1;">
-                    <h4 style="margin: 0 0 15px 0; color: #475569; font-size: 14px;">
-                        🎮 Demo Controls - Simulate Order Progress
-                    </h4>
-                    <p style="margin: 0 0 15px 0; font-size: 12px; color: #64748b;">
-                        Use these buttons to simulate order status changes for demonstration purposes.
-                    </p>
-                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                        <?php if ($currentStatus === 'Processing'): ?>
-                            <form method="POST" style="display: inline;">
-                                <input type="hidden" name="action" value="simulate_status">
-                                <input type="hidden" name="new_status" value="Shipped">
-                                <button type="submit" style="
-                                    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-                                    color: white;
-                                    border: none;
-                                    padding: 10px 20px;
-                                    border-radius: 6px;
-                                    cursor: pointer;
-                                    font-weight: 500;
-                                    font-size: 13px;
-                                    transition: transform 0.2s ease;
-                                " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
-                                    📦 Ship Order
-                                </button>
-                            </form>
-                        <?php endif; ?>
-
-                        <?php if ($currentStatus === 'Shipped'): ?>
-                            <form method="POST" style="display: inline;">
-                                <input type="hidden" name="action" value="simulate_status">
-                                <input type="hidden" name="new_status" value="Delivered">
-                                <button type="submit" style="
-                                    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-                                    color: white;
-                                    border: none;
-                                    padding: 10px 20px;
-                                    border-radius: 6px;
-                                    cursor: pointer;
-                                    font-weight: 500;
-                                    font-size: 13px;
-                                    transition: transform 0.2s ease;
-                                " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
-                                    ✓ Mark as Delivered
-                                </button>
-                            </form>
-                        <?php endif; ?>
-
-                        <?php if ($currentStatus === 'Delivered'): ?>
-                            <form method="POST" style="display: inline;">
-                                <input type="hidden" name="action" value="simulate_status">
-                                <input type="hidden" name="new_status" value="Completed">
-                                <button type="submit" style="
-                                    background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
-                                    color: white;
-                                    border: none;
-                                    padding: 10px 20px;
-                                    border-radius: 6px;
-                                    cursor: pointer;
-                                    font-weight: 500;
-                                    font-size: 13px;
-                                    transition: transform 0.2s ease;
-                                " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
-                                    ✓ Complete Order
-                                </button>
-                            </form>
-                        <?php endif; ?>
-
-                        <!-- Reset to Processing -->
-                        <?php if ($currentStatus !== 'Processing'): ?>
-                            <form method="POST" style="display: inline;">
-                                <input type="hidden" name="action" value="simulate_status">
-                                <input type="hidden" name="new_status" value="Processing">
-                                <button type="submit" style="
-                                    background: #e5e7eb;
-                                    color: #374151;
-                                    border: 1px solid #d1d5db;
-                                    padding: 10px 20px;
-                                    border-radius: 6px;
-                                    cursor: pointer;
-                                    font-weight: 500;
-                                    font-size: 13px;
-                                    transition: transform 0.2s ease;
-                                " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
-                                    🔄 Reset to Processing
-                                </button>
-                            </form>
-                        <?php endif; ?>
-                    </div>
-                </div>
-            <?php endif; ?>
         </div>
 
         <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 30px; margin-bottom: 40px;">
@@ -357,14 +303,25 @@ if (!isset($_SESSION['last_order']['status'])) {
                         <span style="color: #d32f2f;">$<?php echo number_format($lastOrder['total'], 2); ?></span>
                     </div>
 
-                    <div style="margin-top: 20px; padding: 15px; background: #d4edda; border-radius: 8px;">
-                        <p style="margin: 0; color: #155724; font-weight: 500; text-align: center;">
-                            ✓ Order Placed Successfully
-                        </p>
-                        <p style="margin: 5px 0 0 0; color: #155724; font-size: 12px; text-align: center;">
-                            Order placed on <?php echo date('F d, Y \a\t h:i A', strtotime($lastOrder['date'])); ?>
-                        </p>
-                    </div>
+                    <?php if (isset($_SESSION['last_order']['status']) && $_SESSION['last_order']['status'] === 'Cancelled'): ?>
+                        <div style="margin-top: 20px; padding: 15px; background: #fee2e2; border-radius: 8px;">
+                            <p style="margin: 0; color: #991b1b; font-weight: 500; text-align: center;">
+                                ✗ Order Cancelled
+                            </p>
+                            <p style="margin: 5px 0 0 0; color: #991b1b; font-size: 12px; text-align: center;">
+                                Refund pending (5-7 days)
+                            </p>
+                        </div>
+                    <?php else: ?>
+                        <div style="margin-top: 20px; padding: 15px; background: #d4edda; border-radius: 8px;">
+                            <p style="margin: 0; color: #155724; font-weight: 500; text-align: center;">
+                                ✓ Order Placed Successfully
+                            </p>
+                            <p style="margin: 5px 0 0 0; color: #155724; font-size: 12px; text-align: center;">
+                                Order placed on <?php echo date('F d, Y \a\t h:i A', strtotime($lastOrder['date'])); ?>
+                            </p>
+                        </div>
+                    <?php endif; ?>
 
                     <!-- Next Steps -->
                     <div style="margin-top: 20px;">
@@ -379,6 +336,11 @@ if (!isset($_SESSION['last_order']['status'])) {
 
                     <!-- Action Buttons -->
                     <div style="margin-top: 20px;">
+                        <?php if (isset($_SESSION['last_order']['status']) && $_SESSION['last_order']['status'] === 'Processing'): ?>
+                            <button onclick="openCancelModal()" class="btn" style="width: 100%; margin-bottom: 10px; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; padding: 12px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">
+                                ❌ Cancel Order
+                            </button>
+                        <?php endif; ?>
                         <a href="profile.php" class="btn btn-primary" style="display: block; text-align: center; padding: 12px; text-decoration: none; margin-bottom: 10px;">
                             Go to Dashboard
                         </a>
@@ -388,6 +350,11 @@ if (!isset($_SESSION['last_order']['status'])) {
                         <a href="products.php" style="display: block; text-align: center; padding: 12px; color: #2563eb; text-decoration: none; border: 1px solid #2563eb; border-radius: 4px;">
                             Continue Shopping
                         </a>
+                        <?php if (isset($_SESSION['last_order']['status']) && $_SESSION['last_order']['status'] === 'Cancelled'): ?>
+                            <button onclick="window.location.href='products.php'" class="btn" style="width: 100%; margin-top: 10px; background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%); color: white; padding: 12px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">
+                                🔄 Buy Again
+                            </button>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>

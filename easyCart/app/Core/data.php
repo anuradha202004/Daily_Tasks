@@ -32,12 +32,17 @@ try {
 
 // 2. Fetch Brands from Database
 $brands = [];
+$brandNameMap = []; // Map normalized brand name to ID for lookup
 try {
     $stmt = $pdo->query("SELECT DISTINCT brand as name FROM catalog_product_attribute WHERE brand IS NOT NULL");
     $i = 1;
     while ($row = $stmt->fetch()) {
-        $brands[$i] = ['id' => $i, 'name' => $row['name']];
-        $i++;
+        $name = trim($row['name']); // Clean name
+        if ($name) {
+            $brands[$i] = ['id' => $i, 'name' => $name];
+            $brandNameMap[strtolower($name)] = $i; // Normalize key
+            $i++;
+        }
     }
 } catch (PDOException $e) { 
     error_log("Brands Fetch Error: " . $e->getMessage());
@@ -84,7 +89,11 @@ try {
         $catStmt->execute([$row['id']]);
         $catId = $catStmt->fetchColumn();
         $row['category_id'] = $catId ? (int)$catId : 1;
-        $row['brand_id'] = 1;
+        
+        // Assign Brand ID based on name match (normalized)
+        $brandName = trim($row['brand'] ?? '');
+        $brandKey = strtolower($brandName);
+        $row['brand_id'] = ($brandKey && isset($brandNameMap[$brandKey])) ? $brandNameMap[$brandKey] : 0;
         
         $products[$row['id']] = $row;
     }
@@ -284,17 +293,29 @@ function getUserEmail($userId) {
 function loadUserCart($userId) {
     global $pdo;
     
-    if (!$userId) {
-        return [];
-    }
+    
+    // Support for guest carts via null userId
+    // if (!$userId) { return []; } 
+
     
     try {
-        $stmt = $pdo->prepare("
-            SELECT product_id, quantity 
-            FROM checkout_cart 
-            WHERE user_id = ?
-        ");
-        $stmt->execute([$userId]);
+        if ($userId) {
+            $stmt = $pdo->prepare("
+                SELECT product_id, quantity 
+                FROM checkout_cart 
+                WHERE user_id = ?
+            ");
+            $stmt->execute([$userId]);
+        } else {
+            // Determine guest ID (passed as argument or from cookie)
+            $guestId = getGuestSessionId();
+            $stmt = $pdo->prepare("
+                SELECT product_id, quantity 
+                FROM checkout_cart 
+                WHERE session_id = ?
+            ");
+            $stmt->execute([$guestId]);
+        }
         
         $cart = [];
         while ($row = $stmt->fetch()) {
@@ -317,30 +338,49 @@ function loadUserCart($userId) {
 function saveUserCart($userId, $cart) {
     global $pdo;
     
-    if (!$userId) {
-        return;
-    }
+    
+    // Support for guest carts via null userId
+    // if (!$userId) { return; }
+
     
     try {
         $pdo->beginTransaction();
         
         // Clear existing cart items
-        $stmt = $pdo->prepare("DELETE FROM checkout_cart WHERE user_id = ?");
-        $stmt->execute([$userId]);
+        if ($userId) {
+            $stmt = $pdo->prepare("DELETE FROM checkout_cart WHERE user_id = ?");
+            $stmt->execute([$userId]);
+        } else {
+            $guestId = getGuestSessionId();
+            $stmt = $pdo->prepare("DELETE FROM checkout_cart WHERE session_id = ?");
+            $stmt->execute([$guestId]);
+        }
         
         // Insert new cart items
         if (!empty($cart)) {
-            $insertStmt = $pdo->prepare("
-                INSERT INTO checkout_cart (user_id, product_id, quantity, updated_at)
-                VALUES (?, ?, ?, NOW())
-            ");
+            if ($userId) {
+                $insertStmt = $pdo->prepare("
+                    INSERT INTO checkout_cart (user_id, product_id, quantity, updated_at)
+                    VALUES (?, ?, ?, NOW())
+                ");
+            } else {
+                $guestId = getGuestSessionId();
+                $insertStmt = $pdo->prepare("
+                    INSERT INTO checkout_cart (session_id, product_id, quantity, updated_at)
+                    VALUES (?, ?, ?, NOW())
+                ");
+            }
             
             foreach ($cart as $item) {
                 $productId = $item['product_id'] ?? null;
                 $quantity = $item['quantity'] ?? 1;
                 
                 if ($productId && $quantity > 0) {
-                    $insertStmt->execute([$userId, $productId, $quantity]);
+                    if ($userId) {
+                        $insertStmt->execute([$userId, $productId, $quantity]);
+                    } else {
+                        $insertStmt->execute([$guestId, $productId, $quantity]);
+                    }
                 }
             }
         }

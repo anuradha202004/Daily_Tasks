@@ -53,3 +53,21 @@ function view($view, $data = []) {
 function e($string) {
     return htmlspecialchars($string, ENT_QUOTES, 'UTF-8');
 }
+
+/**
+ * Get or Create a Guest Session ID
+ * Uses a long-lived cookie to track guests
+ */
+function getGuestSessionId() {
+    if (isset($_COOKIE['guest_session_id'])) {
+        return $_COOKIE['guest_session_id'];
+    }
+    
+    // Generate new unique ID
+    $guestId = bin2hex(random_bytes(16));
+    
+    // Set cookie for 30 days
+    setcookie('guest_session_id', $guestId, time() + (86400 * 30), "/");
+    
+    return $guestId;
+}

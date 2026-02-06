@@ -25,15 +25,23 @@ $globalMaxPrice = ceil(max($allPrices));
 
 // 2. Get Filter Parameters
 $selectedCategories = isset($_GET['categories']) ? (is_array($_GET['categories']) ? $_GET['categories'] : [$_GET['categories']]) : [];
+$selectedBrands = isset($_GET['brands']) ? (is_array($_GET['brands']) ? $_GET['brands'] : [$_GET['brands']]) : [];
 $minPrice = isset($_GET['min_price']) ? floatval($_GET['min_price']) : $globalMinPrice;
 $maxPrice = isset($_GET['max_price']) ? floatval($_GET['max_price']) : $globalMaxPrice;
 $sortBy = isset($_GET['sort']) ? $_GET['sort'] : 'newest';
 
 // 3. Apply Filters
-$displayProducts = array_filter($products, function($product) use ($selectedCategories, $minPrice, $maxPrice) {
+$displayProducts = array_filter($products, function($product) use ($selectedCategories, $selectedBrands, $minPrice, $maxPrice) {
     // Category Filter
     if (!empty($selectedCategories)) {
         if (!in_array($product['category_id'], $selectedCategories)) {
+            return false;
+        }
+    }
+
+    // Brand Filter
+    if (!empty($selectedBrands)) {
+        if (!isset($product['brand_id']) || !in_array($product['brand_id'], $selectedBrands)) {
             return false;
         }
     }
@@ -71,9 +79,9 @@ switch ($sortBy) {
 ?>
 <?php include TEMPLATES_PATH . '/header.php'; ?>
     <!-- Scripts -->
-    <script src="public/js/wishlist.js"></script>
-    <script src="public/js/cart.js"></script>
-    <script src="public/js/toast.js"></script>
+    <script src="/public/js/wishlist.js"></script>
+    <script src="/public/js/cart.js"></script>
+    <script src="/public/js/toast.js"></script>
 
     <!-- Page Styles -->
     <style>
@@ -85,7 +93,7 @@ switch ($sortBy) {
             --text-dark: #1f2937;
             --text-gray: #6b7280;
             --bg-light: #f9fafb;
-            --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025);
             --card-hover-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
             --glass-bg: rgba(255, 255, 255, 0.95);
         }
@@ -93,8 +101,8 @@ switch ($sortBy) {
         /* Enhanced Page Header */
         .page-header {
             background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-            padding: 25px 0; /* Reduced padding */
-            margin-bottom: 30px;
+            padding: 40px 0;
+            margin-bottom: 40px;
             border-bottom: 1px solid #dee2e6;
         }
 
@@ -106,22 +114,42 @@ switch ($sortBy) {
             align-items: start;
         }
 
-        /* Modern Sidebar */
+        /* Modern Sidebar with Custom Scrolling */
         .filters-sidebar {
             background: #fff;
             border-radius: 16px;
             padding: 25px;
-            border: 1px solid rgba(229, 231, 235, 0.5);
-            box-shadow: var(--card-shadow);
+            border: 1px solid rgba(229, 231, 235, 0.8);
+            box-shadow: 0 4px 20px -5px rgba(0, 0, 0, 0.05); /* Softer shadow */
             position: sticky;
-            top: 20px;
+            top: 85px; /* Offset for fixed header if present, or just top spacing */
+            max-height: calc(100vh - 100px);
+            overflow-y: auto;
+            overscroll-behavior: contain; /* Prevent body scroll when sidebar scrolls */
             transition: all 0.3s ease;
+        }
+
+        /* Custom Scrollbar */
+        .filters-sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .filters-sidebar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .filters-sidebar::-webkit-scrollbar-thumb {
+            background-color: #d1d5db;
+            border-radius: 20px;
+            border: 2px solid transparent;
+            background-clip: content-box;
+        }
+        .filters-sidebar::-webkit-scrollbar-thumb:hover {
+            background-color: #9ca3af;
         }
 
         .filter-group {
             margin-bottom: 30px;
             padding-bottom: 25px;
-            border-bottom: 1px solid #f3f4f6;
+            border-bottom: 1px dashed #e5e7eb; /* Modern dashed divider */
         }
 
         .filter-group:last-child {
@@ -131,12 +159,15 @@ switch ($sortBy) {
         }
 
         .filter-title {
-            font-size: 0.95rem;
-            font-weight: 700;
+            font-size: 0.85rem;
+            font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin-bottom: 15px;
-            color: var(--text-dark);
+            letter-spacing: 0.1em;
+            margin-bottom: 18px;
+            color: #374151;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
 
         /* Sleek Checkboxes */
@@ -257,51 +288,242 @@ switch ($sortBy) {
             color: var(--primary-color);
         }
 
-        .btn-buy-now {
-            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-            color: white;
-            padding: 8px 16px;
-            border-radius: 6px;
-            text-decoration: none;
-            font-weight: 500;
-            font-size: 14px;
-            transition: all 0.3s;
-            border: none;
-            cursor: pointer;
-            display: inline-block;
-            text-align: center;
-            box-shadow: 0 4px 6px rgba(245, 158, 11, 0.2);
-        }
-        
-        .btn-buy-now:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 6px 12px rgba(245, 158, 11, 0.3);
+        /* =================================
+           🔥 MODERN PRODUCT CARDS
+           ================================= */
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 25px;
         }
 
-        /* Product Cards Override */
         .product-card {
             background: #fff;
             border: 1px solid rgba(229, 231, 235, 0.5);
-            border-radius: 12px;
+            border-radius: 16px;
             transition: all 0.3s ease;
-            box-shadow: var(--card-shadow);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
         }
 
         .product-card:hover {
-            transform: translateY(-5px);
-            box-shadow: var(--card-hover-shadow);
+            transform: translateY(-6px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
             border-color: rgba(79, 70, 229, 0.2);
         }
-        
-        .product-actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 10px;
+
+        .product-image-container {
+            position: relative;
+            padding-top: 100%; /* 1:1 Aspect Ratio */
+            background: #f3f4f6;
+            overflow: hidden;
+            border-bottom: 1px solid #f0f0f0;
         }
-        
-        .btn-add-cart {
+
+        .product-image-content {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            transition: transform 0.5s ease;
+        }
+
+        .product-card:hover .product-image img {
+            transform: scale(1.08); /* Modern subtler zoom */
+        }
+
+        /* Floating Wishlist Button */
+        .card-wishlist-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 40px;
+            height: 40px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            cursor: pointer;
+            z-index: 10;
+            font-size: 1.25rem;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .card-wishlist-btn:hover {
+            transform: scale(1.15);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.12);
+        }
+
+        /* "New" Badge */
+        .badge-new {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: var(--primary-color);
+            color: white;
+            font-size: 0.75rem;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            z-index: 10;
+            box-shadow: 0 4px 6px rgba(79, 70, 229, 0.3);
+        }
+
+        .product-info {
+            padding: 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .product-category {
+            font-size: 0.8rem;
+            color: var(--text-gray);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+
+        .product-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin: 0 0 8px 0;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
             flex: 1;
         }
+
+        .product-price-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 10px;
+            margin-bottom: 15px;
+        }
+
+        .price-current {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: var(--text-dark);
+        }
+
+        .rating-block {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.85rem;
+            color: #f59e0b;
+            font-weight: 600;
+        }
+
+        .product-footer {
+            margin-top: auto;
+            border-top: 1px solid #f3f4f6;
+            padding-top: 15px;
+        }
+
+        /* Modern Action Buttons */
+        .action-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .btn-modern {
+            padding: 10px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-align: center;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-outline-cart {
+            background: transparent;
+            border: 2px solid #e5e7eb;
+            color: var(--text-dark);
+        }
+
+        .btn-outline-cart:hover {
+            border-color: var(--text-dark);
+            background: var(--text-dark);
+            color: white;
+        }
+
+        .btn-gradient-buy {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            box-shadow: 0 4px 10px rgba(124, 58, 237, 0.3);
+        }
+
+        .btn-gradient-buy:hover {
+            filter: brightness(110%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(124, 58, 237, 0.4);
+        }
+        
+        .btn-disabled {
+            background: #f3f4f6;
+            color: #9ca3af;
+            cursor: not-allowed;
+            grid-column: span 2;
+        }
+
+        /* Stock Indicator */
+        .stock-indicator {
+            font-size: 0.75rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .stock-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .in-stock { color: #059669; }
+        .in-stock .stock-dot { background: #10b981; }
+        
+        .low-stock { color: #d97706; }
+        .low-stock .stock-dot { background: #f59e0b; }
+        
+        .out-stock { color: #dc2626; }
+        .out-stock .stock-dot { background: #ef4444; }
 
         /* Mobile */
         .filter-toggle {
@@ -357,7 +579,7 @@ switch ($sortBy) {
             🔍 Show Filters & Sort
         </button>
 
-        <form id="filterForm" class="products-layout" method="GET" action="products">
+        <form id="filterForm" class="products-layout" method="GET" action="products.php">
             
             <!-- Sidebar -->
             <aside class="filters-sidebar">
@@ -366,10 +588,27 @@ switch ($sortBy) {
                     <?php foreach ($categories as $category): ?>
                         <label class="custom-checkbox">
                             <input type="checkbox" name="categories[]" value="<?php echo $category['id']; ?>"
-                                <?php echo in_array($category['id'], $selectedCategories) ? 'checked' : ''; ?>>
+                                <?php echo in_array($category['id'], $selectedCategories) ? 'checked' : ''; ?>
+                                onchange="this.form.submit()">
                             <?php echo htmlspecialchars($category['name']); ?>
                         </label>
                     <?php endforeach; ?>
+                </div>
+
+                <div class="filter-group">
+                    <div class="filter-title">Brands</div>
+                    <?php if (!empty($brands)): ?>
+                        <?php foreach ($brands as $brand): ?>
+                            <label class="custom-checkbox">
+                                <input type="checkbox" name="brands[]" value="<?php echo $brand['id']; ?>"
+                                    <?php echo in_array($brand['id'], $selectedBrands) ? 'checked' : ''; ?>
+                                    onchange="this.form.submit()">
+                                <?php echo htmlspecialchars($brand['name']); ?>
+                            </label>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <div style="color: #999; font-size: 13px;">No brands available</div>
+                    <?php endif; ?>
                 </div>
 
                 <div class="filter-group">
@@ -385,7 +624,7 @@ switch ($sortBy) {
 
                 <div class="filter-group">
                     <button type="submit" class="btn-apply">Apply Filters</button>
-                    <a href="products" class="btn-reset">Reset Filters</a>
+                    <a href="/products" class="btn-reset">Reset Filters</a>
                 </div>
             </aside>
 
@@ -412,50 +651,93 @@ switch ($sortBy) {
                 <!-- Products Grid -->
                 <?php if (count($displayProducts) > 0): ?>
                     <div class="products-grid">
-                        <?php foreach ($displayProducts as $product): ?>
+                        <?php foreach ($displayProducts as $index => $product): ?>
                             <?php $isWishlisted = isset($_SESSION['wishlist']) && in_array($product['id'], $_SESSION['wishlist']); ?>
-                            <div class="product-card" style="position: relative; cursor: pointer;" onclick="window.location.href='product-detail?id=<?php echo $product['id']; ?>'">
+                            
+                            <!-- MODERN PRODUCT CARD -->
+                            <div class="product-card" onclick="window.location.href='product-detail?id=<?php echo $product['id']; ?>'">
+                                
+                                <!-- Wishlist & Badges -->
                                 <?php if (isLoggedIn()): ?>
-                                <div onclick="event.stopPropagation(); toggleWishlist(event, <?php echo $product['id']; ?>)" 
-                                     style="position: absolute; top: 10px; right: 10px; font-size: 24px; cursor: pointer; z-index: 10; background: white; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.15); transition: all 0.3s ease;"
-                                     class="heart-icon"
-                                     data-product-id="<?php echo $product['id']; ?>">
-                                    <?php echo $isWishlisted ? '❤️' : '🤍'; ?>
-                                </div>
+                                    <div class="card-wishlist-btn" 
+                                         onclick="event.stopPropagation(); toggleWishlist(event, <?php echo $product['id']; ?>)"
+                                         data-product-id="<?php echo $product['id']; ?>">
+                                        <?php echo $isWishlisted ? '❤️' : '🤍'; ?>
+                                    </div>
                                 <?php endif; ?>
-                                <div class="product-image" style="overflow: hidden; display: flex; align-items: center; justify-content: center; background: #fff;">
-                                    <?php if (!empty($product['image'])): ?>
-                                        <img src="<?php echo $product['image']; ?>" alt="<?php echo htmlspecialchars($product['name']); ?>" style="width: 100%; height: 100%; object-fit: contain; transition: transform 0.3s ease;">
-                                    <?php else: ?>
-                                        <?php echo $product['emoji']; ?>
-                                    <?php endif; ?>
-                                </div>
-                                <h3 class="product-title"><?php echo htmlspecialchars($product['name']); ?></h3>
-                                <div class="product-rating"><?php echo renderStars($product['rating']); ?> <?php echo $product['rating']; ?> (<?php echo $product['reviews']; ?>)</div>
-                                <p class="product-description"><?php echo htmlspecialchars($product['description']); ?></p>
-                                <div class="product-price"><?php echo formatPrice($product['price']); ?></div>
-                                <div class="product-footer">
-                                    <span class="stock-info">Stock: <?php echo $product['stock']; ?></span>
-                                    <div class="product-actions" onclick="event.stopPropagation();">
-                                        <?php if ($product['stock'] > 0): ?>
-                                            <button type="button" onclick="(function(e, id, name){ e.preventDefault(); e.stopPropagation(); var fd = new FormData(); fd.append('action', 'add'); fd.append('product_id', id); fd.append('quantity', 1); fetch('cart', {method: 'POST', body: fd}).then(res => res.json()).then(data => { if(data.success) { showToast('🛒 ' + name + ' added to cart!', 'success', 3500); var badge = document.querySelector('.badge'); if(badge){ badge.textContent = data.cartCount || (parseInt(badge.textContent) + 1); badge.style.display = 'flex'; } } else if(data.alreadyInCart) { showToast('ℹ️ ' + name + ' is already in your cart!', 'info', 3500); } else { showToast('❌ ' + (data.message || 'Error adding to cart'), 'error', 3000); } }).catch(() => showToast('❌ Error adding to cart', 'error', 3000)); return false; })(event, <?php echo $product['id']; ?>, '<?php echo addslashes($product['name']); ?>')" class="btn btn-primary btn-add-cart" data-product-id="<?php echo $product['id']; ?>">
-                                                Add to Cart
-                                            </button>
-                                            <a href="checkout?product_id=<?php echo $product['id']; ?>&qty=1&reset_shipping=1" class="btn btn-buy-now">Buy Now</a>
+
+                                <!-- "New" Badge for first 3 items or specific IDs -->
+                                <?php if ($index < 3): ?>
+                                    <span class="badge-new">NEW</span>
+                                <?php endif; ?>
+
+                                <!-- Image -->
+                                <div class="product-image-container">
+                                    <div class="product-image-content product-image">
+                                        <?php if (!empty($product['image'])): ?>
+                                            <img src="<?php echo $product['image']; ?>" alt="<?php echo htmlspecialchars($product['name']); ?>">
                                         <?php else: ?>
-                                            <button class="btn btn-disabled" disabled>Out of Stock</button>
+                                            <span style="font-size: 60px;"><?php echo $product['emoji']; ?></span>
                                         <?php endif; ?>
                                     </div>
                                 </div>
+
+                                <!-- Content -->
+                                <div class="product-info">
+                                    <div class="product-category"><?php echo htmlspecialchars($product['brand'] ?? 'General'); ?></div>
+                                    <h3 class="product-title"><?php echo htmlspecialchars($product['name']); ?></h3>
+                                    
+                                    <div class="product-price-row">
+                                        <div class="price-current"><?php echo formatPrice($product['price']); ?></div>
+                                        <div class="rating-block">
+                                            ⭐ <?php echo $product['rating']; ?> <span style="color: #9ca3af; font-weight: 400;">(<?php echo $product['reviews']; ?>)</span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Stock Status -->
+                                    <div class="product-footer">
+                                        <?php 
+                                            $stockClass = 'in-stock';
+                                            $stockText = 'In Stock';
+                                            if ($product['stock'] == 0) {
+                                                $stockClass = 'out-stock';
+                                                $stockText = 'Out of Stock';
+                                            } elseif ($product['stock'] < 10) {
+                                                $stockClass = 'low-stock';
+                                                $stockText = 'Running Low';
+                                            }
+                                        ?>
+                                        <div class="stock-indicator <?php echo $stockClass; ?>">
+                                            <span class="stock-dot"></span> <?php echo $stockText; ?>
+                                        </div>
+
+                                        <!-- Actions -->
+                                        <div class="action-buttons" onclick="event.stopPropagation();">
+                                            <?php if ($product['stock'] > 0): ?>
+                                                <button onclick="(function(e, id, name){ e.preventDefault(); e.stopPropagation(); var fd = new FormData(); fd.append('action', 'add'); fd.append('product_id', id); fd.append('quantity', 1); fetch('cart', {method: 'POST', body: fd}).then(res => res.json()).then(data => { if(data.success) { showToast('🛒 ' + name + ' added to cart!', 'success', 3500); var badge = document.querySelector('.badge'); if(badge){ badge.textContent = data.cartCount || (parseInt(badge.textContent) + 1); badge.style.display = 'flex'; } } else if(data.alreadyInCart) { showToast('ℹ️ ' + name + ' is already in your cart!', 'info', 3500); } else { showToast('❌ ' + (data.message || 'Error adding to cart'), 'error', 3000); } }).catch(() => showToast('❌ Error adding to cart', 'error', 3000)); return false; })(event, <?php echo $product['id']; ?>, '<?php echo addslashes($product['name']); ?>')" 
+                                                        class="btn-modern btn-outline-cart">
+                                                    Add to Cart
+                                                </button>
+                                                <a href="/checkout?product_id=<?php echo $product['id']; ?>&qty=1&reset_shipping=1" class="btn-modern btn-gradient-buy">
+                                                    Buy Now
+                                                </a>
+                                            <?php else: ?>
+                                                <button class="btn-modern btn-disabled" disabled>Out of Stock</button>
+                                            <?php endif; ?>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
+                            <!-- END CARD -->
+
                         <?php endforeach; ?>
                     </div>
                 <?php else: ?>
                     <div class="empty-state" style="text-align: center; padding: 60px 20px; background: #f8f9fa; border-radius: 12px;">
-                        <div style="font-size: 40px; margin-bottom: 20px;">🔍</div>
-                        <h3 style="color: #333; margin-bottom: 10px;">No products found</h3>
+                        <span style="font-size: 40px;">🔍</span>
+                        <h3 style="color: #333; margin-top: 20px;">No products found</h3>
                         <p style="color: #666; margin-bottom: 20px;">Try adjusting your filters or price range.</p>
-                        <a href="products" class="btn btn-primary" style="display: inline-block;">Clear All Filters</a>
+                        <a href="/products" class="btn btn-primary" style="display: inline-block;">Clear All Filters</a>
                     </div>
                 <?php endif; ?>
             </main>

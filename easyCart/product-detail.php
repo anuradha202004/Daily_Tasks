@@ -271,25 +271,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             gap: 8px;
         }
         .btn-cart {
-            background: #2563eb;
-            color: white;
-            border: none;
-            box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2);
+            background: transparent;
+            border: 2px solid #e5e7eb;
+            color: #1f2937; /* var(--text-dark) equivalent */
+            box-shadow: none;
         }
         .btn-cart:hover { 
-            background: #1d4ed8; 
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(37, 99, 235, 0.3);
+            background: #1f2937; /* var(--text-dark) equivalent */
+            color: white;
+            border-color: #1f2937;
         }
         
         .btn-buy {
-            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
             color: white;
-            box-shadow: 0 4px 6px rgba(245, 158, 11, 0.3);
+            border: none;
+            box-shadow: 0 4px 6px rgba(79, 70, 229, 0.2);
         }
         .btn-buy:hover { 
             transform: translateY(-2px);
-            box-shadow: 0 8px 15px rgba(245, 158, 11, 0.4);
+            box-shadow: 0 6px 12px rgba(79, 70, 229, 0.3);
         }
 
         .features-list {
@@ -396,10 +397,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                         <div class="action-buttons">
                             <?php if ($product['stock'] > 0): ?>
                                 <button type="button" class="btn-action btn-cart" onclick="addToCartAjax(event, <?php echo $product['id']; ?>, '<?php echo addslashes($product['name']); ?>')">
-                                    🛒 Add to Cart
+                                    Add to Cart
                                 </button>
                                 <button type="button" class="btn-action btn-buy" onclick="buyNow(<?php echo $product['id']; ?>, <?php echo $product['stock']; ?>)">
-                                    ⚡ Buy Now
+                                    Buy Now
                                 </button>
                             <?php else: ?>
                                 <button type="button" class="btn-action btn-cart" style="grid-column: span 2; opacity: 0.5;" disabled>
@@ -428,23 +429,51 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 
             <!-- Recommended Products Reuse -->
             <h3 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 25px;">You Might Also Like</h3>
-            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px;">
+            <div class="products-grid">
                 <?php
                 $related = array_slice(getProductsByCategory($product['category_id']), 0, 4);
                 foreach ($related as $rel):
                     if ($rel['id'] == $product['id']) continue;
+                    $isWishlisted = isset($_SESSION['wishlist']) && in_array($rel['id'], $_SESSION['wishlist']);
                 ?>
-                    <a href="product-detail.php?id=<?php echo $rel['id']; ?>" style="text-decoration: none; color: inherit; background: white; padding: 15px; border-radius: 12px; border: 1px solid #eee; transition: transform 0.2s; display: block;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
-                        <div style="height: 150px; display: flex; align-items: center; justify-content: center; margin-bottom: 10px;">
-                            <?php if (!empty($rel['image'])): ?>
-                                <img src="<?php echo $rel['image']; ?>" style="max-height: 100%; max-width: 100%;">
-                            <?php else: ?>
-                                <span style="font-size: 3rem;"><?php echo $rel['emoji']; ?></span>
-                            <?php endif; ?>
+                    <div class="product-card" onclick="window.location.href='product-detail.php?id=<?php echo $rel['id']; ?>'">
+                        
+                        <?php if (isLoggedIn()): ?>
+                            <div class="card-wishlist-btn" 
+                                 onclick="event.stopPropagation(); toggleWishlist(event, <?php echo $rel['id']; ?>)"
+                                 data-product-id="<?php echo $rel['id']; ?>">
+                                <?php echo $isWishlisted ? '❤️' : '🤍'; ?>
+                            </div>
+                        <?php endif; ?>
+
+                        <div class="product-image-container">
+                            <div class="product-image-content">
+                                <?php if (!empty($rel['image'])): ?>
+                                    <img src="<?php echo $rel['image']; ?>" alt="<?php echo htmlspecialchars($rel['name']); ?>">
+                                <?php else: ?>
+                                    <span style="font-size: 60px;"><?php echo $rel['emoji']; ?></span>
+                                <?php endif; ?>
+                            </div>
                         </div>
-                        <h4 style="font-size: 1rem; margin-bottom: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"><?php echo htmlspecialchars($rel['name']); ?></h4>
-                        <div style="color: var(--primary); font-weight: 700;"><?php echo formatPrice($rel['price']); ?></div>
-                    </a>
+
+                        <div class="product-info">
+                            <div class="product-category"><?php echo htmlspecialchars($rel['brand'] ?? 'General'); ?></div>
+                            <h3 class="product-title"><?php echo htmlspecialchars($rel['name']); ?></h3>
+                            
+                            <div class="product-price-row">
+                                <div class="price-current"><?php echo formatPrice($rel['price']); ?></div>
+                                <div class="rating-block">
+                                    ⭐ <?php echo $rel['rating']; ?> <span style="color: #9ca3af; font-weight: 400;">(<?php echo $rel['reviews']; ?>)</span>
+                                </div>
+                            </div>
+
+                            <div class="product-footer">
+                                <div class="action-buttons" onclick="event.stopPropagation();">
+                                    <a href="product-detail?id=<?php echo $rel['id']; ?>" class="btn-modern btn-gradient-buy" style="width: 100%;">View Details</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 <?php endforeach; ?>
             </div>
         </div>
@@ -519,274 +548,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             });
         });
     </script>
-<?php include TEMPLATES_PATH . '/footer.php'; ?>
-// Redirect to products page if product not found
-if (!$product) {
-    header('Location: products.php');
-    exit;
-}
-
-$pageTitle = htmlspecialchars($product['name']);
-$category = getCategoryById($product['category_id']);
-$brand = getBrandById($product['brand_id']);
-
-// Check if user is logged in
-$isLoggedIn = isLoggedIn();
-
-// Handle add to cart
-$addToCartMessage = '';
-$addToCartError = '';
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'add') {
-    $quantity = isset($_POST['quantity']) ? intval($_POST['quantity']) : 1;
-    
-    if ($quantity > 0 && $quantity <= $product['stock']) {
-        // Initialize cart if not exists
-        if (!isset($_SESSION['cart'])) {
-            $_SESSION['cart'] = [];
-        }
-        
-        // Check if product already in cart
-        if (isset($_SESSION['cart'][$productId])) {
-            $_SESSION['cart'][$productId]['quantity'] += $quantity;
-        } else {
-            $_SESSION['cart'][$productId] = [
-                'product_id' => $productId,
-                'quantity' => $quantity
-            ];
-        }
-        
-        // Save cart to file for logged-in users
-        if ($isLoggedIn && isset($_SESSION['user_email'])) {
-            saveUserCart($_SESSION['user_email'], $_SESSION['cart']);
-        }
-        
-        $addToCartMessage = 'Product added to cart successfully!';
-    } else {
-        $addToCartError = 'Invalid quantity. Please check stock availability.';
-    }
-}
-?>
-<?php include TEMPLATES_PATH . '/header.php'; ?>
-    <script src="public/js/product-detail.js"></script>
-    <script src="public/js/wishlist.js"></script>
-    <script src="public/js/toast.js"></script>
-
-    <?php if ($addToCartMessage): ?>
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                showToast('<?php echo htmlspecialchars($addToCartMessage); ?>', 'success', 3500);
-            });
-        </script>
-    <?php endif; ?>
-
-    <?php if ($addToCartError): ?>
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                showToast('<?php echo htmlspecialchars($addToCartError); ?>', 'error', 4000);
-            });
-        </script>
-    <?php endif; ?>
-
-    <!-- Product Detail Page - Modern Design -->
-    <section class="product-detail-section">
-        <div class="container">
-            <!-- Back Button -->
-            <a href="products.php" class="back-link">← Back to Products</a>
-
-            <!-- Success/Error Messages -->
-            
-
-            <div class="product-detail-grid">
-                <!-- Left Column: Product Visual -->
-                <div class="product-detail-left">
-                    <div class="product-visual-container" style="position: relative;">
-
-
-                        <div class="product-emoji-large" style="display: flex; align-items: center; justify-content: center; overflow: hidden; background: #fff;">
-                            <?php if (!empty($product['image'])): ?>
-                                <img src="<?php echo $product['image']; ?>" alt="<?php echo htmlspecialchars($product['name']); ?>" style="width: 100%; height: 100%; object-fit: contain;">
-                            <?php else: ?>
-                                <?php echo $product['emoji']; ?>
-                            <?php endif; ?>
-                        </div>
-                    </div>
-                    
-                    <!-- Product Info Box -->
-                    <div class="product-info-box">
-                        <h3>Product Information</h3>
-                        <div class="info-item">
-                            <span class="label">Product ID</span>
-                            <span class="value">#<?php echo $product['id']; ?></span>
-                        </div>
-                        <div class="info-item">
-                            <span class="label">Brand</span>
-                            <span class="value"><?php echo htmlspecialchars($brand['name'] ?? 'N/A'); ?></span>
-                        </div>
-                        <div class="info-item">
-                            <span class="label">Category</span>
-                            <a href="products.php?category=<?php echo $product['category_id']; ?>" class="value-link">
-                                <?php echo htmlspecialchars($category['name'] ?? 'N/A'); ?>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Right Column: Product Details & Actions -->
-                <div class="product-detail-right">
-                    <!-- Product Title & Rating -->
-                    <div class="product-header">
-                        <h1 class="product-title"><?php echo htmlspecialchars($product['name']); ?></h1>
-                        <div class="rating-section">
-                            <div class="stars"><?php echo renderStars($product['rating']); ?></div>
-                            <span class="rating-value"><?php echo $product['rating']; ?>/5</span>
-                            <span class="review-count">(<?php echo $product['reviews']; ?> reviews)</span>
-                        </div>
-                    </div>
-
-                    <!-- Description -->
-                    <p class="product-description"><?php echo htmlspecialchars($product['description']); ?></p>
-
-                    <!-- Price & Availability -->
-                    <div class="price-availability-section">
-                        <div class="price-box">
-                            <span class="price-label">Price</span>
-                            <span class="price"><?php echo formatPrice($product['price']); ?></span>
-                        </div>
-                        
-                        <div class="availability-box <?php echo $product['stock'] > 0 ? 'in-stock' : 'out-of-stock'; ?>">
-                            <span class="status-icon"><?php echo $product['stock'] > 0 ? '✓' : '✕'; ?></span>
-                            <div>
-                                <div class="status-label"><?php echo $product['stock'] > 0 ? 'In Stock' : 'Out of Stock'; ?></div>
-                                <div class="status-detail"><?php echo $product['stock'] > 0 ? $product['stock'] . ' units available' : 'Currently unavailable'; ?></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Color Options -->
-                    <div class="options-section">
-                        <div class="option-group">
-                            <label class="option-label">Colors Available</label>
-                            <div class="color-options">
-                                <button class="color-btn active" style="background: #e74c3c;" title="Red"></button>
-                                <button class="color-btn" style="background: #3498db;" title="Blue"></button>
-                                <button class="color-btn" style="background: #2ecc71;" title="Green"></button>
-                                <button class="color-btn" style="background: #f39c12;" title="Orange"></button>
-                                <button class="color-btn" style="background: #34495e;" title="Black"></button>
-                            </div>
-                        </div>
-
-                        <!-- Quantity Selector -->
-                        <div class="option-group">
-                            <label for="quantity" class="option-label">Quantity</label>
-                            <div class="quantity-selector">
-                                <button class="qty-btn" onclick="decrementQty()">−</button>
-                                <input type="number" id="quantity" name="quantity" value="1" min="1" max="<?php echo $product['stock']; ?>" readonly>
-                                <button class="qty-btn" onclick="incrementQty(<?php echo $product['stock']; ?>)">+</button>
-                            </div>
-                            <small class="qty-note">Max: <?php echo $product['stock']; ?> units available</small>
-                        </div>
-                    </div>
-
-                    <!-- Add to Cart Form -->
-                    <form method="POST" action="" class="add-to-cart-form">
-                        <input type="hidden" name="action" value="add">
-                        <input type="hidden" id="quantity-hidden" name="quantity" value="1">
-                        <input type="hidden" id="buy-quantity" value="1">
-
-                        <?php if ($product['stock'] > 0): ?>
-                            <button type="submit" class="btn-add-to-cart">
-                                <span class="btn-icon">🛒</span>
-                                Add to Cart
-                            </button>
-                            <button type="button" class="btn-buy-now" onclick="buyNow(<?php echo $product['id']; ?>, <?php echo $product['stock']; ?>)">
-                                <span class="btn-icon">💳</span>
-                                Buy Now
-                            </button>
-                        <?php else: ?>
-                            <button type="button" class="btn-add-to-cart" disabled>
-                                Out of Stock
-                            </button>
-                        <?php endif; ?>
-                    </form>
-
-
-                    <!-- Features -->
-                    <div class="info-features" style="margin-top: 20px;">
-                        <div class="feature-item">
-                            <span class="feature-icon">↩️</span>
-                            <div>
-                                <h4>30-Day Returns</h4>
-                                <p>Hassle-free returns</p>
-                            </div>
-                        </div>
-                        <div class="feature-item">
-                            <span class="feature-icon">🔒</span>
-                            <div>
-                                <h4>Secure Payment</h4>
-                                <p>100% encrypted</p>
-                            </div>
-                        </div>
-                        <div class="feature-item">
-                            <span class="feature-icon">✓</span>
-                            <div>
-                                <h4>Authentic</h4>
-                                <p>Guaranteed original</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <script>
-                        function selectShipping(element) {
-                            // Remove selected state from all shipping options
-                            document.querySelectorAll('.shipping-option').forEach(option => {
-                                option.style.borderColor = '#ddd';
-                                option.style.backgroundColor = 'white';
-                            });
-                            
-                            // Add selected state to clicked option
-                            element.style.borderColor = '#2563eb';
-                            element.style.backgroundColor = '#eff6ff';
-                            
-                            // Store selected shipping in data attribute
-                            const shippingCost = element.dataset.shippingCost;
-                            document.body.dataset.selectedShipping = shippingCost;
-                        }
-                    </script>
-                </div>
-            </div>
-
-            <!-- Recommended Products Section -->
-            <section class="recommended-section">
-                <h2 class="section-title">Recommended for You</h2>
-                <p class="section-subtitle">Similar products you might like</p>
-                <?php
-                $relatedProducts = array_slice(
-                    getProductsByCategory($product['category_id']),
-                    0,
-                    4,
-                    true
-                );
-                ?>
-                <div class="products-grid">
-                    <?php foreach ($relatedProducts as $relatedProduct): ?>
-                        <?php if ($relatedProduct['id'] !== $product['id']): ?>
-                            <div class="product-card">
-                                <div class="product-image"><?php echo $relatedProduct['emoji']; ?></div>
-                                <h3 class="product-title"><?php echo htmlspecialchars($relatedProduct['name']); ?></h3>
-                                <div class="product-rating"><?php echo renderStars($relatedProduct['rating']); ?> <?php echo $relatedProduct['rating']; ?></div>
-                                <div class="product-price"><?php echo formatPrice($relatedProduct['price']); ?></div>
-                                <div class="product-footer">
-                                    <span class="stock-info">Stock: <?php echo $relatedProduct['stock']; ?> units</span>
-                                    <a href="product-detail.php?id=<?php echo $relatedProduct['id']; ?>" class="btn btn-primary">View Details</a>
-                                </div>
-                            </div>
-                        <?php endif; ?>
-                    <?php endforeach; ?>
-                </div>
-            </section>
-        </div>
-    </section>
-                       
-
 <?php include TEMPLATES_PATH . '/footer.php'; ?>

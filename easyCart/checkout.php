@@ -402,7 +402,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             // Clear shipping selection for the next order
             unset($_SESSION['selected_shipping']);
             
-            header('Location: order-confirmation.php');
+            header('Location: order-confirmation');
             exit;
         } else {
             $checkoutMessage = 'Order creation failed. Please try again or contact support.';
@@ -530,6 +530,55 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         }
 
         /* Order Summary Enhancements */
+        /* Order Summary Enhancements */
+        .checkout-summary-wrapper {
+            position: sticky;
+            top: 100px;
+            max-height: calc(100vh - 120px);
+            overflow-y: auto;
+            border-radius: 12px; /* Ensure scrollbar corners match */
+            padding-right: 5px; /* Prevent content from hitting scrollbar */
+        }
+        
+        /* Custom Scrollbar for Summary Wrapper */
+        .checkout-summary-wrapper::-webkit-scrollbar {
+            width: 8px;
+        }
+        .checkout-summary-wrapper::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 4px;
+        }
+        .checkout-summary-wrapper::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
+            border-radius: 20px;
+            border: 2px solid #f1f5f9;
+        }
+        .checkout-summary-wrapper::-webkit-scrollbar-thumb:hover {
+            background-color: #94a3b8;
+        }
+
+        .summary-items {
+            /* max-height removed to let wrapper handle scroll */
+            margin-bottom: 20px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        /* Custom Scrollbar for Items */
+        .summary-items::-webkit-scrollbar {
+            width: 6px;
+        }
+        .summary-items::-webkit-scrollbar-track {
+            background: #f9fafb;
+            border-radius: 4px;
+        }
+        .summary-items::-webkit-scrollbar-thumb {
+            background-color: #d1d5db;
+            border-radius: 20px;
+        }
+        .summary-items::-webkit-scrollbar-thumb:hover {
+            background-color: #9ca3af;
+        }
+
         #shipping-method-name {
             display: block;
             color: #2563eb;

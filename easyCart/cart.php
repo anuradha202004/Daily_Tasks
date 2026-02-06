@@ -11,15 +11,15 @@ ini_set('display_errors', 0);
 ini_set('log_errors', 1);
 
 $pageTitle = 'Shopping Cart';
-// Load cart from file on page load (for logged-in users)
-if (isLoggedIn() && !isset($_SESSION['cart'])) {
-    $currentUser = getCurrentUser();
-    $_SESSION['cart'] = loadUserCart($currentUser['id']);
-}
-
-// Initialize empty cart for non-logged-in users
+// Load cart from file/db on page load (for logged-in users OR guests)
+// Note: loadUserCart now handles null $userId by using guest session ID
 if (!isset($_SESSION['cart'])) {
-    $_SESSION['cart'] = [];
+    $userId = isLoggedIn() ? getCurrentUser()['id'] : null;
+    $dbCart = loadUserCart($userId);
+    
+    // If DB has items, use them. 
+    // If DB is empty but we just started, initialized empty array
+    $_SESSION['cart'] = $dbCart;
 }
 
 // Handle AJAX cart actions

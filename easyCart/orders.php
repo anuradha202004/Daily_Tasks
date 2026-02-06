@@ -10,25 +10,66 @@ $pageTitle = 'My Orders';
 // Require login
 requireLogin();
 
+// Handle Order Cancellation
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'cancel') {
+    $cancelOrderId = $_POST['order_id'];
+    $currentUser = getCurrentUser();
+    
+    // Security Check: Verify order belongs to user and is Processing
+    $stmt = $pdo->prepare("SELECT id, status FROM sales_order WHERE user_id = ? AND increment_id = ?");
+    $stmt->execute([$currentUser['id'], $cancelOrderId]);
+    $orderToCancel = $stmt->fetch();
+    
+    if ($orderToCancel && $orderToCancel['status'] === 'Processing') {
+        $updateStmt = $pdo->prepare("UPDATE sales_order SET status = 'Cancelled' WHERE id = ?");
+        if ($updateStmt->execute([$orderToCancel['id']])) {
+             $_SESSION['flash_message'] = "Order #$cancelOrderId has been cancelled successfully.";
+             $_SESSION['flash_type'] = "success";
+        } else {
+             $_SESSION['flash_message'] = "Failed to cancel order.";
+             $_SESSION['flash_type'] = "error";
+        }
+    } else {
+        $_SESSION['flash_message'] = "Order cannot be cancelled. It may have already been processed.";
+        $_SESSION['flash_type'] = "error";
+    }
+    
+    // Refresh to show status change
+    header("Location: orders.php");
+    exit;
+}
+
 // Get order history from database
 $currentUser = getCurrentUser();
 $allOrders = getUserOrders($currentUser['id']) ?? [];
 if (isset($_SESSION['last_order'])) {
-    // Add latest order from session
-    $lastOrderData = [
-        'id' => 'recent_' . time(),
-        'order_number' => $_SESSION['last_order']['order_number'] ?? 'ORD' . str_pad(rand(100000, 999999), 6, '0', STR_PAD_LEFT),
-        'date' => $_SESSION['last_order']['date'] ?? date('Y-m-d H:i:s'),
-        'status' => $_SESSION['last_order']['status'] ?? 'Processing',
-        'subtotal' => $_SESSION['last_order']['subtotal'] ?? 0,
-        'tax' => $_SESSION['last_order']['tax'] ?? 0,
-        'shipping' => $_SESSION['last_order']['shipping_cost'] ?? 0,
-        'shipping_method_name' => $_SESSION['last_order']['shipping_method_name'] ?? 'Standard',
-        'total' => $_SESSION['last_order']['total'] ?? 0,
-        'items' => $_SESSION['last_order']['items'] ?? [],
-        'customer' => $_SESSION['last_order']['customer'] ?? []
-    ];
-    array_unshift($allOrders, $lastOrderData);
+    $sessionOrderNum = $_SESSION['last_order']['order_number'] ?? null;
+    $alreadyExists = false;
+    
+    foreach ($allOrders as $existingOrder) {
+        if ($existingOrder['order_number'] === $sessionOrderNum) {
+            $alreadyExists = true;
+            break;
+        }
+    }
+
+    if (!$alreadyExists) {
+        // Add latest order from session if not in DB list
+        $lastOrderData = [
+            'id' => 'recent_' . time(),
+            'order_number' => $_SESSION['last_order']['order_number'] ?? 'ORD' . str_pad(rand(100000, 999999), 6, '0', STR_PAD_LEFT),
+            'date' => $_SESSION['last_order']['date'] ?? date('Y-m-d H:i:s'),
+            'status' => $_SESSION['last_order']['status'] ?? 'Processing',
+            'subtotal' => $_SESSION['last_order']['subtotal'] ?? 0,
+            'tax' => $_SESSION['last_order']['tax'] ?? 0,
+            'shipping' => $_SESSION['last_order']['shipping_cost'] ?? 0,
+            'shipping_method_name' => $_SESSION['last_order']['shipping_method_name'] ?? 'Standard',
+            'total' => $_SESSION['last_order']['total'] ?? 0,
+            'items' => $_SESSION['last_order']['items'] ?? [],
+            'customer' => $_SESSION['last_order']['customer'] ?? []
+        ];
+        array_unshift($allOrders, $lastOrderData);
+    }
 }
 ?>
 <?php include TEMPLATES_PATH . '/header.php'; ?>
@@ -36,6 +77,16 @@ if (isset($_SESSION['last_order'])) {
     <!-- My Orders Page -->
     <section class="container" style="padding: 40px 0;">
         <h1 class="section-title">My Orders</h1>
+
+        <?php if (isset($_SESSION['flash_message'])): ?>
+            <div style="background: <?php echo $_SESSION['flash_type'] === 'success' ? '#d1fae5' : '#fee2e2'; ?>; color: <?php echo $_SESSION['flash_type'] === 'success' ? '#065f46' : '#991b1b'; ?>; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                <?php 
+                    echo $_SESSION['flash_message']; 
+                    unset($_SESSION['flash_message']);
+                    unset($_SESSION['flash_type']);
+                ?>
+            </div>
+        <?php endif; ?>
 
         <?php if (count($allOrders) > 0): ?>
             <div>
@@ -84,7 +135,10 @@ if (isset($_SESSION['last_order'])) {
                             <div style="text-align: right;">
                                 <label style="color: #999; font-size: 12px; text-transform: uppercase;">Total</label>
                                 <p style="margin: 5px 0 0 0; font-weight: bold; color: #d32f2f; font-size: 18px;">
-                                    $<?php echo number_format($order['subtotal'] + ($order['tax'] ?? 0) + ($order['shipping'] ?? 0), 2); ?>
+                                    $<?php 
+                                        $finalTotal = isset($order['total']) ? $order['total'] : ($order['subtotal'] + ($order['tax'] ?? 0) + ($order['shipping_cost'] ?? 0));
+                                        echo number_format($finalTotal, 2); 
+                                    ?>
                                 </p>
                             </div>
                         </div>
@@ -144,9 +198,7 @@ if (isset($_SESSION['last_order'])) {
                         </div>
 
                         <!-- Order Items -->
-                        <div style="margin-bottom: 20px;">
-                            <h4 style="margin: 0 0 15px 0; color: #333;">Items Ordered</h4>
-                            
+                        <div style="margin-bottom: 20px;">                            
                             <?php if (isset($order['items']) && count($order['items']) > 0): ?>
                                 <?php foreach ($order['items'] as $item): ?>
                                     <?php $product = getProductById($item['product_id'] ?? null); ?>
@@ -175,117 +227,26 @@ if (isset($_SESSION['last_order'])) {
                         </div>
 
                         <!-- Order Summary and Actions Row -->
-                        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 30px; padding: 20px 0; border-top: 1px solid #eee;">
+                        <div style="padding: 20px 0; border-top: 1px solid #eee;">
                             <!-- Left: Details and Actions -->
                             <div>
-                                <!-- Status Info -->
-                                <?php if ($order['status'] === 'Processing'): ?>
-                                    <div style="background: #fff3cd; padding: 15px; border-radius: 8px; border-left: 4px solid #f59e0b; margin-bottom: 15px;">
-                                        <p style="margin: 0; color: #856404; font-weight: 500;">⏳ Order Processing</p>
-                                        <p style="margin: 5px 0 0 0; font-size: 12px; color: #856404;">
-                                            We're preparing your items for shipment. You'll receive a shipping confirmation shortly.
-                                        </p>
-                                    </div>
-                                <?php elseif ($order['status'] === 'Shipped'): ?>
-                                    <div style="background: #cfe2ff; padding: 15px; border-radius: 8px; border-left: 4px solid #3b82f6; margin-bottom: 15px;">
-                                        <p style="margin: 0; color: #084298; font-weight: 500;">📦 Order Shipped</p>
-                                        <p style="margin: 5px 0 0 0; font-size: 12px; color: #084298;">
-                                            Tracking #: <strong><?php echo 'TRACK' . str_pad($order['id'] ?? 1, 9, '0', STR_PAD_LEFT); ?></strong>
-                                        </p>
-                                    </div>
-                                <?php elseif ($order['status'] === 'Delivered'): ?>
-                                    <div style="background: #d4edda; padding: 15px; border-radius: 8px; border-left: 4px solid #10b981; margin-bottom: 15px;">
-                                        <p style="margin: 0; color: #155724; font-weight: 500;">✓ Order Delivered</p>
-                                        <p style="margin: 5px 0 0 0; font-size: 12px; color: #155724;">
-                                            Delivered on <?php echo date('F d, Y', strtotime($order['date'] . ' +5 days')); ?>
-                                        </p>
-                                    </div>
-                                <?php elseif ($order['status'] === 'Cancelled'): ?>
-                                    <div style="background: #f8d7da; padding: 15px; border-radius: 8px; border-left: 4px solid #dc2626; margin-bottom: 15px;">
-                                        <p style="margin: 0; color: #842029; font-weight: 500;">✗ Order Cancelled</p>
-                                        <p style="margin: 5px 0 0 0; font-size: 12px; color: #842029;">
-                                            Refund will be processed within 5-7 business days.
-                                        </p>
-                                    </div>
-                                <?php endif; ?>
+
 
                                 <!-- Action Links -->
                                 <div style="padding-top: 15px;">
-                                    <a href="order-confirmation.php" style="color: #2563eb; text-decoration: none; margin-right: 20px; font-size: 14px; font-weight: 500;">
+                                    <a href="order-confirmation?id=<?php echo $order['order_number']; ?>" style="
+                                        display: inline-block;
+                                        background-color: #2563eb;
+                                        color: white;
+                                        padding: 10px 20px;
+                                        border-radius: 6px;
+                                        text-decoration: none;
+                                        font-weight: 500;
+                                        font-size: 14px;
+                                        transition: background-color 0.2s;
+                                    " onmouseover="this.style.backgroundColor='#1d4ed8'" onmouseout="this.style.backgroundColor='#2563eb'">
                                         View Details
                                     </a>
-                                    <a href="invoice.php?order_number=<?php echo $order['order_number']; ?>" style="color: #2563eb; text-decoration: none; margin-right: 20px; font-size: 14px; font-weight: 500;" target="_blank">
-                                        Download Invoice
-                                    </a>
-                                    <?php if ($order['status'] === 'Delivered'): ?>
-                                        <a href="#" style="color: #2563eb; text-decoration: none; font-size: 14px; font-weight: 500;">
-                                            Leave Review
-                                        </a>
-                                    <?php endif; ?>
-                                </div>
-                            </div>
-
-                            <!-- Right: Order Total -->
-                            <!-- Right: Payment Summary Card -->
-                            <div style="padding-left: 20px;">
-                                <div style="background: #f8fafc; padding: 20px; border-radius: 12px; border: 1px solid #f1f5f9;">
-                                    <h5 style="margin: 0 0 20px 0; font-size: 13px; text-transform: uppercase; color: #64748b; font-weight: 700; letter-spacing: 0.05em;">Payment Summary</h5>
-                                    
-                                    <?php 
-                                        $itemCount = 0;
-                                        if (isset($order['items'])) {
-                                            foreach($order['items'] as $item) {
-                                                $itemCount += $item['quantity'];
-                                            }
-                                        }
-                                    ?>
-                                    
-                                    <!-- Subtotal -->
-                                    <div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 14px; color: #475569;">
-                                        <span>Subtotal (<?php echo $itemCount; ?> items)</span>
-                                        <span style="font-weight: 500; color: #1e293b;">$<?php echo number_format($order['subtotal'], 2); ?></span>
-                                    </div>
-
-                                    <!-- Shipping -->
-                                    <div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 14px; color: #475569;">
-                                        <div>
-                                            <span>Shipping</span>
-                                            <?php if (isset($order['shipping_method_name'])): ?>
-                                                <div style="font-size: 11px; color: #94a3b8; margin-top: 2px;">
-                                                    via <?php echo htmlspecialchars($order['shipping_method_name']); ?>
-                                                </div>
-                                            <?php endif; ?>
-                                        </div>
-                                        <span style="font-weight: 500; color: #1e293b;">$<?php echo number_format($order['shipping'] ?? 0, 2); ?></span>
-                                    </div>
-
-                                    <!-- Tax -->
-                                    <div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 14px; color: #475569;">
-                                        <span>Tax</span>
-                                        <span style="font-weight: 500; color: #1e293b;">$<?php echo number_format($order['tax'] ?? 0, 2); ?></span>
-                                    </div>
-
-                                    <!-- Discount (if any) -->
-                                    <?php if (isset($order['discount_amount']) && $order['discount_amount'] > 0): ?>
-                                        <div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 14px; color: #059669;">
-                                            <span>Discount</span>
-                                            <span style="font-weight: 500;">-$<?php echo number_format($order['discount_amount'], 2); ?></span>
-                                        </div>
-                                    <?php endif; ?>
-
-                                    <!-- Divider -->
-                                    <div style="border-top: 1px dashed #cbd5e1; margin: 15px 0;"></div>
-
-                                    <!-- Total -->
-                                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                                        <span style="font-size: 15px; font-weight: 700; color: #0f172a;">Total Order</span>
-                                        <span style="font-size: 20px; font-weight: 800; color: #0f172a; letter-spacing: -0.025em;">
-                                            $<?php echo number_format($order['subtotal'] + ($order['tax'] ?? 0) + ($order['shipping'] ?? 0), 2); ?>
-                                        </span>
-                                    </div>
-                                    <div style="text-align: right; margin-top: 5px;">
-                                        <span style="font-size: 11px; color: #94a3b8;">Include all taxes</span>
-                                    </div>
                                 </div>
                             </div>
                         </div>

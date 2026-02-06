@@ -618,7 +618,10 @@ if (isset($_SESSION['last_order'])) {
                     <div class="stats-item">
                         <div class="stats-value">
                             <?php 
-                            $totalOrders = count($orders);
+                            $activeOrders = array_filter($orders, function($o) {
+                                return isset($o['status']) && $o['status'] !== 'Cancelled';
+                            });
+                            $totalOrders = count($activeOrders);
                             echo $totalOrders;
                             ?>
                         </div>
@@ -630,6 +633,9 @@ if (isset($_SESSION['last_order'])) {
                             <?php 
                             $totalSpent = 0;
                             foreach ($orders as $order) {
+                                if (isset($order['status']) && $order['status'] === 'Cancelled') {
+                                    continue;
+                                }
                                 if (isset($order['total'])) {
                                     $totalSpent += $order['total'];
                                 } else {
@@ -653,25 +659,8 @@ if (isset($_SESSION['last_order'])) {
                     </div>
                 </div>
 
-                <!-- Order Analytics Chart -->
-                <div class="chart-card">
-                    <h3 class="chart-card-header">📈 Order Analytics</h3>
-                    <p class="chart-card-subtitle">Your spending trends over time</p>
-                    
-                    <?php if (count($orders) > 0): ?>
-                        <div class="chart-container">
-                            <canvas id="orderChart"></canvas>
-                        </div>
-                    <?php else: ?>
-                        <div class="empty-chart-state">
-                            <div style="font-size: 3rem; margin-bottom: 10px; opacity: 0.5;">📊</div>
-                            <p style="color: #6b7280; margin: 0;">No order data available yet</p>
-                        </div>
-                    <?php endif; ?>
-                </div>
-
                 <!-- Help Card -->
-                <div class="help-card">
+                <div class="help-card" style="margin-top: 25px;">
                     <h4 class="help-card-title">Need Help?</h4>
                     <p class="help-card-text">
                         Visit our customer support for any questions or assistance.
@@ -681,6 +670,38 @@ if (isset($_SESSION['last_order'])) {
                     </a>
                 </div>
             </div>
+            </div>
+        </div>
+
+        <!-- Order Analytics Chart (Full Width) -->
+        <div class="chart-card" style="margin-bottom: 40px;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                    <h3 class="chart-card-header">📈 Order Analysis</h3>
+                    <p class="chart-card-subtitle">Comprehensive view of your orders, including cancellations.</p>
+                </div>
+                <div style="display: flex; gap: 15px;">
+                    <div style="display: flex; align-items: center; gap: 5px;">
+                        <span style="width: 12px; height: 12px; background: #10b981; border-radius: 50%;"></span>
+                        <span style="font-size: 0.9rem; color: #555;">Successful</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 5px;">
+                        <span style="width: 12px; height: 12px; background: #ef4444; border-radius: 50%;"></span>
+                        <span style="font-size: 0.9rem; color: #555;">Cancelled</span>
+                    </div>
+                </div>
+            </div>
+            
+            <?php if (count($orders) > 0): ?>
+                <div class="chart-container" style="height: 400px;">
+                    <canvas id="orderChart"></canvas>
+                </div>
+            <?php else: ?>
+                <div class="empty-chart-state">
+                    <div style="font-size: 3rem; margin-bottom: 10px; opacity: 0.5;">📊</div>
+                    <p style="color: #6b7280; margin: 0;">No order data available yet</p>
+                </div>
+            <?php endif; ?>
         </div>
 
         <!-- Recent Orders Preview -->
@@ -744,8 +765,9 @@ if (isset($_SESSION['last_order'])) {
                 // Prepare data for chart
                 $chartData = array_map(function($order) {
                     return [
-                        'date' => date('M d, Y', strtotime($order['date'])),
+                        'date' => date('M d', strtotime($order['date'])),
                         'amount' => floatval($order['subtotal'] + ($order['tax'] ?? 0) + ($order['shipping'] ?? 0)),
+                        'status' => $order['status'] ?? 'Completed',
                         'orderNumber' => $order['order_number']
                     ];
                 }, $orders);
@@ -753,74 +775,81 @@ if (isset($_SESSION['last_order'])) {
                 echo json_encode($chartData);
             ?>;
 
-            // Extract labels and data
-            const labels = orderData.map(item => item.date);
-            const amounts = orderData.map(item => item.amount);
-            const orderNumbers = orderData.map(item => item.orderNumber);
-
-            // Create gradient
+            // Prepare chart data
+            const orderLabels = orderData.map(item => item.date);
+            const successAmounts = orderData.map(item => {
+                if (item.status === 'Cancelled') return 0;
+                return item.amount;
+            });
+            const cancelledAmounts = orderData.map(item => {
+                if (item.status === 'Cancelled') return item.amount;
+                return 0;
+            });
+            
             const ctx = document.getElementById('orderChart').getContext('2d');
-            const gradient = ctx.createLinearGradient(0, 0, 0, 300);
-            gradient.addColorStop(0, 'rgba(102, 126, 234, 0.8)');
-            gradient.addColorStop(1, 'rgba(118, 75, 162, 0.2)');
+            
+            // Gradients
+            const gradientSuccess = ctx.createLinearGradient(0, 0, 0, 400);
+            gradientSuccess.addColorStop(0, 'rgba(16, 185, 129, 0.7)');
+            gradientSuccess.addColorStop(1, 'rgba(16, 185, 129, 0.1)');
 
-            // Initialize Chart
+            const gradientCancel = ctx.createLinearGradient(0, 0, 0, 400);
+            gradientCancel.addColorStop(0, 'rgba(239, 68, 68, 0.7)');
+            gradientCancel.addColorStop(1, 'rgba(239, 68, 68, 0.1)');
+
             new Chart(ctx, {
-                type: 'line',
+                type: 'bar', // Switch to bar for better comparison
                 data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Order Amount ($)',
-                        data: amounts,
-                        backgroundColor: gradient,
-                        borderColor: '#667eea',
-                        borderWidth: 3,
-                        fill: true,
-                        tension: 0.4,
-                        pointBackgroundColor: '#667eea',
-                        pointBorderColor: '#fff',
-                        pointBorderWidth: 2,
-                        pointRadius: 6,
-                        pointHoverRadius: 8,
-                        pointHoverBackgroundColor: '#764ba2',
-                        pointHoverBorderColor: '#fff',
-                        pointHoverBorderWidth: 3
-                    }]
+                    labels: orderLabels,
+                    datasets: [
+                        {
+                            label: 'Successful Orders',
+                            data: successAmounts,
+                            backgroundColor: gradientSuccess,
+                            borderColor: '#10b981',
+                            borderWidth: 2,
+                            borderRadius: 6,
+                            barPercentage: 0.6,
+                        },
+                        {
+                            label: 'Cancelled Orders',
+                            data: cancelledAmounts,
+                            backgroundColor: gradientCancel,
+                            borderColor: '#ef4444',
+                            borderWidth: 2,
+                            borderRadius: 6,
+                            barPercentage: 0.6,
+                        }
+                    ]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    },
                     plugins: {
                         legend: {
-                            display: true,
-                            position: 'top',
-                            labels: {
-                                font: {
-                                    size: 14,
-                                    weight: '600'
-                                },
-                                color: '#333',
-                                usePointStyle: true,
-                                padding: 20
-                            }
+                            display: false // Custom legend used
                         },
                         tooltip: {
-                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                            titleColor: '#fff',
-                            bodyColor: '#fff',
-                            padding: 12,
-                            borderColor: '#667eea',
+                            backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                            titleColor: '#1f2937',
+                            bodyColor: '#4b5563',
+                            borderColor: '#e5e7eb',
                             borderWidth: 1,
-                            displayColors: false,
+                            padding: 12,
                             callbacks: {
-                                title: function(context) {
-                                    return orderNumbers[context[0].dataIndex];
-                                },
                                 label: function(context) {
-                                    return 'Amount: $' + context.parsed.y.toFixed(2);
-                                },
-                                afterLabel: function(context) {
-                                    return 'Date: ' + labels[context.dataIndex];
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.y !== null) {
+                                        label += new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(context.parsed.y);
+                                    }
+                                    return label;
                                 }
                             }
                         }
@@ -828,41 +857,33 @@ if (isset($_SESSION['last_order'])) {
                     scales: {
                         y: {
                             beginAtZero: true,
-                            ticks: {
-                                callback: function(value) {
-                                    return '$' + value.toFixed(0);
-                                },
-                                font: {
-                                    size: 12
-                                },
-                                color: '#6b7280'
-                            },
                             grid: {
                                 color: 'rgba(0, 0, 0, 0.05)',
                                 drawBorder: false
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return '$' + value;
+                                },
+                                font: {
+                                    family: "'Inter', sans-serif"
+                                }
                             }
                         },
                         x: {
+                            grid: {
+                                display: false
+                            },
                             ticks: {
                                 font: {
-                                    size: 11
-                                },
-                                color: '#6b7280',
-                                maxRotation: 45,
-                                minRotation: 45
-                            },
-                            grid: {
-                                display: false,
-                                drawBorder: false
+                                    family: "'Inter', sans-serif"
+                                }
                             }
                         }
-                    },
-                    interaction: {
-                        intersect: false,
-                        mode: 'index'
                     }
                 }
             });
+
         <?php endif; ?>
         </script>
     </section>

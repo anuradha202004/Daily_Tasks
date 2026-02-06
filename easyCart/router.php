@@ -1,43 +1,25 @@
 <?php
-// router.php - Handles Clean URLs for PHP Built-in Server
+// Simple PHP Router for Built-in Server
+$uri = urldecode(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));
 
-$path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-
-// 1. Static Files: If it exists, check for .php enforcement
-$file = __DIR__ . $path;
-if (file_exists($file) && !is_dir($file)) {
-    // If requesting a .php file directly, redirect to clean URL
-    // (Mimics .htaccess RewriteRule ^(.*)\.php$ /$1 [R=301,L])
-    if (substr($path, -4) === '.php') {
-        $cleanPath = substr($path, 0, -4);
-        // Special case: /index -> /
-        if ($cleanPath === '/index') {
-            $cleanPath = '/';
-        }
-        
-        // Preserve POST data using 307, otherwise 301
-        $responseCode = ($_SERVER['REQUEST_METHOD'] === 'GET' || $_SERVER['REQUEST_METHOD'] === 'HEAD') ? 301 : 307;
-        
-        $queryString = $_SERVER['QUERY_STRING'];
-        $redirectUrl = $cleanPath . ($queryString ? '?' . $queryString : '');
-        
-        header("Location: " . $redirectUrl, true, $responseCode);
-        exit();
-    }
-    
-    // Serve the file as-is
-    return false; 
+// 1. Serve static files directly if they exist
+if ($uri !== '/' && file_exists(__DIR__ . $uri)) {
+    return false; // Serve file as-is
 }
 
-// 2. Handle Extensionless URLs (Internal Rewrite)
-// Check if the path corresponds to a .php file
-// (Mimics .htaccess RewriteCond %{REQUEST_FILENAME}.php -f)
-$phpFile = $file . '.php';
-if (file_exists($phpFile)) {
-    require $phpFile;
-    exit();
+// 2. Handle root path
+if ($uri === '/' || $uri === '/index') {
+    require 'index.php';
+    exit;
 }
 
-// 3. Handle Directory Index (for /) automatically by returning false
-return false;
-?>
+// 3. Auto-append .php if file exists
+$file = __DIR__ . $uri . '.php';
+if (file_exists($file)) {
+    require $file;
+    exit;
+}
+
+// 4. Handle 404
+http_response_code(404);
+echo "404 Not Found";

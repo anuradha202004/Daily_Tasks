@@ -10,6 +10,9 @@ require_once 'app/bootstrap.php';
 
 $pageTitle = 'My Wishlist';
 
+// Get current user ID if logged in
+$userId = isLoggedIn() ? getCurrentUser()['id'] : null;
+
 // Handle AJAX requests BEFORE requireLogin (so we can return proper JSON)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     header('Content-Type: application/json');
@@ -20,10 +23,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         exit;
     }
     
-    // Initialize wishlist if not set
+    // Initialize wishlist from DB if not in session
     if (!isset($_SESSION['wishlist'])) {
-        $_SESSION['wishlist'] = [];
-        initializeWishlistFromFile();
+        $_SESSION['wishlist'] = loadUserWishlist($userId);
     }
     
     // Ensure wishlist is an array
@@ -38,14 +40,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         if (!in_array($productId, $_SESSION['wishlist'])) {
             $_SESSION['wishlist'][] = $productId;
         }
-        saveUserWishlist($_SESSION['user_email'], $_SESSION['wishlist']);
+        saveUserWishlist($userId, $_SESSION['wishlist']); // Pass ID, not email
         echo json_encode(['success' => true, 'message' => 'Added to wishlist', 'count' => count($_SESSION['wishlist'])]);
     } elseif ($action === 'remove' && $productId > 0) {
         $_SESSION['wishlist'] = array_filter($_SESSION['wishlist'], function($id) use ($productId) {
             return $id !== $productId;
         });
         $_SESSION['wishlist'] = array_values($_SESSION['wishlist']); // Re-index array
-        saveUserWishlist($_SESSION['user_email'], $_SESSION['wishlist']);
+        saveUserWishlist($userId, $_SESSION['wishlist']); // Pass ID, not email
         echo json_encode(['success' => true, 'message' => 'Removed from wishlist', 'count' => count($_SESSION['wishlist'])]);
     } elseif ($action === 'get_wishlist') {
         echo json_encode(['success' => true, 'wishlist' => $_SESSION['wishlist']]);
@@ -60,9 +62,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 // For page view, require login
 requireLogin();
 
-// Load wishlist from file on page load
-if (!isset($_SESSION['wishlist'])) {
-    initializeWishlistFromFile();
+// Load wishlist from DB on page load
+if (!isset($_SESSION['wishlist']) && $userId) {
+    $_SESSION['wishlist'] = loadUserWishlist($userId);
 }
 
 // Ensure wishlist is an array
@@ -73,7 +75,9 @@ if (!is_array($_SESSION['wishlist'])) {
 // Get wishlist items with product details
 $wishlistItems = [];
 if (!empty($_SESSION['wishlist'])) {
-    foreach ($_SESSION['wishlist'] as $productId) {
+    // Reverse to show newest first if desired, or keep as is
+    $itemsToShow = array_reverse($_SESSION['wishlist']);
+    foreach ($itemsToShow as $productId) {
         $product = getProductById($productId);
         if ($product) {
             $wishlistItems[] = $product;
@@ -85,40 +89,6 @@ if (!empty($_SESSION['wishlist'])) {
     <script src="public/js/wishlist.js"></script>
     <script src="public/js/toast.js"></script>
     <script src="public/js/cart.js"></script>
-
-    <style>
-        /* Wishlist-specific styles - Only for this page */
-        .wishlist-product-card {
-            position: relative;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .wishlist-product-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 12px 30px rgba(102, 126, 234, 0.2);
-        }
-
-        .wishlist-product-link {
-            text-decoration: none;
-            color: inherit;
-            display: block;
-        }
-
-        .wishlist-product-link:hover .product-title {
-            color: #667eea;
-        }
-
-        .wishlist-product-card .product-actions {
-            position: relative;
-            z-index: 5;
-        }
-
-        .wishlist-product-card .product-actions button,
-        .wishlist-product-card .product-actions a {
-            pointer-events: auto;
-        }
-    </style>
 
     <!-- My Wishlist Page -->
     <section class="container" style="padding: 40px 0;">
@@ -132,59 +102,67 @@ if (!empty($_SESSION['wishlist'])) {
         <?php if (count($wishlistItems) > 0): ?>
             <div class="products-grid" style="margin-top: 30px;">
                 <?php foreach ($wishlistItems as $product): ?>
-                    <div class="product-card wishlist-product-card" style="position: relative;">
-                        <!-- Heart Icon -->
-                        <div onclick="toggleWishlist(event, <?php echo $product['id']; ?>)" 
-                             style="
-                                position: absolute;
-                                top: 10px;
-                                right: 10px;
-                                font-size: 24px;
-                                cursor: pointer;
-                                z-index: 10;
-                                background: white;
-                                width: 40px;
-                                height: 40px;
-                                border-radius: 50%;
-                                display: flex;
-                                align-items: center;
-                                justify-content: center;
-                                box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-                                transition: all 0.3s ease;
-                             "
-                             onmouseover="this.style.transform='scale(1.1)'"
-                             onmouseout="this.style.transform='scale(1)'"
-                             class="heart-icon"
+                    <?php $isWishlisted = true; // Always true on wishlist page ?>
+                    
+                    <div class="product-card" onclick="window.location.href='product-detail?id=<?php echo $product['id']; ?>'">
+                        
+                        <!-- Remove from Wishlist Button -->
+                        <div class="card-wishlist-btn" 
+                             onclick="event.stopPropagation(); toggleWishlist(event, <?php echo $product['id']; ?>)"
                              data-product-id="<?php echo $product['id']; ?>">
                             ❤️
                         </div>
 
-                        <!-- Clickable Product Link -->
-                        <a href="product-detail.php?id=<?php echo $product['id']; ?>" class="wishlist-product-link">
-                        <div class="product-image" style="overflow: hidden; display: flex; align-items: center; justify-content: center; background: #fff;">
-                            <?php if (!empty($product['image'])): ?>
-                                <img src="<?php echo $product['image']; ?>" alt="<?php echo htmlspecialchars($product['name']); ?>" style="width: 100%; height: 100%; object-fit: contain; transition: transform 0.3s ease;">
-                            <?php else: ?>
-                                <?php echo $product['emoji']; ?>
-                            <?php endif; ?>
-                        </div>
-                            <h3 class="product-title"><?php echo htmlspecialchars($product['name']); ?></h3>
-                            <div class="product-rating"><?php echo renderStars($product['rating']); ?> <?php echo $product['rating']; ?> (<?php echo $product['reviews']; ?> reviews)</div>
-                            <p class="product-description"><?php echo htmlspecialchars($product['description']); ?></p>
-                            <div class="product-price"><?php echo formatPrice($product['price']); ?></div>
-                        </a>
-                        
-                        <div class="product-footer">
-                            <span class="stock-info">Stock: <?php echo $product['stock']; ?> units</span>
-                            <div class="product-actions">
-                                <?php if ($product['stock'] > 0): ?>
-                                    <button type="button" onclick="(function(e, id, name){ e.preventDefault(); e.stopPropagation(); var fd = new FormData(); fd.append('action', 'add'); fd.append('product_id', id); fd.append('quantity', 1); fetch('cart.php', {method: 'POST', body: fd}).then(res => res.json()).then(data => { if(data.success) { showToast('🛒 ' + name + ' added to cart!', 'success', 3500); var badge = document.querySelector('.badge'); if(badge){ badge.textContent = data.cartCount || (parseInt(badge.textContent) + 1); badge.style.display = 'flex'; } } else if(data.alreadyInCart) { showToast('ℹ️ ' + name + ' is already in your cart!', 'info', 3500); } else { showToast('❌ ' + (data.message || 'Error adding to cart'), 'error', 3000); } }).catch(() => showToast('❌ Error adding to cart', 'error', 3000)); return false; })(event, <?php echo $product['id']; ?>, '<?php echo addslashes($product['name']); ?>')" class="btn btn-primary btn-add-cart" data-product-id="<?php echo $product['id']; ?>">
-                                        Add to Cart
-                                    </button>
-                                    <a href="checkout.php?product_id=<?php echo $product['id']; ?>&qty=1&reset_shipping=1" class="btn btn-buy-now" onclick="event.stopPropagation();">Buy Now</a>
+                        <div class="product-image-container">
+                            <div class="product-image-content">
+                                <?php if (!empty($product['image'])): ?>
+                                    <img src="<?php echo $product['image']; ?>" alt="<?php echo htmlspecialchars($product['name']); ?>">
                                 <?php else: ?>
-                                    <button class="btn btn-disabled" disabled>Out of Stock</button>
+                                    <span style="font-size: 60px;"><?php echo $product['emoji']; ?></span>
                                 <?php endif; ?>
+                            </div>
+                        </div>
+
+                        <div class="product-info">
+                            <div class="product-category"><?php echo htmlspecialchars($product['brand'] ?? 'General'); ?></div>
+                            <h3 class="product-title"><?php echo htmlspecialchars($product['name']); ?></h3>
+                            
+                            <div class="product-price-row">
+                                <div class="price-current"><?php echo formatPrice($product['price']); ?></div>
+                                <div class="rating-block">
+                                    ⭐ <?php echo $product['rating']; ?> <span style="color: #9ca3af; font-weight: 400;">(<?php echo $product['reviews']; ?>)</span>
+                                </div>
+                            </div>
+
+                            <div class="product-footer">
+                                <?php 
+                                    $stockClass = 'in-stock';
+                                    $stockText = 'In Stock';
+                                    if ($product['stock'] == 0) {
+                                        $stockClass = 'out-stock';
+                                        $stockText = 'Out of Stock';
+                                    } elseif ($product['stock'] < 10) {
+                                        $stockClass = 'low-stock';
+                                        $stockText = 'Running Low';
+                                    }
+                                ?>
+                                <div class="stock-indicator <?php echo $stockClass; ?>">
+                                    <span class="stock-dot"></span> <?php echo $stockText; ?>
+                                </div>
+
+                                <div class="action-buttons" onclick="event.stopPropagation();">
+                                    <?php if ($product['stock'] > 0): ?>
+                                        <button onclick="(function(e, id, name){ e.preventDefault(); e.stopPropagation(); var fd = new FormData(); fd.append('action', 'add'); fd.append('product_id', id); fd.append('quantity', 1); fetch('cart.php', {method: 'POST', body: fd}).then(res => res.json()).then(data => { if(data.success) { showToast('🛒 ' + name + ' added to cart!', 'success', 3500); var badge = document.querySelector('.badge'); if(badge){ badge.textContent = data.cartCount || (parseInt(badge.textContent) + 1); badge.style.display = 'flex'; } } else if(data.alreadyInCart) { showToast('ℹ️ ' + name + ' is already in your cart!', 'info', 3500); } else { showToast('❌ ' + (data.message || 'Error adding to cart'), 'error', 3000); } }).catch(() => showToast('❌ Error adding to cart', 'error', 3000)); return false; })(event, <?php echo $product['id']; ?>, '<?php echo addslashes($product['name']); ?>')" 
+                                                class="btn-modern btn-outline-cart">
+                                            Add to Cart 
+                                        </button>
+                                        <a href="checkout?product_id=<?php echo $product['id']; ?>&qty=1&reset_shipping=1" class="btn-modern btn-gradient-buy">
+                                            Buy Now
+                                        </a>
+                                    <?php else: ?>
+                                        <button class="btn-modern btn-outline-cart" style="opacity: 0.5; cursor: not-allowed;" disabled>Out of Stock</button>
+                                    <?php endif; ?>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -197,7 +175,7 @@ if (!empty($_SESSION['wishlist'])) {
                 <div style="font-size: 60px; margin-bottom: 20px;">🤍</div>
                 <h2 style="color: #666; margin-bottom: 10px;">Your Wishlist is Empty</h2>
                 <p style="color: #999; margin-bottom: 30px;">Start adding products to your wishlist to save them for later!</p>
-                <a href="products.php" class="btn btn-primary" style="display: inline-block; padding: 12px 30px; text-decoration: none;">
+                <a href="products" class="btn btn-primary" style="display: inline-block; padding: 12px 30px; text-decoration: none;">
                     Explore Products
                 </a>
             </div>

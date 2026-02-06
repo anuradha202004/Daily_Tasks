@@ -1,6 +1,14 @@
 <?php
 session_start();
 
+// Fallback Router: If server sends requests for 'product-detail' (no ext) to index.php, redirect to product-detail.php
+if (isset($_SERVER['REQUEST_URI']) && strpos($_SERVER['REQUEST_URI'], 'product-detail') !== false && strpos($_SERVER['REQUEST_URI'], '.php') === false) {
+    if (isset($_GET['id'])) {
+        header("Location: product-detail.php?id=" . $_GET['id']);
+        exit;
+    }
+}
+
 // die("<pre>" . json_encode($_SESSION, 128) . "</pre>");
 
 // echo "<pre>";
@@ -142,39 +150,69 @@ $featuredProducts = array_slice($products, 0, 4, true);
         <div class="products-grid">
             <?php foreach ($featuredProducts as $product): ?>
                 <?php $isWishlisted = isset($_SESSION['wishlist']) && in_array($product['id'], $_SESSION['wishlist']); ?>
-                <div class="product-card" style="position: relative; cursor: pointer;" onclick="window.location.href='product-detail.php?id=<?php echo $product['id']; ?>'">
+                
+                <div class="product-card" onclick="window.location.href='product-detail?id=<?php echo $product['id']; ?>'">
+                    
                     <?php if (isLoggedIn()): ?>
-                    <div onclick="event.stopPropagation(); toggleWishlist(event, <?php echo $product['id']; ?>)" 
-                         style="position: absolute; top: 10px; right: 10px; font-size: 24px; cursor: pointer; z-index: 10; background: white; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.15); transition: all 0.3s ease;"
-                         onmouseover="this.style.transform='scale(1.1)'"
-                         onmouseout="this.style.transform='scale(1)'"
-                         class="heart-icon"
-                         data-product-id="<?php echo $product['id']; ?>">
-                        <?php echo $isWishlisted ? '❤️' : '🤍'; ?>
-                    </div>
+                        <div class="card-wishlist-btn" 
+                             onclick="event.stopPropagation(); toggleWishlist(event, <?php echo $product['id']; ?>)"
+                             data-product-id="<?php echo $product['id']; ?>">
+                            <?php echo $isWishlisted ? '❤️' : '🤍'; ?>
+                        </div>
                     <?php endif; ?>
-                    <div class="product-image" style="overflow: hidden; display: flex; align-items: center; justify-content: center; background: #fff;">
-                        <?php if (!empty($product['image'])): ?>
-                            <img src="<?php echo $product['image']; ?>" alt="<?php echo htmlspecialchars($product['name']); ?>" style="width: 100%; height: 100%; object-fit: contain; transition: transform 0.3s ease;">
-                        <?php else: ?>
-                            <?php echo $product['emoji']; ?>
-                        <?php endif; ?>
-                    </div>
-                    <h3 class="product-title"><?php echo htmlspecialchars($product['name']); ?></h3>
-                    <div class="product-rating"><?php echo renderStars($product['rating']); ?> <?php echo $product['rating']; ?> (<?php echo $product['reviews']; ?> reviews)</div>
-                    <p class="product-description"><?php echo htmlspecialchars($product['description']); ?></p>
-                    <div class="product-price"><?php echo formatPrice($product['price']); ?></div>
-                    <div class="product-footer">
-                        <span class="stock-info">Stock: <?php echo $product['stock']; ?> units</span>
-                        <div class="product-actions" onclick="event.stopPropagation();">
-                            <?php if ($product['stock'] > 0): ?>
-                                <button type="button" onclick="(function(e, id, name){ e.preventDefault(); e.stopPropagation(); var fd = new FormData(); fd.append('action', 'add'); fd.append('product_id', id); fd.append('quantity', 1); fetch('cart.php', {method: 'POST', body: fd}).then(res => res.json()).then(data => { if(data.success) { showToast('🛒 ' + name + ' added to cart!', 'success', 3500); var badge = document.querySelector('.badge'); if(badge){ badge.textContent = data.cartCount || (parseInt(badge.textContent) + 1); badge.style.display = 'flex'; } } else if(data.alreadyInCart) { showToast('ℹ️ ' + name + ' is already in your cart!', 'info', 3500); } else { showToast('❌ ' + (data.message || 'Error adding to cart'), 'error', 3000); } }).catch(() => showToast('❌ Error adding to cart', 'error', 3000)); return false; })(event, <?php echo $product['id']; ?>, '<?php echo addslashes($product['name']); ?>')" class="btn btn-primary btn-add-cart" data-product-id="<?php echo $product['id']; ?>">
-                                    Add to Cart
-                                </button>
-                                <a href="checkout?product_id=<?php echo $product['id']; ?>&qty=1&reset_shipping=1" class="btn btn-buy-now">Buy Now</a>
+
+                    <span class="badge-new">NEW</span>
+
+                    <div class="product-image-container">
+                        <div class="product-image-content">
+                            <?php if (!empty($product['image'])): ?>
+                                <img src="<?php echo $product['image']; ?>" alt="<?php echo htmlspecialchars($product['name']); ?>">
                             <?php else: ?>
-                                <button class="btn btn-disabled" disabled>Out of Stock</button>
+                                <span style="font-size: 60px;"><?php echo $product['emoji']; ?></span>
                             <?php endif; ?>
+                        </div>
+                    </div>
+
+                    <div class="product-info">
+                        <div class="product-category"><?php echo htmlspecialchars($product['brand'] ?? 'General'); ?></div>
+                        <h3 class="product-title"><?php echo htmlspecialchars($product['name']); ?></h3>
+                        
+                        <div class="product-price-row">
+                            <div class="price-current"><?php echo formatPrice($product['price']); ?></div>
+                            <div class="rating-block">
+                                ⭐ <?php echo $product['rating']; ?> <span style="color: #9ca3af; font-weight: 400;">(<?php echo $product['reviews']; ?>)</span>
+                            </div>
+                        </div>
+
+                        <div class="product-footer">
+                            <?php 
+                                $stockClass = 'in-stock';
+                                $stockText = 'In Stock';
+                                if ($product['stock'] == 0) {
+                                    $stockClass = 'out-stock';
+                                    $stockText = 'Out of Stock';
+                                } elseif ($product['stock'] < 10) {
+                                    $stockClass = 'low-stock';
+                                    $stockText = 'Running Low';
+                                }
+                            ?>
+                            <div class="stock-indicator <?php echo $stockClass; ?>">
+                                <span class="stock-dot"></span> <?php echo $stockText; ?>
+                            </div>
+
+                            <div class="action-buttons" onclick="event.stopPropagation();">
+                                <?php if ($product['stock'] > 0): ?>
+                                    <button onclick="(function(e, id, name){ e.preventDefault(); e.stopPropagation(); var fd = new FormData(); fd.append('action', 'add'); fd.append('product_id', id); fd.append('quantity', 1); fetch('cart.php', {method: 'POST', body: fd}).then(res => res.json()).then(data => { if(data.success) { showToast('🛒 ' + name + ' added to cart!', 'success', 3500); var badge = document.querySelector('.badge'); if(badge){ badge.textContent = data.cartCount || (parseInt(badge.textContent) + 1); badge.style.display = 'flex'; } } else if(data.alreadyInCart) { showToast('ℹ️ ' + name + ' is already in your cart!', 'info', 3500); } else { showToast('❌ ' + (data.message || 'Error adding to cart'), 'error', 3000); } }).catch(() => showToast('❌ Error adding to cart', 'error', 3000)); return false; })(event, <?php echo $product['id']; ?>, '<?php echo addslashes($product['name']); ?>')" 
+                                            class="btn-modern btn-outline-cart">
+                                        Add to Cart 
+                                    </button>
+                                    <a href="checkout.php?product_id=<?php echo $product['id']; ?>&qty=1&reset_shipping=1" class="btn-modern btn-gradient-buy">
+                                        Buy Now
+                                    </a>
+                                <?php else: ?>
+                                    <button class="btn-modern btn-outline-cart" style="opacity: 0.5; cursor: not-allowed;" disabled>Out of Stock</button>
+                                <?php endif; ?>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -196,41 +234,73 @@ $featuredProducts = array_slice($products, 0, 4, true);
         </div>
 
         <div class="products-grid">
-            <?php foreach (array_slice($products, 0, 8, true) as $product): ?>
+            <?php foreach (array_slice($products, 0, 8, true) as $index => $product): ?>
                 <?php $isWishlisted = isset($_SESSION['wishlist']) && in_array($product['id'], $_SESSION['wishlist']); ?>
-                <div class="product-card" style="position: relative; cursor: pointer;" onclick="window.location.href='product-detail.php?id=<?php echo $product['id']; ?>'">
+                
+                <div class="product-card" onclick="window.location.href='product-detail?id=<?php echo $product['id']; ?>'">
+                    
                     <?php if (isLoggedIn()): ?>
-                    <div onclick="event.stopPropagation(); toggleWishlist(event, <?php echo $product['id']; ?>)" 
-                         style="position: absolute; top: 10px; right: 10px; font-size: 24px; cursor: pointer; z-index: 10; background: white; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.15); transition: all 0.3s ease;"
-                         onmouseover="this.style.transform='scale(1.1)'"
-                         onmouseout="this.style.transform='scale(1)'"
-                         class="heart-icon"
-                         data-product-id="<?php echo $product['id']; ?>">
-                        <?php echo $isWishlisted ? '❤️' : '🤍'; ?>
-                    </div>
+                        <div class="card-wishlist-btn" 
+                             onclick="event.stopPropagation(); toggleWishlist(event, <?php echo $product['id']; ?>)"
+                             data-product-id="<?php echo $product['id']; ?>">
+                            <?php echo $isWishlisted ? '❤️' : '🤍'; ?>
+                        </div>
                     <?php endif; ?>
-                    <div class="product-image" style="overflow: hidden; display: flex; align-items: center; justify-content: center; background: #fff;">
-                        <?php if (!empty($product['image'])): ?>
-                            <img src="<?php echo $product['image']; ?>" alt="<?php echo htmlspecialchars($product['name']); ?>" style="width: 100%; height: 100%; object-fit: contain; transition: transform 0.3s ease;">
-                        <?php else: ?>
-                            <?php echo $product['emoji']; ?>
-                        <?php endif; ?>
-                    </div>
-                    <h3 class="product-title"><?php echo htmlspecialchars($product['name']); ?></h3>
-                    <div class="product-rating"><?php echo renderStars($product['rating']); ?> <?php echo $product['rating']; ?> (<?php echo $product['reviews']; ?> reviews)</div>
-                    <p class="product-description"><?php echo htmlspecialchars($product['description']); ?></p>
-                    <div class="product-price"><?php echo formatPrice($product['price']); ?></div>
-                    <div class="product-footer">
-                        <span class="stock-info">Stock: <?php echo $product['stock']; ?> units</span>
-                        <div class="product-actions" onclick="event.stopPropagation();">
-                            <?php if ($product['stock'] > 0): ?>
-                                <button type="button" onclick="(function(e, id, name){ e.preventDefault(); e.stopPropagation(); var fd = new FormData(); fd.append('action', 'add'); fd.append('product_id', id); fd.append('quantity', 1); fetch('cart.php', {method: 'POST', body: fd}).then(res => res.json()).then(data => { if(data.success) { showToast('🛒 ' + name + ' added to cart!', 'success', 3500); var badge = document.querySelector('.badge'); if(badge){ badge.textContent = data.cartCount || (parseInt(badge.textContent) + 1); badge.style.display = 'flex'; } } else if(data.alreadyInCart) { showToast('ℹ️ ' + name + ' is already in your cart!', 'info', 3500); } else { showToast('❌ ' + (data.message || 'Error adding to cart'), 'error', 3000); } }).catch(() => showToast('❌ Error adding to cart', 'error', 3000)); return false; })(event, <?php echo $product['id']; ?>, '<?php echo addslashes($product['name']); ?>')" class="btn btn-primary btn-add-cart" data-product-id="<?php echo $product['id']; ?>">
-                                     Add to Cart
-                                </button>
-                                <a href="checkout?product_id=<?php echo $product['id']; ?>&qty=1&reset_shipping=1" class="btn btn-buy-now">Buy Now</a>
+
+                    <?php if ($index < 3): ?>
+                        <span class="badge-new">NEW</span>
+                    <?php endif; ?>
+
+                    <div class="product-image-container">
+                        <div class="product-image-content">
+                            <?php if (!empty($product['image'])): ?>
+                                <img src="<?php echo $product['image']; ?>" alt="<?php echo htmlspecialchars($product['name']); ?>">
                             <?php else: ?>
-                                <button class="btn btn-disabled" disabled>Out of Stock</button>
+                                <span style="font-size: 60px;"><?php echo $product['emoji']; ?></span>
                             <?php endif; ?>
+                        </div>
+                    </div>
+
+                    <div class="product-info">
+                        <div class="product-category"><?php echo htmlspecialchars($product['brand'] ?? 'General'); ?></div>
+                        <h3 class="product-title"><?php echo htmlspecialchars($product['name']); ?></h3>
+                        
+                        <div class="product-price-row">
+                            <div class="price-current"><?php echo formatPrice($product['price']); ?></div>
+                            <div class="rating-block">
+                                ⭐ <?php echo $product['rating']; ?> <span style="color: #9ca3af; font-weight: 400;">(<?php echo $product['reviews']; ?>)</span>
+                            </div>
+                        </div>
+
+                        <div class="product-footer">
+                            <?php 
+                                $stockClass = 'in-stock';
+                                $stockText = 'In Stock';
+                                if ($product['stock'] == 0) {
+                                    $stockClass = 'out-stock';
+                                    $stockText = 'Out of Stock';
+                                } elseif ($product['stock'] < 10) {
+                                    $stockClass = 'low-stock';
+                                    $stockText = 'Running Low';
+                                }
+                            ?>
+                            <div class="stock-indicator <?php echo $stockClass; ?>">
+                                <span class="stock-dot"></span> <?php echo $stockText; ?>
+                            </div>
+
+                            <div class="action-buttons" onclick="event.stopPropagation();">
+                                <?php if ($product['stock'] > 0): ?>
+                                    <button onclick="(function(e, id, name){ e.preventDefault(); e.stopPropagation(); var fd = new FormData(); fd.append('action', 'add'); fd.append('product_id', id); fd.append('quantity', 1); fetch('cart.php', {method: 'POST', body: fd}).then(res => res.json()).then(data => { if(data.success) { showToast('🛒 ' + name + ' added to cart!', 'success', 3500); var badge = document.querySelector('.badge'); if(badge){ badge.textContent = data.cartCount || (parseInt(badge.textContent) + 1); badge.style.display = 'flex'; } } else if(data.alreadyInCart) { showToast('ℹ️ ' + name + ' is already in your cart!', 'info', 3500); } else { showToast('❌ ' + (data.message || 'Error adding to cart'), 'error', 3000); } }).catch(() => showToast('❌ Error adding to cart', 'error', 3000)); return false; })(event, <?php echo $product['id']; ?>, '<?php echo addslashes($product['name']); ?>')" 
+                                            class="btn-modern btn-outline-cart">
+                                        Add to Cart
+                                    </button>
+                                    <a href="checkout.php?product_id=<?php echo $product['id']; ?>&qty=1&reset_shipping=1" class="btn-modern btn-gradient-buy">
+                                        Buy Now
+                                    </a>
+                                <?php else: ?>
+                                    <button class="btn-modern btn-outline-cart" style="opacity: 0.5; cursor: not-allowed;" disabled>Out of Stock</button>
+                                <?php endif; ?>
+                            </div>
                         </div>
                     </div>
                 </div>
