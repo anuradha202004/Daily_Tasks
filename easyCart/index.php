@@ -4,7 +4,7 @@ session_start();
 // Fallback Router: If server sends requests for 'product-detail' (no ext) to index.php, redirect to product-detail.php
 if (isset($_SERVER['REQUEST_URI']) && strpos($_SERVER['REQUEST_URI'], 'product-detail') !== false && strpos($_SERVER['REQUEST_URI'], '.php') === false) {
     if (isset($_GET['id'])) {
-        header("Location: product-detail.php?id=" . $_GET['id']);
+        header("Location: product-detail?id=" . $_GET['id']);
         exit;
     }
 }
@@ -23,11 +23,12 @@ require_once 'app/bootstrap.php';
 
 // Load cart and wishlist from file if user is logged in
 if (isLoggedIn()) {
+    // Cart and wishlist are loaded into session during login in auth.php
     if (!isset($_SESSION['cart'])) {
-        initializeCartFromFile();
+        $_SESSION['cart'] = [];
     }
     if (!isset($_SESSION['wishlist'])) {
-        initializeWishlistFromFile();
+        $_SESSION['wishlist'] = [];
     }
 }
 
@@ -97,7 +98,7 @@ $featuredProducts = array_slice($products, 0, 4, true);
                 </p>
                 
                 <div style="display: flex; gap: 20px; align-items: center;">
-                    <button onclick="window.location.href='products.php'" style="
+                    <button onclick="window.location.href='products'" style="
                         cursor: pointer;
                         padding: 18px 40px;
                         background: #2563eb;
@@ -239,11 +240,12 @@ $featuredProducts = array_slice($products, 0, 4, true);
 
                             <div class="action-buttons" onclick="event.stopPropagation();">
                                 <?php if ($product['stock'] > 0): ?>
-                                    <button onclick="(function(e, id, name){ e.preventDefault(); e.stopPropagation(); var fd = new FormData(); fd.append('action', 'add'); fd.append('product_id', id); fd.append('quantity', 1); fetch('cart.php', {method: 'POST', body: fd}).then(res => res.json()).then(data => { if(data.success) { showToast('🛒 ' + name + ' added to cart!', 'success', 3500); var badge = document.querySelector('.badge'); if(badge){ badge.textContent = data.cartCount || (parseInt(badge.textContent) + 1); badge.style.display = 'flex'; } } else if(data.alreadyInCart) { showToast('ℹ️ ' + name + ' is already in your cart!', 'info', 3500); } else { showToast('❌ ' + (data.message || 'Error adding to cart'), 'error', 3000); } }).catch(() => showToast('❌ Error adding to cart', 'error', 3000)); return false; })(event, <?php echo $product['id']; ?>, '<?php echo addslashes($product['name']); ?>')" 
-                                            class="btn-modern btn-outline-cart">
+                                    <button onclick="event.preventDefault(); event.stopPropagation(); addToCart(<?php echo $product['id']; ?>, 1);" 
+                                            class="btn-modern btn-outline-cart btn-add-cart" 
+                                            data-product-id="<?php echo $product['id']; ?>">
                                         Add to Cart 
                                     </button>
-                                    <a href="checkout.php?product_id=<?php echo $product['id']; ?>&qty=1&reset_shipping=1" class="btn-modern btn-gradient-buy">
+                                    <a href="checkout?product_id=<?php echo $product['id']; ?>&qty=1&reset_shipping=1" class="btn-modern btn-gradient-buy">
                                         Buy Now
                                     </a>
                                 <?php else: ?>
@@ -262,9 +264,9 @@ $featuredProducts = array_slice($products, 0, 4, true);
         <h2 class="section-title">Our Products</h2>
         
         <div class="category-filters">
-            <a href="products.php" class="filter-btn active">All Products</a>
+            <a href="products" class="filter-btn active">All Products</a>
             <?php foreach ($categories as $category): ?>
-                <a href="products.php?category=<?php echo $category['id']; ?>" class="filter-btn">
+                <a href="products?category=<?php echo $category['id']; ?>" class="filter-btn">
                     <?php echo htmlspecialchars($category['name']); ?>
                 </a>
             <?php endforeach; ?>
@@ -327,11 +329,12 @@ $featuredProducts = array_slice($products, 0, 4, true);
 
                             <div class="action-buttons" onclick="event.stopPropagation();">
                                 <?php if ($product['stock'] > 0): ?>
-                                    <button onclick="(function(e, id, name){ e.preventDefault(); e.stopPropagation(); var fd = new FormData(); fd.append('action', 'add'); fd.append('product_id', id); fd.append('quantity', 1); fetch('cart.php', {method: 'POST', body: fd}).then(res => res.json()).then(data => { if(data.success) { showToast('🛒 ' + name + ' added to cart!', 'success', 3500); var badge = document.querySelector('.badge'); if(badge){ badge.textContent = data.cartCount || (parseInt(badge.textContent) + 1); badge.style.display = 'flex'; } } else if(data.alreadyInCart) { showToast('ℹ️ ' + name + ' is already in your cart!', 'info', 3500); } else { showToast('❌ ' + (data.message || 'Error adding to cart'), 'error', 3000); } }).catch(() => showToast('❌ Error adding to cart', 'error', 3000)); return false; })(event, <?php echo $product['id']; ?>, '<?php echo addslashes($product['name']); ?>')" 
-                                            class="btn-modern btn-outline-cart">
+                                    <button onclick="event.preventDefault(); event.stopPropagation(); addToCart(<?php echo $product['id']; ?>, 1);" 
+                                            class="btn-modern btn-outline-cart btn-add-cart" 
+                                            data-product-id="<?php echo $product['id']; ?>">
                                         Add to Cart
                                     </button>
-                                    <a href="checkout.php?product_id=<?php echo $product['id']; ?>&qty=1&reset_shipping=1" class="btn-modern btn-gradient-buy">
+                                    <a href="checkout?product_id=<?php echo $product['id']; ?>&qty=1&reset_shipping=1" class="btn-modern btn-gradient-buy">
                                         Buy Now
                                     </a>
                                 <?php else: ?>
@@ -396,17 +399,54 @@ $featuredProducts = array_slice($products, 0, 4, true);
 
             <div class="contact-card" style="background: white; padding: 40px; border-radius: 16px; border: 1px solid #e5e7eb;">
                 <h3 style="margin-bottom: 20px; font-size: 1.5rem; color: #111827;">Send Message</h3>
-                <form onsubmit="event.preventDefault(); showToast('✅ Message sent!', 'success'); this.reset();">
+                <form id="contactForm" onsubmit="event.preventDefault(); submitContactForm(this);">
                     <div style="margin-bottom: 15px;">
                         <label style="display: block; margin-bottom: 5px; color: #374151;">Name</label>
-                        <input type="text" required style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 8px;">
+                        <input type="text" name="name" required style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 8px;">
+                    </div>
+                    <div style="margin-bottom: 15px;">
+                        <label style="display: block; margin-bottom: 5px; color: #374151;">Email</label>
+                        <input type="email" name="email" required style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 8px;">
                     </div>
                     <div style="margin-bottom: 15px;">
                         <label style="display: block; margin-bottom: 5px; color: #374151;">Message</label>
-                        <textarea required rows="3" style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 8px;"></textarea>
+                        <textarea name="message" required rows="3" style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 8px;"></textarea>
                     </div>
-                    <button type="submit" class="btn btn-primary" style="width: 100%;">Send</button>
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">Send Message</button>
                 </form>
+                
+                <script>
+                function submitContactForm(form) {
+                    const formData = new FormData(form);
+                    const btn = form.querySelector('button[type="submit"]');
+                    const originalText = btn.innerHTML;
+                    
+                    btn.innerHTML = 'Sending...';
+                    btn.disabled = true;
+                    
+                    fetch('contact_process.php', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            showToast(data.message, 'success');
+                            form.reset();
+                        } else {
+                            showToast(data.message, 'error');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showToast('An error occurred. Please try again.', 'error');
+                    })
+                    .finally(() => {
+                        btn.innerHTML = originalText;
+                        btn.disabled = false;
+                    });
+                }
+                </script>
             </div>
         </div>
     </section>

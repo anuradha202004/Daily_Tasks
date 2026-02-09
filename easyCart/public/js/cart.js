@@ -17,7 +17,7 @@ function addToCart(productId, quantity = 1) {
         btn.disabled = true;
     }
 
-    fetch('cart.php', {
+    fetch('cart', {
         method: 'POST',
         headers: {
             'X-Requested-With': 'XMLHttpRequest'
@@ -27,7 +27,7 @@ function addToCart(productId, quantity = 1) {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                showCartToast(data.message, 'success');
+                showToast(data.message, 'success');
                 updateCartBadge(data.cartCount);
                 if (btn) {
                     btn.innerHTML = '✓ Added!';
@@ -39,7 +39,7 @@ function addToCart(productId, quantity = 1) {
                     }, 1500);
                 }
             } else {
-                showCartToast(data.message || 'Error adding to cart', 'error');
+                showToast(data.message || 'Error adding to cart', 'error');
                 if (btn) {
                     btn.innerHTML = originalText;
                     btn.disabled = false;
@@ -48,7 +48,7 @@ function addToCart(productId, quantity = 1) {
         })
         .catch(error => {
             console.error('Cart error:', error);
-            showCartToast('Error adding to cart', 'error');
+            showToast('Error adding to cart', 'error');
             if (btn) {
                 btn.innerHTML = originalText;
                 btn.disabled = false;
@@ -60,64 +60,35 @@ function addToCart(productId, quantity = 1) {
  * Update cart badge count
  */
 function updateCartBadge(count) {
-    const badgeElements = document.querySelectorAll('.badge, #cart-badge');
+    console.log('Updating cart badge count:', count);
+
+    // Specific selector for cart badge only
+    const badgeElements = document.querySelectorAll('.cart-badge, #cart-badge');
+    console.log('Found badge elements:', badgeElements.length);
+
     badgeElements.forEach(cartBadge => {
         if (cartBadge) {
             cartBadge.textContent = count;
+            cartBadge.setAttribute('data-count', count); // Helper for debugging
+
             if (count > 0) {
-                cartBadge.style.display = 'flex';
+                cartBadge.classList.remove('d-none');
+                cartBadge.classList.add('d-flex');
+                cartBadge.style.display = 'flex'; // Force display inline style
                 cartBadge.style.transform = 'scale(1.3)';
                 setTimeout(() => {
                     cartBadge.style.transform = 'scale(1)';
                 }, 200);
             } else {
+                cartBadge.classList.remove('d-flex');
+                cartBadge.classList.add('d-none');
                 cartBadge.style.display = 'none';
             }
         }
     });
 }
 
-/**
- * Show toast notification
- */
-function showCartToast(message, type = 'info') {
-    const existingToast = document.querySelector('.cart-toast');
-    if (existingToast) existingToast.remove();
-
-    const toast = document.createElement('div');
-    toast.className = 'cart-toast';
-    toast.style.cssText = `
-        position: fixed;
-        bottom: 30px;
-        left: 50%;
-        transform: translateX(-50%) translateY(100px);
-        padding: 14px 28px;
-        border-radius: 12px;
-        font-weight: 600;
-        font-size: 14px;
-        z-index: 10000;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    `;
-
-    const icon = type === 'success' ? '🛒' : (type === 'error' ? '⚠️' : 'ℹ️');
-    const bg = type === 'success' ? 'linear-gradient(135deg, #10b981, #059669)' : (type === 'error' ? 'linear-gradient(135deg, #ef4444, #dc2626)' : 'linear-gradient(135deg, #3b82f6, #2563eb)');
-
-    toast.style.background = bg;
-    toast.style.color = 'white';
-    toast.innerHTML = `<span>${icon}</span> ${message}`;
-
-    document.body.appendChild(toast);
-    setTimeout(() => toast.style.transform = 'translateX(-50%) translateY(0)', 10);
-    setTimeout(() => {
-        toast.style.transform = 'translateX(-50%) translateY(100px)';
-        toast.style.opacity = '0';
-        setTimeout(() => toast.remove(), 300);
-    }, 3000);
-}
+// showCartToast replaced by global showToast from toast.js
 
 /**
  * Increase quantity for a cart item
@@ -161,7 +132,7 @@ function updateQuantityAjax(cartItem, quantity) {
     // Show loading state
     cartItem.style.opacity = '0.7';
 
-    fetch('cart.php', {
+    fetch('cart', {
         method: 'POST',
         headers: { 'X-Requested-With': 'XMLHttpRequest' },
         body: formData
@@ -221,7 +192,7 @@ function removeCartItem(btn) {
         cartItem.style.transform = 'translateX(100px)';
         cartItem.style.opacity = '0';
 
-        fetch('cart.php', {
+        fetch('cart', {
             method: 'POST',
             headers: { 'X-Requested-With': 'XMLHttpRequest' },
             body: formData
@@ -229,13 +200,23 @@ function removeCartItem(btn) {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
+                    // Update UI immediately (don't wait for animation)
+                    if (data.cartCount > 0) {
+                        updateSummaryDisplay(data);
+                        updateCartBadge(data.cartCount);
+
+                        // Update cart page specific header
+                        const pageCountEl = document.getElementById('cart-page-count');
+                        if (pageCountEl) {
+                            pageCountEl.textContent = data.cartCount + ' Item' + (data.cartCount !== 1 ? 's' : '') + ' in Cart';
+                        }
+                    }
+
+                    // Remove element after animation
                     setTimeout(() => {
                         cartItem.remove();
                         if (data.cartCount === 0) {
                             location.reload(); // Reload to show empty cart message
-                        } else {
-                            updateSummaryDisplay(data);
-                            updateCartBadge(data.cartCount);
                         }
                     }, 300);
                 } else {

@@ -381,4 +381,81 @@ function updateCheckoutPrices() {
 document.addEventListener('DOMContentLoaded', function () {
     // Initial calculation
     updateCheckoutPrices();
+
+    // ============================================
+    // Form Persistence Logic (Auto-save/restore)
+    // ============================================
+    const checkoutForm = document.getElementById('checkoutForm');
+    const FORM_STORAGE_KEY = 'easycart_checkout_data';
+
+    if (checkoutForm) {
+        // 1. Restore data from localStorage
+        const savedData = localStorage.getItem(FORM_STORAGE_KEY);
+        if (savedData) {
+            try {
+                const formData = JSON.parse(savedData);
+
+                // Iterate over saved keys
+                for (const name in formData) {
+                    const value = formData[name];
+                    const elements = checkoutForm.querySelectorAll(`[name="${name}"]`);
+
+                    if (elements.length > 0) {
+                        // Handle Radio Buttons (Shipping)
+                        if (elements[0].type === 'radio') {
+                            elements.forEach(el => {
+                                if (el.value === value) {
+                                    el.checked = true;
+                                    // Trigger change event to update UI/Calculations
+                                    el.dispatchEvent(new Event('change', { bubbles: true }));
+                                }
+                            });
+                        }
+                        // Handle Checkboxes
+                        else if (elements[0].type === 'checkbox') {
+                            const el = elements[0];
+                            if (el.checked !== value) {
+                                el.checked = value;
+                                // Trigger change event
+                                el.dispatchEvent(new Event('change', { bubbles: true }));
+                            }
+                        }
+                        // Handle Text/Select
+                        else {
+                            if (elements[0].name !== 'card_number' && elements[0].name !== 'cvv' && elements[0].type !== 'password') {
+                                elements[0].value = value;
+                            }
+                        }
+                    }
+                }
+            } catch (e) {
+                console.error("Error restoring form data:", e);
+            }
+        }
+
+        // 2. Save data on input/change
+        const saveFormData = () => {
+            const formData = {};
+            // Collect all inputs we want to save
+            const formElements = checkoutForm.elements;
+
+            for (let i = 0; i < formElements.length; i++) {
+                const el = formElements[i];
+                if (!el.name || el.type === 'hidden' || el.type === 'password' || el.name === 'card_number' || el.name === 'cvv') continue;
+
+                if (el.type === 'radio') {
+                    if (el.checked) formData[el.name] = el.value;
+                } else if (el.type === 'checkbox') {
+                    formData[el.name] = el.checked;
+                } else {
+                    formData[el.name] = el.value;
+                }
+            }
+
+            localStorage.setItem(FORM_STORAGE_KEY, JSON.stringify(formData));
+        };
+
+        checkoutForm.addEventListener('input', saveFormData);
+        checkoutForm.addEventListener('change', saveFormData);
+    }
 });

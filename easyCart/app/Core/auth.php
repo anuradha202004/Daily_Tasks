@@ -185,6 +185,10 @@ function loginUser($email, $password) {
                 }
             }
             saveUserCart($user['id'], $_SESSION['cart']);
+            
+            // CRITICAL: Clear guest cart from database so it doesn't reappear on logout
+            // This removes rows associated with the guest_session_id cookie
+            saveUserCart(null, []);
         }
         
         if (!empty($guestWishlist)) {
@@ -194,6 +198,9 @@ function loginUser($email, $password) {
                 }
             }
             saveUserWishlist($user['id'], $_SESSION['wishlist']);
+            
+            // Clear guest wishlist session variable just in case
+            unset($_SESSION['wishlist']); 
         }
         
         return ['success' => true, 'message' => 'Logged in successfully!'];

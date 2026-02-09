@@ -12,6 +12,16 @@ if (isLoggedIn()) {
     exit;
 }
 
+// Capture redirect param if present
+if (isset($_GET['redirect'])) {
+    $_SESSION['redirect_after_login'] = $_GET['redirect'];
+    
+    // If redirecting to product-detail, capture ID too
+    if ($_GET['redirect'] === 'product-detail' && isset($_GET['id'])) {
+        $_SESSION['redirect_after_login'] .= '?id=' . $_GET['id'];
+    }
+}
+
 $errors = [];
 $success = false;
 

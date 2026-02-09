@@ -11,8 +11,8 @@
                 </div>
                 <div class="footer-section">
                     <h4>Quick Links</h4>
-                    <a href="index.php">Home</a>
-                    <a href="products.php">Products</a>
+                    <a href="/">Home</a>
+                    <a href="products">Products</a>
                     <a href="index.php#about">About</a>
                     <a href="index.php#contact">Contact</a>
                 </div>

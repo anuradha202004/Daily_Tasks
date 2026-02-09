@@ -34,6 +34,7 @@ elseif (isset($_GET['latest'])) {
 }
 
 // Redirect if no order found
+// Redirect if no order found
 if (!$order) {
     die("Order not found or access denied.");
 }
@@ -44,36 +45,10 @@ if (!$order) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Invoice #<?php echo htmlspecialchars($order['order_number']); ?> - EasyCart</title>
-    <style>
-        body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #333; line-height: 1.6; padding: 40px; background: #fff; }
-        .invoice-box { max-width: 800px; margin: 0 auto; border: 1px solid #eee; padding: 30px; box-shadow: 0 0 10px rgba(0,0,0,.15); }
-        .header { display: flex; justify-content: space-between; margin-bottom: 40px; padding-bottom: 20px; border-bottom: 1px solid #eee; }
-        .logo { font-size: 24px; font-weight: bold; color: #2563eb; }
-        .invoice-info { text-align: right; }
-        .invoice-info h1 { margin: 0; font-size: 24px; color: #333; }
-        .invoice-info p { margin: 5px 0 0; color: #666; font-size: 14px; }
-        .columns { display: flex; justify-content: space-between; margin-bottom: 40px; }
-        .column { flex: 1; }
-        .column h3 { font-size: 14px; text-transform: uppercase; color: #999; margin: 0 0 10px; }
-        .column p { margin: 0; font-weight: 500; font-size: 15px; }
-        .column .sub-text { font-weight: normal; font-size: 14px; color: #666; }
-        table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
-        th { text-align: left; padding: 12px; background: #f8f9fa; border-bottom: 2px solid #eee; font-size: 14px; text-transform: uppercase; color: #666; }
-        td { padding: 12px; border-bottom: 1px solid #eee; }
-        .total-section { display: flex; justify-content: flex-end; }
-        .total-table { width: 300px; }
-        .total-table td { text-align: right; border: none; padding: 5px 12px; }
-        .total-table tr.final-total td { font-size: 18px; font-weight: bold; color: #2563eb; padding-top: 10px; border-top: 2px solid #eee; }
-        .footer { margin-top: 50px; text-align: center; color: #999; font-size: 12px; padding-top: 20px; border-top: 1px solid #eee; }
-        .print-btn { display: inline-block; padding: 10px 20px; background: #2563eb; color: white; border-radius: 5px; text-decoration: none; font-weight: bold; margin-bottom: 20px; cursor: pointer; border: none; }
-        @media print {
-            .print-btn, .back-btn { display: none; }
-            body { padding: 0; }
-            .invoice-box { border: none; box-shadow: none; padding: 0; }
-        }
-    </style>
+    <link rel="stylesheet" href="/public/css/style.css">
+    <!-- Page Styles Moved to style.css -->
 </head>
-<body>
+<body class="invoice-page">
     <div style="text-align: center;">
         <button onclick="window.print()" class="print-btn">🖨️ Print Invoice</button>
     </div>
@@ -123,14 +98,29 @@ if (!$order) {
                 </tr>
             </thead>
             <tbody>
-                <?php foreach ($order['items'] as $item): ?>
+                <?php foreach ($order['items'] as $item): 
+                    // Handle both Session structure (nested product) and DB structure (flat)
+                    $productName = $item['product']['name'] ?? $item['name'] ?? 'Unknown Product';
+                    
+                    // Retrieve quantities and totals first
+                    $qty = isset($item['quantity']) ? (int)$item['quantity'] : (isset($item['qty_ordered']) ? (int)$item['qty_ordered'] : 0);
+                    $itemTotal = isset($item['itemTotal']) ? (float)$item['itemTotal'] : (isset($item['row_total']) ? (float)$item['row_total'] : 0);
+                    
+                    // Try to find explicit price
+                    $productPrice = isset($item['product']['price']) ? (float)$item['product']['price'] : (isset($item['price']) ? (float)$item['price'] : 0);
+                    
+                    // Fallback: Calculate unit price from total if explicit price is missing or zero
+                    if ($productPrice <= 0 && $qty > 0) {
+                        $productPrice = $itemTotal / $qty;
+                    }
+                ?>
                 <tr>
                     <td>
-                        <strong><?php echo htmlspecialchars($item['product']['name']); ?></strong>
+                        <strong><?php echo htmlspecialchars($productName); ?></strong>
                     </td>
-                    <td style="text-align: center;"><?php echo $item['quantity']; ?></td>
-                    <td style="text-align: right;">$<?php echo number_format($item['product']['price'], 2); ?></td>
-                    <td style="text-align: right;">$<?php echo number_format($item['itemTotal'], 2); ?></td>
+                    <td style="text-align: center;"><?php echo $qty; ?></td>
+                    <td style="text-align: right;">$<?php echo number_format($productPrice, 2); ?></td>
+                    <td style="text-align: right;">$<?php echo number_format($itemTotal, 2); ?></td>
                 </tr>
                 <?php endforeach; ?>
             </tbody>

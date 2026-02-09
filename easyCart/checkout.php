@@ -418,189 +418,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     <script src="public/js/validation.js"></script>
     <script src="public/js/checkout.js"></script>
 
-    <style>
-        /* Shipping Options Card Styling */
-        .shipping-options {
-            display: grid;
-            gap: 15px;
-            margin-top: 10px;
-        }
-
-        .shipping-option {
-            position: relative;
-            display: block;
-            background: #fff;
-            border: 2px solid #e5e7eb;
-            border-radius: 12px;
-            padding: 20px;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .shipping-option:hover {
-            border-color: #2563eb;
-            background: #f8faff;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1);
-        }
-
-        .shipping-option.selected {
-            border-color: #2563eb;
-            background: #f0f7ff;
-            box-shadow: 0 0 0 1px #2563eb;
-        }
-
-        .shipping-option input[type="radio"] {
-            position: absolute;
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-
-        .shipping-option-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .shipping-option-header {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .shipping-icon {
-            font-size: 32px;
-            background: #fff;
-            width: 54px;
-            height: 54px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 10px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
-
-        .shipping-option-details h4 {
-            font-size: 16px;
-            font-weight: 700;
-            color: #111827;
-            margin: 0 0 4px 0;
-        }
-
-        .shipping-option-details p {
-            font-size: 13px;
-            color: #6b7280;
-            margin: 0;
-        }
-
-        .shipping-calc {
-            display: block;
-            font-size: 11px;
-            color: #3b82f6;
-            margin-top: 4px;
-            font-weight: 600;
-        }
-
-        .shipping-option-price {
-            font-size: 18px;
-            font-weight: 800;
-            color: #2563eb;
-            white-space: nowrap;
-        }
-
-        /* Custom Radio Checkmark */
-        .radio-checkmark {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            height: 20px;
-            width: 20px;
-            background-color: #fff;
-            border: 2px solid #d1d5db;
-            border-radius: 50%;
-            transition: all 0.2s ease;
-            display: none; /* Hide if we want simple design, but let's keep it optional */
-        }
-
-        .shipping-option.selected .radio-checkmark {
-            border-color: #2563eb;
-            border-width: 6px;
-        }
-
-        /* Order Summary Enhancements */
-        /* Order Summary Enhancements */
-        .checkout-summary-wrapper {
-            position: sticky;
-            top: 100px;
-            max-height: calc(100vh - 120px);
-            overflow-y: auto;
-            border-radius: 12px; /* Ensure scrollbar corners match */
-            padding-right: 5px; /* Prevent content from hitting scrollbar */
-        }
-        
-        /* Custom Scrollbar for Summary Wrapper */
-        .checkout-summary-wrapper::-webkit-scrollbar {
-            width: 8px;
-        }
-        .checkout-summary-wrapper::-webkit-scrollbar-track {
-            background: #f1f5f9;
-            border-radius: 4px;
-        }
-        .checkout-summary-wrapper::-webkit-scrollbar-thumb {
-            background-color: #cbd5e1;
-            border-radius: 20px;
-            border: 2px solid #f1f5f9;
-        }
-        .checkout-summary-wrapper::-webkit-scrollbar-thumb:hover {
-            background-color: #94a3b8;
-        }
-
-        .summary-items {
-            /* max-height removed to let wrapper handle scroll */
-            margin-bottom: 20px;
-            border-bottom: 1px solid #f0f0f0;
-        }
-        
-        /* Custom Scrollbar for Items */
-        .summary-items::-webkit-scrollbar {
-            width: 6px;
-        }
-        .summary-items::-webkit-scrollbar-track {
-            background: #f9fafb;
-            border-radius: 4px;
-        }
-        .summary-items::-webkit-scrollbar-thumb {
-            background-color: #d1d5db;
-            border-radius: 20px;
-        }
-        .summary-items::-webkit-scrollbar-thumb:hover {
-            background-color: #9ca3af;
-        }
-
-        #shipping-method-name {
-            display: block;
-            color: #2563eb;
-            font-weight: 600;
-            font-size: 11px;
-            margin-top: 2px;
-        }
-
-        .total-row small {
-            display: block;
-            font-size: 10px;
-            color: #9ca3af;
-            font-weight: normal;
-        }
-
-        .grand-total {
-            background: #f0f7ff;
-            margin: 0 -25px;
-            padding: 20px 25px !important;
-            border-top: 2px dashed #2563eb !important;
-        }
-    </style>
+    <!-- Page Styles Moved to style.css -->
 
     <!-- Modern Checkout Page -->
     <section class="checkout-page">
@@ -659,11 +477,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                                 <div class="form-row">
                                     <div class="form-field">
                                         <label class="field-label">First Name <span class="required">*</span></label>
-                                        <input type="text" name="first_name" class="checkout-input" placeholder="John" required>
+                                        <input type="text" name="first_name" id="firstName" class="checkout-input" placeholder="John" required>
+                                        <small class="error-message" id="firstNameError" style="color: red;"></small>
                                     </div>
                                     <div class="form-field">
                                         <label class="field-label">Last Name <span class="required">*</span></label>
-                                        <input type="text" name="last_name" class="checkout-input" placeholder="Doe" required>
+                                        <input type="text" name="last_name" id="lastName" class="checkout-input" placeholder="Doe" required>
+                                        <small class="error-message" id="lastNameError" style="color: red;"></small>
                                     </div>
                                 </div>
                                 <div class="form-row">
@@ -671,15 +491,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                                         <label class="field-label">Email Address <span class="required">*</span></label>
                                         <div class="input-with-icon">
                                             <span class="input-icon">📧</span>
-                                            <input type="email" name="email" class="checkout-input with-icon" placeholder="john@example.com" required>
+                                            <input type="email" name="email" id="email" class="checkout-input with-icon" placeholder="john@example.com" required>
                                         </div>
+                                        <small class="error-message" id="emailError" style="color: red;"></small>
                                     </div>
                                     <div class="form-field">
                                         <label class="field-label">Phone Number <span class="required">*</span></label>
                                         <div class="input-with-icon">
                                             <span class="input-icon">📱</span>
-                                            <input type="tel" name="phone" class="checkout-input with-icon" placeholder="+1 (555) 000-0000" required>
+                                            <input type="tel" name="phone" id="phone" class="checkout-input with-icon" placeholder="9876543210" required>
                                         </div>
+                                        <small class="error-message" id="phoneError" style="color: red;"></small>
                                     </div>
                                 </div>
                             </div>
@@ -696,21 +518,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                                     <label class="field-label">Street Address <span class="required">*</span></label>
                                     <div class="input-with-icon">
                                         <span class="input-icon">🏠</span>
-                                        <input type="text" name="address" class="checkout-input with-icon" placeholder="123 Main Street, Apt 4B" required>
+                                        <input type="text" name="address" id="address" class="checkout-input with-icon" placeholder="123 Main Street, Apt 4B" required>
                                     </div>
+                                    <small class="error-message" id="addressError" style="color: red;"></small>
                                 </div>
                                 <div class="form-row three-cols">
                                     <div class="form-field">
                                         <label class="field-label">City <span class="required">*</span></label>
-                                        <input type="text" name="city" class="checkout-input" placeholder="New York" required>
+                                        <input type="text" name="city" id="city" class="checkout-input" placeholder="New York" required>
+                                        <small class="error-message" id="cityError" style="color: red;"></small>
                                     </div>
                                     <div class="form-field">
                                         <label class="field-label">State <span class="required">*</span></label>
-                                        <input type="text" name="state" class="checkout-input" placeholder="NY" required>
+                                        <input type="text" name="state" id="state" class="checkout-input" placeholder="NY" required>
+                                        <small class="error-message" id="stateError" style="color: red;"></small>
                                     </div>
                                     <div class="form-field">
                                         <label class="field-label">Zip Code <span class="required">*</span></label>
-                                        <input type="text" name="zip" class="checkout-input" placeholder="10001" required>
+                                        <input type="text" name="zip" id="zip" class="checkout-input" placeholder="10001" required>
+                                        <small class="error-message" id="zipError" style="color: red;"></small>
                                     </div>
                                 </div>
                             </div>
@@ -723,15 +549,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                                 <h3>Billing Address</h3>
                             </div>
                             <div class="card-body">
-                                <div class="form-field full-width" style="margin-bottom: 20px;">
+                                <div class="form-field full-width mb-20">
                                     <label class="checkbox-container">
                                         <input type="checkbox" name="billing_same" id="billing_same" checked onchange="toggleBilling()">
                                         <span class="checkmark"></span>
-                                        <span style="margin-left: 10px; font-weight: 500;">Same as shipping address</span>
+                                        <span class="billing-text">Same as shipping address</span>
                                     </label>
                                 </div>
 
-                                <div id="billing-address-section" style="display: none; border-top: 1px solid #eee; padding-top: 20px;">
+                                <div id="billing-address-section" class="billing-section" style="display: none;">
                                     <div class="form-field full-width">
                                         <label class="field-label">Billing Street Address <span class="required">*</span></label>
                                         <div class="input-with-icon">
@@ -780,6 +606,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                                 <span class="card-icon">🚚</span>
                                 <h3>Shipping Method <span class="required">*</span></h3>
                             </div>
+                            <small class="error-message" id="shippingError" style="color: red; display:block; padding: 0 20px;"></small>
                             <div class="card-body">
                                 <div class="shipping-options">
                                     <?php foreach ($shippingOptions as $key => $option): ?>
@@ -792,7 +619,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                                             if (in_array($key, ['standard', 'express'])) $isDisabled = true;
                                         }
                                         ?>
-                                        <label class="shipping-option <?php echo $key === $selectedShipping ? 'selected' : ''; ?>" for="shipping_<?php echo $key; ?>" style="<?php echo $isDisabled ? 'opacity: 0.5; pointer-events: none;' : ''; ?>">
+                                        <label class="shipping-option <?php echo $key === $selectedShipping ? 'selected' : ''; ?> <?php echo $isDisabled ? 'disabled-option' : ''; ?>" for="shipping_<?php echo $key; ?>">
                                             <input 
                                                 type="radio" 
                                                 name="shipping_method" 
@@ -843,20 +670,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                                     <label class="field-label">Card Number <span class="required">*</span></label>
                                     <div class="input-with-icon">
                                         <span class="input-icon">💳</span>
-                                        <input type="text" name="card_number" class="checkout-input with-icon" placeholder="1234 5678 9012 3456" maxlength="19" required>
+                                        <input type="text" name="card_number" id="cardNumber" class="checkout-input with-icon" placeholder="1234 5678 9012 3456" maxlength="19" required>
                                     </div>
+                                    <small class="error-message" id="cardError" style="color: red;"></small>
                                 </div>
                                 <div class="form-row">
                                     <div class="form-field">
                                         <label class="field-label">Expiry Date <span class="required">*</span></label>
-                                        <input type="text" name="expiry" class="checkout-input" placeholder="MM/YY" maxlength="5" required>
+                                        <input type="text" name="expiry" id="expiry" class="checkout-input" placeholder="MM/YY" maxlength="5" required>
+                                        <small class="error-message" id="expiryError" style="color: red;"></small>
                                     </div>
                                     <div class="form-field">
                                         <label class="field-label">CVV <span class="required">*</span></label>
                                         <div class="input-with-icon">
-                                            <input type="text" name="cvv" class="checkout-input" placeholder="•••" maxlength="3" required>
+                                            <input type="text" name="cvv" id="cvv" class="checkout-input" placeholder="•••" maxlength="3" required>
                                             <span class="cvv-help" title="3 digits on the back of your card">?</span>
                                         </div>
+                                        <small class="error-message" id="cvvError" style="color: red;"></small>
                                     </div>
                                 </div>
                             </div>

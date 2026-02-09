@@ -210,10 +210,10 @@ $total = $subtotal - $discount;
                     <p style="margin: 0; color: #666; font-size: 14px;">Please log in to proceed with checkout and complete your purchase securely.</p>
                 </div>
                 <div style="display: flex; gap: 10px; flex-shrink: 0;">
-                    <a href="signin.php" style="background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600; transition: all 0.3s ease;" onmouseover="this.style.background='linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%)'; this.style.transform='translateY(-2px)';" onmouseout="this.style.background='linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)'; this.style.transform='translateY(0)';">
+                    <a href="signin" style="background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600; transition: all 0.3s ease;" onmouseover="this.style.background='linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%)'; this.style.transform='translateY(-2px)';" onmouseout="this.style.background='linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)'; this.style.transform='translateY(0)';">
                         Login
                     </a>
-                    <a href="signup.php" style="background: white; color: #2563eb; padding: 12px 24px; border: 2px solid #2563eb; border-radius: 8px; text-decoration: none; font-weight: 600; transition: all 0.3s ease;" onmouseover="this.style.background='#e3f2fd';" onmouseout="this.style.background='white';">
+                    <a href="signup" style="background: white; color: #2563eb; padding: 12px 24px; border: 2px solid #2563eb; border-radius: 8px; text-decoration: none; font-weight: 600; transition: all 0.3s ease;" onmouseover="this.style.background='#e3f2fd';" onmouseout="this.style.background='white';">
                         Sign Up
                     </a>
                 </div>
@@ -227,7 +227,7 @@ $total = $subtotal - $discount;
                     <div style="background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
                         <!-- Cart Header -->
                         <div style="background: #f8f9fa; padding: 20px; border-bottom: 1px solid #dee2e6;">
-                            <h3 style="margin: 0;">
+                            <h3 style="margin: 0;" id="cart-page-count">
                                 <?php echo count($cartItemsWithDetails); ?> 
                                 Item<?php echo count($cartItemsWithDetails) !== 1 ? 's' : ''; ?> in Cart
                             </h3>
@@ -250,7 +250,7 @@ $total = $subtotal - $discount;
                                     <!-- Product Details -->
                                     <div style="flex: 1; min-width: 0;">
                                         <h4 style="margin: 0 0 8px 0; font-size: 16px; font-weight: 600; color: #1f2937;">
-                                            <a href="product-detail.php?id=<?php echo $item['product']['id']; ?>" style="color: #2563eb; text-decoration: none; transition: color 0.3s ease;" onmouseover="this.style.color='#1d4ed8';" onmouseout="this.style.color='#2563eb';">
+                                            <a href="product-detail?id=<?php echo $item['product']['id']; ?>" style="color: #2563eb; text-decoration: none; transition: color 0.3s ease;" onmouseover="this.style.color='#1d4ed8';" onmouseout="this.style.color='#2563eb';">
                                                 <?php echo htmlspecialchars($item['product']['name']); ?>
                                             </a>
                                         </h4>
@@ -323,11 +323,11 @@ $total = $subtotal - $discount;
                             </span>
                         </div>
 
-                        <a href="<?php echo isLoggedIn() ? 'checkout.php?reset_shipping=1' : 'signin.php?redirect=cart'; ?>" class="btn btn-primary" style="display: block; text-align: center; padding: 15px; text-decoration: none; background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); border-radius: 8px; font-weight: 600; font-size: 16px; transition: all 0.3s ease; color: white;" onmouseover="this.style.background='linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%)'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 16px rgba(37, 99, 235, 0.3)';" onmouseout="this.style.background='linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)'; this.style.transform='translateY(0)'; this.style.boxShadow='none';">
+                        <a href="<?php echo isLoggedIn() ? 'checkout?reset_shipping=1' : 'signin?redirect=cart'; ?>" class="btn btn-primary" style="display: block; text-align: center; padding: 15px; text-decoration: none; background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); border-radius: 8px; font-weight: 600; font-size: 16px; transition: all 0.3s ease; color: white;" onmouseover="this.style.background='linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%)'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 16px rgba(37, 99, 235, 0.3)';" onmouseout="this.style.background='linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)'; this.style.transform='translateY(0)'; this.style.boxShadow='none';">
                             <?php echo isLoggedIn() ? 'Proceed to Checkout' : 'Login to Checkout'; ?>
                         </a>
 
-                        <a href="products.php" style="display: block; text-align: center; padding: 12px; margin-top: 10px; color: #2563eb; text-decoration: none; border: 2px solid #2563eb; border-radius: 8px; font-weight: 500; transition: all 0.3s ease;" onmouseover="this.style.background='#e3f2fd';" onmouseout="this.style.background='transparent';">
+                        <a href="products" style="display: block; text-align: center; padding: 12px; margin-top: 10px; color: #2563eb; text-decoration: none; border: 2px solid #2563eb; border-radius: 8px; font-weight: 500; transition: all 0.3s ease;" onmouseover="this.style.background='#e3f2fd';" onmouseout="this.style.background='transparent';">
                             Continue Shopping
                         </a>
                     </div>
@@ -346,7 +346,7 @@ $total = $subtotal - $discount;
                 <div style="font-size: 60px; margin-bottom: 20px;">🛒</div>
                 <h2 style="color: #666; margin-bottom: 10px;">Your Cart is Empty</h2>
                 <p style="color: #999; margin-bottom: 30px;">Add some products to get started!</p>
-                <a href="products.php" class="btn btn-primary" style="display: inline-block; padding: 12px 30px; text-decoration: none;">
+                <a href="products" class="btn btn-primary" style="display: inline-block; padding: 12px 30px; text-decoration: none;">
                     Start Shopping
                 </a>
             </div>

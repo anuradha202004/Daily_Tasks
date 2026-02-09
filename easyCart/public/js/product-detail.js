@@ -60,8 +60,31 @@ function buyNow(productId, maxStock) {
         return false;
     }
 
-    // Navigate to checkout page - force shipping reset
-    window.location.href = `checkout.php?product_id=${productId}&qty=${quantity}&reset_shipping=1`;
+    // Add to cart via AJAX first so it merges with existing cart
+    const formData = new FormData();
+    formData.append('action', 'add');
+    formData.append('product_id', productId);
+    formData.append('quantity', quantity);
+
+    fetch('cart', {
+        method: 'POST',
+        headers: { 'X-Requested-With': 'XMLHttpRequest' },
+        body: formData
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Redirect to standard checkout (full cart)
+                window.location.href = 'checkout?reset_shipping=1';
+            } else {
+                alert(data.message || 'Error processing request');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred. Please try again.');
+        });
+
     return false;
 }
 

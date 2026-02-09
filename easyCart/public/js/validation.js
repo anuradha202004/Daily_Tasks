@@ -6,13 +6,13 @@
 function validateLoginForm() {
     const email = document.getElementById('email').value.trim();
     const password = document.getElementById('password').value;
-    
+
     // Clear previous errors
     document.getElementById('emailError').textContent = '';
     document.getElementById('passwordError').textContent = '';
-    
+
     let isValid = true;
-    
+
     // Validate email
     if (!email) {
         showError('emailError', 'Email is required');
@@ -21,7 +21,7 @@ function validateLoginForm() {
         showError('emailError', 'Please enter a valid email address');
         isValid = false;
     }
-    
+
     // Validate password
     if (!password) {
         showError('passwordError', 'Password is required');
@@ -30,7 +30,7 @@ function validateLoginForm() {
         showError('passwordError', 'Password must be at least 6 characters');
         isValid = false;
     }
-    
+
     return isValid;
 }
 
@@ -42,15 +42,15 @@ function validateSignupForm() {
     const email = document.getElementById('email').value.trim();
     const password = document.getElementById('password').value;
     const confirmPassword = document.getElementById('confirmPassword').value;
-    
+
     // Clear previous errors
     document.getElementById('nameError').textContent = '';
     document.getElementById('emailError').textContent = '';
     document.getElementById('passwordError').textContent = '';
     document.getElementById('confirmError').textContent = '';
-    
+
     let isValid = true;
-    
+
     // Validate name
     if (!fullName) {
         showError('nameError', 'Full name is required');
@@ -59,7 +59,7 @@ function validateSignupForm() {
         showError('nameError', 'Name must be at least 3 characters');
         isValid = false;
     }
-    
+
     // Validate email
     if (!email) {
         showError('emailError', 'Email is required');
@@ -68,7 +68,7 @@ function validateSignupForm() {
         showError('emailError', 'Please enter a valid email address');
         isValid = false;
     }
-    
+
     // Validate password
     if (!password) {
         showError('passwordError', 'Password is required');
@@ -77,7 +77,7 @@ function validateSignupForm() {
         showError('passwordError', 'Password must be at least 6 characters');
         isValid = false;
     }
-    
+
     // Validate confirm password
     if (!confirmPassword) {
         showError('confirmError', 'Please confirm your password');
@@ -88,7 +88,7 @@ function validateSignupForm() {
     }
     return isValid;
 }
- 
+
 /**
  * Validate password strength
  */
@@ -96,26 +96,26 @@ function validatePasswordStrength() {
     const password = document.getElementById('password').value;
     const strengthMeter = document.getElementById('strengthMeter');
     const strengthText = document.getElementById('strengthText');
-    
+
     if (!strengthMeter || !strengthText) return;
-    
+
     let strength = 0;
-    
+
     // Check length
     if (password.length >= 6) strength++;
     if (password.length >= 8) strength++;
     if (password.length >= 12) strength++;
-    
+
     // Check for variety
     if (/[a-z]/.test(password)) strength++;
     if (/[A-Z]/.test(password)) strength++;
     if (/[0-9]/.test(password)) strength++;
     if (/[^a-zA-Z0-9]/.test(password)) strength++;
-    
+
     // Update meter display
     const percentage = (strength / 7) * 100;
     strengthMeter.style.width = percentage + '%';
-    
+
     if (strength < 2) {
         strengthMeter.style.background = '#d32f2f';
         strengthText.textContent = 'Weak';
@@ -142,63 +142,102 @@ function validateCheckoutForm() {
     const firstName = document.getElementById('firstName').value.trim();
     const lastName = document.getElementById('lastName').value.trim();
     const email = document.getElementById('email').value.trim();
+    const phone = document.getElementById('phone').value.trim();
     const address = document.getElementById('address').value.trim();
     const city = document.getElementById('city').value.trim();
     const state = document.getElementById('state').value.trim();
     const zip = document.getElementById('zip').value.trim();
     const cardNumber = document.getElementById('cardNumber').value.trim();
-    const shippingSelected = document.querySelector('input[name="shipping"]:checked');
-    
+    const expiry = document.getElementById('expiry').value.trim();
+    const cvv = document.getElementById('cvv').value.trim();
+    const shippingSelected = document.querySelector('input[name="shipping_method"]:checked');
+
     // Clear previous errors
     document.querySelectorAll('.error-message').forEach(el => el.textContent = '');
-    
+
     let isValid = true;
-    
+
+    // Personal Info
     if (!firstName) {
-        document.getElementById('firstNameError').textContent = 'First name is required';
+        showError('firstNameError', 'First name is required');
         isValid = false;
     }
-    
+
     if (!lastName) {
-        document.getElementById('lastNameError').textContent = 'Last name is required';
+        showError('lastNameError', 'Last name is required');
         isValid = false;
     }
-    
-    if (!email || !isValidEmail(email)) {
-        document.getElementById('emailError').textContent = 'Valid email is required';
+
+    // Email Validation: Pattern Check
+    const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+    if (!email) {
+        showError('emailError', 'Email is required');
+        isValid = false;
+    } else if (!emailPattern.test(email)) {
+        showError('emailError', 'Enter a valid email (e.g., user@example.com)');
         isValid = false;
     }
-    
+
+    // Phone Validation: Starts with 6-9, exactly 10 digits
+    const phonePattern = /^[6-9]\d{9}$/;
+    if (!phone) {
+        showError('phoneError', 'Phone number is required');
+        isValid = false;
+    } else if (!phonePattern.test(phone)) {
+        showError('phoneError', 'Invalid phone number (Start with 6-9, 10 digits)');
+        isValid = false;
+    }
+
+    // Address
     if (!address) {
-        document.getElementById('addressError').textContent = 'Address is required';
+        showError('addressError', 'Address is required');
         isValid = false;
     }
-    
+
     if (!city) {
-        document.getElementById('cityError').textContent = 'City is required';
+        showError('cityError', 'City is required');
         isValid = false;
     }
-    
+
     if (!state) {
-        document.getElementById('stateError').textContent = 'State is required';
+        showError('stateError', 'State is required');
         isValid = false;
     }
-    
-    if (!zip || !/^\d{5}(-\d{4})?$/.test(zip)) {
-        document.getElementById('zipError').textContent = 'Valid ZIP code is required';
+
+    if (!zip || !/^(\d{5}(-\d{4})?|\d{6})$/.test(zip)) {
+        showError('zipError', 'Valid ZIP/PIN code is required (5 or 6 digits)');
         isValid = false;
     }
-    
+
+    // Payment
     if (!cardNumber || !/^\d{13,19}$/.test(cardNumber.replace(/\s/g, ''))) {
-        document.getElementById('cardError').textContent = 'Valid card number is required';
+        showError('cardError', 'Valid card number is required (13-19 digits)');
         isValid = false;
     }
-    
+
+    const expiryPattern = /^(0[1-9]|1[0-2])\/\d{2}$/;
+    if (!expiry) {
+        showError('expiryError', 'Expiry date is required');
+        isValid = false;
+    } else if (!expiryPattern.test(expiry)) {
+        showError('expiryError', 'Invalid format (MM/YY)');
+        isValid = false;
+    }
+
+    const cvvPattern = /^\d{3,4}$/;
+    if (!cvv) {
+        showError('cvvError', 'CVV is required');
+        isValid = false;
+    } else if (!cvvPattern.test(cvv)) {
+        showError('cvvError', 'Invalid CVV (3-4 digits)');
+        isValid = false;
+    }
+
     if (!shippingSelected) {
-        document.getElementById('shippingError').textContent = 'Please select a shipping option';
+        showError('shippingError', 'Please select a shipping option');
         isValid = false;
     }
-    
+
     return isValid;
 }
 

@@ -10,7 +10,7 @@ $product = $productId ? getProductById($productId) : null;
 
 // Redirect to products page if product not found
 if (!$product) {
-    header('Location: products.php');
+    header('Location: products');
     exit;
 }
 
@@ -50,6 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 <?php include TEMPLATES_PATH . '/header.php'; ?>
     <script src="public/js/product-detail.js"></script>
     <script src="public/js/wishlist.js"></script>
+    <script src="public/js/cart.js"></script>
     <script src="public/js/toast.js"></script>
 
     <?php if ($addToCartMessage): ?>
@@ -59,270 +60,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         <script>document.addEventListener('DOMContentLoaded', () => showToast('<?php echo htmlspecialchars($addToCartError); ?>', 'error', 4000));</script>
     <?php endif; ?>
 
-    <style>
-        :root {
-            --primary: #4f46e5;
-            --primary-dark: #4338ca;
-            --secondary: #10b981;
-            --text-main: #111827;
-            --text-sub: #6b7280;
-            --bg-page: #f9fafb;
-            --bg-card: #ffffff;
-        }
-
-        body { background: var(--bg-page); }
-
-        .product-page-wrapper {
-            padding: 20px 0; /* Reduced from 40px */
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        /* Breadcrumb */
-        .breadcrumb {
-            margin-bottom: 15px; /* Reduced */
-            font-size: 0.85rem;
-            color: var(--text-sub);
-        }
-        .breadcrumb a { color: var(--text-sub); text-decoration: none; transition: 0.2s; }
-        .breadcrumb a:hover { color: var(--primary); }
-
-        /* Product Grid */
-        .product-main-grid {
-            display: grid;
-            grid-template-columns: 45% 1fr; /* Image takes slightly less space */
-            gap: 40px;
-            background: var(--bg-card);
-            padding: 25px; /* Reduced padding */
-            border-radius: 16px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-            margin-bottom: 40px;
-            align-items: start;
-        }
-
-        /* Image Section */
-        .product-gallery {
-            position: sticky;
-            top: 20px;
-        }
-        .main-image-frame {
-            background: #f3f4f6;
-            border-radius: 12px;
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            aspect-ratio: 4/3; /* Shorter aspect ratio */
-            max-height: 400px;
-            margin-bottom: 0;
-            position: relative;
-        }
-        .main-image-frame img {
-            width: 85%;
-            height: 85%;
-            object-fit: contain;
-            transition: transform 0.3s;
-        }
-        .main-image-frame:hover img { transform: scale(1.05); }
-
-        /* Details Section */
-        .product-details h1 {
-            font-size: 1.8rem; /* Slightly smaller */
-            font-weight: 800;
-            color: var(--text-main);
-            margin-bottom: 5px;
-            line-height: 1.2;
-        }
-
-        .meta-row {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 15px;
-            font-size: 0.9rem;
-            color: var(--text-sub);
-        }
-        .rating-badge {
-            background: #fef3c7;
-            color: #d97706;
-            padding: 2px 6px;
-            border-radius: 6px;
-            font-weight: 600;
-            font-size: 0.8rem;
-        }
-
-        .price-row {
-            display: flex;
-            align-items: baseline;
-            gap: 15px;
-            margin-bottom: 15px; /* Reduced */
-        }
-        .current-price {
-            font-size: 2rem; /* Slightly smaller */
-            font-weight: 700;
-            color: var(--primary);
-        }
-        .stock-status {
-            font-size: 0.85rem;
-            font-weight: 600;
-            padding: 4px 10px;
-            border-radius: 20px;
-        }
-        .in-stock { background: #d1fae5; color: #059669; }
-        .out-stock { background: #fee2e2; color: #dc2626; }
-
-        .description-text {
-            color: var(--text-sub);
-            line-height: 1.5;
-            margin-bottom: 15px; /* Reduced */
-            padding-bottom: 15px; /* Reduced */
-            border-bottom: 1px solid #e5e7eb;
-            font-size: 0.95rem;
-            display: -webkit-box;
-            -webkit-line-clamp: 3; /* Limit visible lines */
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-
-        /* Options */
-        .options-grid {
-            margin-bottom: 20px; /* Reduced from 30px */
-            display: flex;
-            gap: 30px; /* Align color and qty horizontally if space permits */
-            flex-wrap: wrap;
-        }
-        .option-group {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-
-        .option-label {
-            display: block;
-            font-weight: 600;
-            margin-bottom: 5px;
-            color: var(--text-main);
-            font-size: 0.9rem;
-        }
-        
-        .color-selector { display: flex; gap: 8px; }
-        .color-dot {
-            width: 28px; /* Smaller dots */
-            height: 28px;
-            border-radius: 50%;
-            cursor: pointer;
-            border: 2px solid transparent;
-            transition: all 0.2s;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
-        .color-dot.active { border-color: var(--text-main); transform: scale(1.1); }
-
-        .quantity-wrapper {
-            display: flex;
-            align-items: center;
-            border: 1px solid #d1d5db;
-            border-radius: 6px;
-            overflow: hidden;
-            width: fit-content;
-            height: 36px;
-        }
-        .qty-btn {
-            background: #fff;
-            border: none;
-            padding: 0 12px;
-            cursor: pointer;
-            font-size: 1.1rem;
-            color: var(--text-sub);
-            transition: 0.2s;
-            height: 100%;
-            display: flex;
-            align-items: center;
-        }
-        .qty-btn:hover { background: #f3f4f6; color: var(--primary); }
-        .qty-input {
-            width: 40px;
-            text-align: center;
-            border: none;
-            font-weight: 600;
-            font-size: 0.95rem;
-            -moz-appearance: textfield;
-            height: 100%;
-        }
-
-        /* Action Buttons */
-        .action-buttons {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-top: 5px; /* Reduced */
-        }
-        .btn-action {
-            padding: 14px; /* Reduced padding */
-            border-radius: 8px;
-            font-weight: 600;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s;
-            border: none;
-            font-size: 0.95rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-        .btn-cart {
-            background: transparent;
-            border: 2px solid #e5e7eb;
-            color: #1f2937; /* var(--text-dark) equivalent */
-            box-shadow: none;
-        }
-        .btn-cart:hover { 
-            background: #1f2937; /* var(--text-dark) equivalent */
-            color: white;
-            border-color: #1f2937;
-        }
-        
-        .btn-buy {
-            background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
-            color: white;
-            border: none;
-            box-shadow: 0 4px 6px rgba(79, 70, 229, 0.2);
-        }
-        .btn-buy:hover { 
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(79, 70, 229, 0.3);
-        }
-
-        .features-list {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
-            margin-top: 30px;
-            padding-top: 30px;
-            border-top: 1px solid #e5e7eb;
-        }
-        .feature-box {
-            text-align: center;
-            padding: 10px;
-            background: #f9fafb;
-            border-radius: 8px;
-        }
-        .feature-icon { font-size: 1.5rem; margin-bottom: 5px; display: block; }
-        .feature-text { font-size: 0.8rem; font-weight: 600; color: var(--text-sub); }
-
-        /* Responsive */
-        @media (max-width: 900px) {
-            .product-main-grid { grid-template-columns: 1fr; gap: 30px; }
-            .action-buttons { grid-template-columns: 1fr; }
-        }
-    </style>
+    <!-- Page Styles Moved to style.css -->
 
     <div class="product-page-wrapper">
         <div class="container">
             <!-- Breadcrumb -->
             <div class="breadcrumb">
-                <a href="products.php">Products</a> / 
-                <a href="products.php?category=<?php echo $product['category_id']; ?>"><?php echo htmlspecialchars($category['name']); ?></a> / 
+                <a href="products">Products</a> / 
+                <a href="products?category=<?php echo $product['category_id']; ?>"><?php echo htmlspecialchars($category['name']); ?></a> / 
                 <span style="color: var(--text-main); font-weight: 500;"><?php echo htmlspecialchars($product['name']); ?></span>
             </div>
 
@@ -436,7 +181,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                     if ($rel['id'] == $product['id']) continue;
                     $isWishlisted = isset($_SESSION['wishlist']) && in_array($rel['id'], $_SESSION['wishlist']);
                 ?>
-                    <div class="product-card" onclick="window.location.href='product-detail.php?id=<?php echo $rel['id']; ?>'">
+                    <div class="product-card" onclick="window.location.href='product-detail?id=<?php echo $rel['id']; ?>'">
                         
                         <?php if (isLoggedIn()): ?>
                             <div class="card-wishlist-btn" 
@@ -507,7 +252,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             fd.append('product_id', id);
             fd.append('quantity', qty);
 
-            fetch('cart.php', { method: 'POST', body: fd })
+            fetch('cart', { method: 'POST', body: fd })
                 .then(res => res.json())
                 .then(data => {
                     if (data.success) {
