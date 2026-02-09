@@ -1,9 +1,9 @@
 <?php
 require_once dirname(__DIR__) . '/app/bootstrap.php';
 
-// Basic Admin Auth Check (Placeholder - assuming admin is hardcoded or just simplistic for this phase)
-// In a real app, check for admin role. For now, require login.
-requireLogin();
+// Basic Admin Auth Check
+// In a real app, check for admin role.
+requireAdmin();
 // Make sure to restrict this in production!
 
 $pageTitle = 'Import / Export Products';
@@ -200,33 +200,26 @@ if (isset($_POST['import_csv']) && isset($_FILES['csv_file'])) {
     }
 }
 
+// Include Header
+include dirname(__DIR__) . '/resources/templates/header.php'; 
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title><?php echo $pageTitle; ?> - EasyCart Admin</title>
-    <link rel="stylesheet" href="../public/css/style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
-        .admin-container { max-width: 800px; margin: 50px auto; background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
-        .btn-primary { background: #2563eb; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; }
-        .btn-secondary { background: #4b5563; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; text-decoration: none; display: inline-block; }
-        .alert { padding: 15px; border-radius: 6px; margin-bottom: 20px; }
-        .alert-success { background: #d1fae5; color: #065f46; }
-        .alert-error { background: #fee2e2; color: #991b1b; }
-        .section { margin-bottom: 40px; border-bottom: 1px solid #e5e7eb; padding-bottom: 30px; }
-        .section:last-child { border-bottom: none; }
-    </style>
-</head>
-<body>
-    <?php include dirname(__DIR__) . '/resources/templates/header.php'; ?>
+<style>
+    /* Page Specific Styles */
+    body { background-color: #f3f4f6; }
+    .admin-container { max-width: 800px; margin: 50px auto; background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+    .btn-primary { background: #2563eb; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; }
+    .btn-secondary { background: #4b5563; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; text-decoration: none; display: inline-block; }
+    .alert { padding: 15px; border-radius: 6px; margin-bottom: 20px; }
+    .alert-success { background: #d1fae5; color: #065f46; }
+    .alert-error { background: #fee2e2; color: #991b1b; }
+    .section { margin-bottom: 40px; border-bottom: 1px solid #e5e7eb; padding-bottom: 30px; }
+    .section:last-child { border-bottom: none; }
+</style>
 
     <div class="admin-container">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
             <h1 style="margin: 0;">📦 Product Import / Export</h1>
-            <a href="../products.php" class="btn-secondary">Back to Store</a>
+            <a href="dashboard" class="btn-secondary">← Back to Dashboard</a>
         </div>
 
         <?php if ($message): ?>
@@ -267,5 +260,3 @@ if (isset($_POST['import_csv']) && isset($_FILES['csv_file'])) {
     </div>
 
     <?php include dirname(__DIR__) . '/resources/templates/footer.php'; ?>
-</body>
-</html>

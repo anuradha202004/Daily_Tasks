@@ -459,7 +459,10 @@ function saveUserWishlist($userId, $wishlist) {
         $pdo->commit();
     } catch (PDOException $e) {
         $pdo->rollBack();
-        error_log("Save Wishlist Error: " . $e->getMessage());
+        // Ignore duplicate key errors if any slip through
+        if (strpos($e->getMessage(), 'Duplicate entry') === false && strpos($e->getMessage(), 'unique constraint') === false) {
+             error_log("Save Wishlist Error: " . $e->getMessage());
+        }
     }
 }
 

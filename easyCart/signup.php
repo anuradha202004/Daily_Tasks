@@ -8,7 +8,7 @@ $pageTitle = 'Sign Up';
 
 // If already logged in, redirect to home
 if (isLoggedIn()) {
-    header('Location: index.php');
+    header('Location: index');
     exit;
 }
 
@@ -29,7 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             unset($_SESSION['redirect_after_login']);
             header('Location: ' . $redirect);
         } else {
-            header('Location: products.php');
+            header('Location: products');
         }
         exit;
     } else {
@@ -85,8 +85,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             </form>
 
             <div class="form-footer">
-                <p>Already have an account? <a href="signin.php">Sign In</a></p>
-                <p style="margin-top: 10px;"><a href="products.php" style="color: #999; font-weight: normal;">Continue as Guest</a></p>
+                <p>Already have an account? <a href="signin">Sign In</a></p>
+                <p style="margin-top: 10px;"><a href="products" style="color: #999; font-weight: normal;">Continue as Guest</a></p>
             </div>
         </div>
     </section>

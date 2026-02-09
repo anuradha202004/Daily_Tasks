@@ -225,12 +225,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     </div>
 
     <script>
+        // Persist quantity across refreshes
+        const currentProductId = <?php echo $product['id']; ?>;
+        const maxStock = <?php echo $product['stock']; ?>;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedQty = localStorage.getItem('qty_' + currentProductId);
+            const input = document.getElementById('qtyInput');
+            if (savedQty && input) {
+                let val = parseInt(savedQty);
+                if (val < 1) val = 1;
+                if (val > maxStock) val = maxStock;
+                input.value = val;
+            }
+        });
+
         function updateQty(change, max = 100) {
             const input = document.getElementById('qtyInput');
             let val = parseInt(input.value) + change;
             if (val < 1) val = 1;
             if (val > max) val = max;
             input.value = val;
+            
+            localStorage.setItem('qty_' + currentProductId, val);
         }
 
         function buyNow(id, stock) {

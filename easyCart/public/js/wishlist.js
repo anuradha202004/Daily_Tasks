@@ -41,7 +41,7 @@ function toggleWishlist(event, productId) {
                     showToast('💔 Removed from wishlist', 'info', 3000);
 
                     // If on wishlist page, remove the product card
-                    if (window.location.pathname.includes('wishlist.php')) {
+                    if (window.location.pathname.includes('wishlist')) {
                         const productCard = heartIcon.closest('.product-card');
                         if (productCard) {
                             productCard.style.opacity = '0';
@@ -73,11 +73,11 @@ function toggleWishlist(event, productId) {
             console.error('Wishlist error:', error);
             // If not logged in, redirect to signin
             if (error.message && error.message.includes('login')) {
-                window.location.href = 'signin.php?redirect=1';
+                window.location.href = 'signin?redirect=1';
             } else {
                 showToast('⚠️ Please login to use wishlist', 'error');
                 setTimeout(() => {
-                    window.location.href = 'signin.php?redirect=1';
+                    window.location.href = 'signin?redirect=1';
                 }, 1500);
             }
         });
@@ -102,13 +102,18 @@ function updateWishlistBadge(change = 0, newCount = null) {
         // Hide badge if count is 0
         if (currentCount === 0) {
             wishlistBadge.style.display = 'none';
+            wishlistBadge.classList.remove('d-flex');
+            wishlistBadge.classList.add('d-none');
         } else {
             wishlistBadge.style.display = 'flex';
+            wishlistBadge.classList.remove('d-none');
+            wishlistBadge.classList.add('d-flex');
+
             // Add animation
             wishlistBadge.style.transform = 'scale(1.3)';
             setTimeout(() => {
                 wishlistBadge.style.transform = 'scale(1)';
-            }, 200);
+            }, 100);
         }
     }
 }

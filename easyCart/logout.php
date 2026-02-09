@@ -6,6 +6,6 @@ require_once 'app/bootstrap.php';
 logoutUser();
 
 // Redirect to home page
-header('Location: index.php');
+header('Location: /');
 exit;
 ?>

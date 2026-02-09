@@ -25,7 +25,8 @@ function getCurrentUser() {
         return [
             'id' => $_SESSION['user_id'],
             'email' => $_SESSION['user_email'],
-            'name' => $_SESSION['user_name'] ?? 'User'
+            'name' => $_SESSION['user_name'] ?? 'User',
+            'role' => $_SESSION['user_role'] ?? 'customer'
         ];
     }
     return null;
@@ -97,6 +98,7 @@ function registerUser($email, $password, $name, $confirmPassword) {
         $_SESSION['user_id'] = $newUserId;
         $_SESSION['user_email'] = $email;
         $_SESSION['user_name'] = $name;
+        $_SESSION['user_role'] = 'customer'; // Default role
         $_SESSION['login_time'] = date('Y-m-d H:i:s');
         
         // Load cart and wishlist
@@ -118,9 +120,9 @@ function registerUser($email, $password, $name, $confirmPassword) {
         
         // Merge guest wishlist items
         if (!empty($guestWishlist)) {
-            foreach ($guestWishlist as $productId => $guestWishItem) {
-                if (!isset($_SESSION['wishlist'][$productId])) {
-                    $_SESSION['wishlist'][$productId] = $guestWishItem;
+            foreach ($guestWishlist as $productId) {
+                if (!in_array($productId, $_SESSION['wishlist'])) {
+                    $_SESSION['wishlist'][] = $productId;
                 }
             }
             saveUserWishlist($newUserId, $_SESSION['wishlist']);
@@ -168,6 +170,7 @@ function loginUser($email, $password) {
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['user_email'] = $user['email'];
         $_SESSION['user_name'] = $user['name'];
+        $_SESSION['user_role'] = $user['role'] ?? 'customer'; // Use existing role or default
         $_SESSION['login_time'] = date('Y-m-d H:i:s');
         
         // Load Cart/Wishlist
@@ -192,15 +195,15 @@ function loginUser($email, $password) {
         }
         
         if (!empty($guestWishlist)) {
-            foreach ($guestWishlist as $productId => $guestWishItem) {
-                if (!isset($_SESSION['wishlist'][$productId])) {
-                    $_SESSION['wishlist'][$productId] = $guestWishItem;
+            foreach ($guestWishlist as $productId) {
+                if (!in_array($productId, $_SESSION['wishlist'])) {
+                    $_SESSION['wishlist'][] = $productId;
                 }
             }
             saveUserWishlist($user['id'], $_SESSION['wishlist']);
             
             // Clear guest wishlist session variable just in case
-            unset($_SESSION['wishlist']); 
+
         }
         
         return ['success' => true, 'message' => 'Logged in successfully!'];
@@ -217,6 +220,7 @@ function logoutUser() {
     unset($_SESSION['user_id']);
     unset($_SESSION['user_email']);
     unset($_SESSION['user_name']);
+    unset($_SESSION['user_role']);
     unset($_SESSION['login_time']);
     session_destroy();
     return true;
@@ -228,7 +232,23 @@ function logoutUser() {
 function requireLogin() {
     if (!isLoggedIn()) {
         $_SESSION['redirect_after_login'] = $_SERVER['REQUEST_URI'];
-        header('Location: signin.php?redirect=1');
+        header('Location: signin?redirect=1');
+        exit;
+    }
+}
+
+/**
+ * Check if user is admin
+ */
+function requireAdmin() {
+    requireLogin(); // Ensure logged in first
+    
+    if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
+        // Redirect to homepage or error page if not admin
+        $_SESSION['error_message'] = "Access Denied: You do not have permission to view this page.";
+        // Determine redirect path relative to current script
+        // Assuming this is used in admin/something.php which is 1 level deep
+        header('Location: ../index'); 
         exit;
     }
 }

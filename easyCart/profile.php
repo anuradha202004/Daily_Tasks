@@ -106,13 +106,13 @@ if (isset($_SESSION['last_order'])) {
 
                 <div>
                     <h3 class="quick-actions-header">Quick Actions</h3>
-                    <a href="cart.php" class="action-btn action-btn-primary">
+                    <a href="cart" class="action-btn action-btn-primary">
                         🛒 View My Cart
                     </a>
-                    <a href="orders.php" class="action-btn action-btn-secondary">
+                    <a href="orders" class="action-btn action-btn-secondary">
                         📦 View My Orders
                     </a>
-                    <a href="products.php" class="action-btn action-btn-secondary">
+                    <a href="products" class="action-btn action-btn-secondary">
                         🛍️ Continue Shopping
                     </a>
                 </div>
@@ -174,7 +174,7 @@ if (isset($_SESSION['last_order'])) {
                     <p class="help-card-text">
                         Visit our customer support for any questions or assistance.
                     </p>
-                    <a href="index.php#contact" class="help-card-link">
+                    <a href="index#contact" class="help-card-link">
                         Contact Support →
                     </a>
                 </div>
@@ -243,7 +243,7 @@ if (isset($_SESSION['last_order'])) {
                     <?php endforeach; ?>
                 </div>
                 <div class="view-all-link">
-                    <a href="orders.php">
+                    <a href="orders">
                         View All Orders →
                     </a>
                 </div>
@@ -251,7 +251,7 @@ if (isset($_SESSION['last_order'])) {
                 <div class="empty-state">
                     <div class="empty-state-icon">📦</div>
                     <p class="empty-state-text">No orders yet. Start shopping to see your orders here!</p>
-                    <a href="products.php" class="action-btn action-btn-primary inline-flex">
+                    <a href="products" class="action-btn action-btn-primary inline-flex">
                         🛍️ Start Shopping
                     </a>
                 </div>

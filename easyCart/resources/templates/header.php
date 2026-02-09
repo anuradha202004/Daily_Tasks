@@ -83,7 +83,9 @@ $currentUser = getCurrentUser();
                                 <a href="/profile" class="dropdown-item">👤 My Profile</a>
                                 <a href="/wishlist" class="dropdown-item">❤️ My Wishlist</a>
                                 <a href="/orders" class="dropdown-item">📦 My Orders</a>
-                                <a href="/admin/import_export" class="dropdown-item">⚙️ Admin Panel</a>
+                                <?php if (isset($currentUser['role']) && $currentUser['role'] === 'admin'): ?>
+                                    <a href="/admin/dashboard" class="dropdown-item" style="color: #dc2626; font-weight: 500;">⚙️ Admin Dashboard</a>
+                                <?php endif; ?>
                                 <div class="dropdown-divider"></div>
                                 <a href="/logout" class="dropdown-item logout-item" onclick="return confirmLogout()">🚪 Logout</a>
                             </div>

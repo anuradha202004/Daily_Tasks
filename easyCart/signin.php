@@ -8,7 +8,7 @@ $pageTitle = 'Sign In';
 
 // If already logged in, redirect to home
 if (isLoggedIn()) {
-    header('Location: index.php');
+    header('Location: index');
     exit;
 }
 
@@ -34,12 +34,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     
     if ($result['success']) {
         // Redirect to cart or intended page
-        if (isset($_SESSION['redirect_after_login'])) {
+        // Redirect based on role or intended page
+        $user = getCurrentUser();
+        if ($user && isset($user['role']) && $user['role'] === 'admin') {
+             // Admin goes to dashboard
+             unset($_SESSION['redirect_after_login']); // Clear any pending redirects
+             header('Location: admin/dashboard');
+        } elseif (isset($_SESSION['redirect_after_login'])) {
             $redirect = $_SESSION['redirect_after_login'];
             unset($_SESSION['redirect_after_login']);
             header('Location: ' . $redirect);
         } else {
-            header('Location: products.php');
+            header('Location: products');
         }
         exit;
     } else {
@@ -129,13 +135,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             <div style="text-align: center; padding: 20px 0; border-top: 1px solid #eee;">
                 <p style="margin: 0; color: #666;">
                     Don't have an account?
-                    <a href="signup.php" style="color: #2563eb; text-decoration: none; font-weight: 500;">Create one now</a>
+                    <a href="signup" style="color: #2563eb; text-decoration: none; font-weight: 500;">Create one now</a>
                 </p>
             </div>
 
             <!-- Continue as Guest -->
             <div style="text-align: center; padding: 15px 0;">
-                <a href="products.php" style="color: #666; text-decoration: none; font-size: 14px;">
+                <a href="products" style="color: #666; text-decoration: none; font-size: 14px;">
                     Continue browsing as guest →
                 </a>
             </div>

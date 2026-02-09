@@ -54,7 +54,7 @@ $lastOrder = isset($_SESSION['last_order']) ? $_SESSION['last_order'] : null;
 
 // If no order, redirect to products
 if (!$lastOrder) {
-    header('Location: products.php');
+    header('Location: products');
     exit;
 }
 
@@ -341,17 +341,17 @@ if (!isset($_SESSION['last_order']['status'])) {
                                 ❌ Cancel Order
                             </button>
                         <?php endif; ?>
-                        <a href="profile.php" class="btn btn-primary" style="display: block; text-align: center; padding: 12px; text-decoration: none; margin-bottom: 10px;">
+                        <a href="profile" class="btn btn-primary" style="display: block; text-align: center; padding: 12px; text-decoration: none; margin-bottom: 10px;">
                             Go to Dashboard
                         </a>
-                        <a href="invoice.php?latest=true" target="_blank" class="btn" style="display: block; text-align: center; padding: 12px; text-decoration: none; margin-bottom: 10px; background: #4b5563; color: white; border-radius: 4px;">
+                        <a href="invoice?latest=true" target="_blank" class="btn" style="display: block; text-align: center; padding: 12px; text-decoration: none; margin-bottom: 10px; background: #4b5563; color: white; border-radius: 4px;">
                             📄 Download Invoice
                         </a>
-                        <a href="products.php" style="display: block; text-align: center; padding: 12px; color: #2563eb; text-decoration: none; border: 1px solid #2563eb; border-radius: 4px;">
+                        <a href="products" style="display: block; text-align: center; padding: 12px; color: #2563eb; text-decoration: none; border: 1px solid #2563eb; border-radius: 4px;">
                             Continue Shopping
                         </a>
                         <?php if (isset($_SESSION['last_order']['status']) && $_SESSION['last_order']['status'] === 'Cancelled'): ?>
-                            <button onclick="window.location.href='products.php'" class="btn" style="width: 100%; margin-top: 10px; background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%); color: white; padding: 12px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">
+                            <button onclick="window.location.href='products'" class="btn" style="width: 100%; margin-top: 10px; background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%); color: white; padding: 12px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">
                                 🔄 Buy Again
                             </button>
                         <?php endif; ?>
