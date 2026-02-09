@@ -478,12 +478,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                                     <div class="form-field">
                                         <label class="field-label">First Name <span class="required">*</span></label>
                                         <input type="text" name="first_name" id="firstName" class="checkout-input" placeholder="John" required>
-                                        <small class="error-message" id="firstNameError" style="color: red;"></small>
+                                        <small class="error-message input-error-msg" id="firstNameError"></small>
                                     </div>
                                     <div class="form-field">
                                         <label class="field-label">Last Name <span class="required">*</span></label>
                                         <input type="text" name="last_name" id="lastName" class="checkout-input" placeholder="Doe" required>
-                                        <small class="error-message" id="lastNameError" style="color: red;"></small>
+                                        <small class="error-message input-error-msg" id="lastNameError"></small>
                                     </div>
                                 </div>
                                 <div class="form-row">
@@ -493,7 +493,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                                             <span class="input-icon">📧</span>
                                             <input type="email" name="email" id="email" class="checkout-input with-icon" placeholder="john@example.com" required>
                                         </div>
-                                        <small class="error-message" id="emailError" style="color: red;"></small>
+                                        <small class="error-message input-error-msg" id="emailError"></small>
                                     </div>
                                     <div class="form-field">
                                         <label class="field-label">Phone Number <span class="required">*</span></label>
@@ -501,7 +501,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                                             <span class="input-icon">📱</span>
                                             <input type="tel" name="phone" id="phone" class="checkout-input with-icon" placeholder="9876543210" required>
                                         </div>
-                                        <small class="error-message" id="phoneError" style="color: red;"></small>
+                                        <small class="error-message input-error-msg" id="phoneError"></small>
                                     </div>
                                 </div>
                             </div>
@@ -520,23 +520,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                                         <span class="input-icon">🏠</span>
                                         <input type="text" name="address" id="address" class="checkout-input with-icon" placeholder="123 Main Street, Apt 4B" required>
                                     </div>
-                                    <small class="error-message" id="addressError" style="color: red;"></small>
+                                    <small class="error-message input-error-msg" id="addressError"></small>
                                 </div>
                                 <div class="form-row three-cols">
                                     <div class="form-field">
                                         <label class="field-label">City <span class="required">*</span></label>
                                         <input type="text" name="city" id="city" class="checkout-input" placeholder="New York" required>
-                                        <small class="error-message" id="cityError" style="color: red;"></small>
+                                        <small class="error-message input-error-msg" id="cityError"></small>
                                     </div>
                                     <div class="form-field">
                                         <label class="field-label">State <span class="required">*</span></label>
                                         <input type="text" name="state" id="state" class="checkout-input" placeholder="NY" required>
-                                        <small class="error-message" id="stateError" style="color: red;"></small>
+                                        <small class="error-message input-error-msg" id="stateError"></small>
                                     </div>
                                     <div class="form-field">
                                         <label class="field-label">Zip Code <span class="required">*</span></label>
                                         <input type="text" name="zip" id="zip" class="checkout-input" placeholder="10001" required>
-                                        <small class="error-message" id="zipError" style="color: red;"></small>
+                                        <small class="error-message input-error-msg" id="zipError"></small>
                                     </div>
                                 </div>
                             </div>
@@ -557,7 +557,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                                     </label>
                                 </div>
 
-                                <div id="billing-address-section" class="billing-section" style="display: none;">
+                                <div id="billing-address-section" class="billing-section hidden">
                                     <div class="form-field full-width">
                                         <label class="field-label">Billing Street Address <span class="required">*</span></label>
                                         <div class="input-with-icon">
@@ -606,7 +606,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                                 <span class="card-icon">🚚</span>
                                 <h3>Shipping Method <span class="required">*</span></h3>
                             </div>
-                            <small class="error-message" id="shippingError" style="color: red; display:block; padding: 0 20px;"></small>
+                            <small class="error-message shipping-error-msg" id="shippingError"></small>
                             <div class="card-body">
                                 <div class="shipping-options">
                                     <?php foreach ($shippingOptions as $key => $option): ?>
@@ -672,13 +672,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                                         <span class="input-icon">💳</span>
                                         <input type="text" name="card_number" id="cardNumber" class="checkout-input with-icon" placeholder="1234 5678 9012 3456" maxlength="19" required>
                                     </div>
-                                    <small class="error-message" id="cardError" style="color: red;"></small>
+                                    <small class="error-message input-error-msg" id="cardError"></small>
                                 </div>
                                 <div class="form-row">
                                     <div class="form-field">
                                         <label class="field-label">Expiry Date <span class="required">*</span></label>
                                         <input type="text" name="expiry" id="expiry" class="checkout-input" placeholder="MM/YY" maxlength="5" required>
-                                        <small class="error-message" id="expiryError" style="color: red;"></small>
+                                        <small class="error-message input-error-msg" id="expiryError"></small>
                                     </div>
                                     <div class="form-field">
                                         <label class="field-label">CVV <span class="required">*</span></label>
@@ -686,7 +686,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                                             <input type="text" name="cvv" id="cvv" class="checkout-input" placeholder="•••" maxlength="3" required>
                                             <span class="cvv-help" title="3 digits on the back of your card">?</span>
                                         </div>
-                                        <small class="error-message" id="cvvError" style="color: red;"></small>
+                                        <small class="error-message input-error-msg" id="cvvError"></small>
                                     </div>
                                 </div>
                             </div>
@@ -731,9 +731,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                         <div class="summary-items">
                             <?php foreach ($cartItemsWithDetails as $index => $item): ?>
                                 <div class="summary-item" data-product-id="<?php echo $item['product']['id']; ?>" data-product-price="<?php echo $item['product']['price']; ?>" data-stock="<?php echo $item['product']['stock']; ?>">
-                                    <div class="item-emoji" style="overflow: hidden; display: flex; align-items: center; justify-content: center; background: #fff;">
+                                    <div class="item-emoji-wrapper">
                                         <?php if (!empty($item['product']['image'])): ?>
-                                            <img src="<?php echo $item['product']['image']; ?>" alt="<?php echo htmlspecialchars($item['product']['name']); ?>" style="width: 100%; height: 100%; object-fit: contain;">
+                                            <img src="<?php echo $item['product']['image']; ?>" alt="<?php echo htmlspecialchars($item['product']['name']); ?>" class="item-img">
                                         <?php else: ?>
                                             <?php echo $item['product']['emoji']; ?>
                                         <?php endif; ?>
@@ -757,7 +757,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                                 <input type="text" placeholder="Promo code" class="promo-input" id="promo-code-input" value="<?php echo $appliedPromo ? htmlspecialchars($appliedPromo['code']) : ''; ?>" <?php echo $appliedPromo ? 'disabled' : ''; ?>>
                                 <button type="button" class="promo-btn" id="promo-btn" onclick="<?php echo $appliedPromo ? 'removePromoCode()' : 'applyPromoCode()'; ?>"><?php echo $appliedPromo ? 'Remove' : 'Apply'; ?></button>
                             </div>
-                            <div id="promo-message" style="margin-top: 8px; font-size: 13px; color: <?php echo $appliedPromo ? '#10b981' : 'inherit'; ?>;">
+                            <div id="promo-message" class="promo-msg <?php echo $appliedPromo ? 'promo-applied' : ''; ?>">
                                 <?php echo $appliedPromo ? 'Promo applied: ' . ($appliedPromo['type'] == 'percent' ? $appliedPromo['value'] . '%' : '$' . $appliedPromo['value']) . ' Off' : ''; ?>
                             </div>
                         </div>
@@ -768,20 +768,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                                 <span>Subtotal</span>
                                 <span id="checkout-subtotal" data-value="<?php echo $subtotal; ?>"><?php echo formatPrice($subtotal); ?></span>
                             </div>
-                            <div class="total-row discount-row" style="color: #10b981;">
+                            <div class="total-row discount-row">
                                 <span>Bulk Discount</span>
                                 <span id="checkout-discount" data-value="<?php echo $discount; ?>">-<?php echo formatPrice($discount); ?></span>
                             </div>
-                            <div class="total-row promo-row" style="color: #10b981; display: <?php echo $appliedPromo ? 'flex' : 'none'; ?>;" id="promo-row">
+                            <div class="total-row promo-row" style="display: <?php echo $appliedPromo ? 'flex' : 'none'; ?>;" id="promo-row">
                                 <span>Promo Discount</span>
                                 <span id="checkout-promo" data-value="<?php echo $promoDiscount; ?>">-<?php echo formatPrice($promoDiscount); ?></span>
                             </div>
                             
-                            <hr style="border: 0; border-top: 1px solid #e5e7eb; margin: 10px 0;">
+                            <hr class="checkout-divider">
                             
                             <div class="total-row">
-                                <span style="font-weight: 600;">Discounted Subtotal</span>
-                                <span id="checkout-discounted-subtotal" style="font-weight: 600;"><?php echo formatPrice($subtotal - $discount - $promoDiscount); ?></span>
+                                <span class="font-bold">Discounted Subtotal</span>
+                                <span id="checkout-discounted-subtotal" class="font-bold"><?php echo formatPrice($subtotal - $discount - $promoDiscount); ?></span>
                             </div>
 
                             <div class="total-row shipping-row">

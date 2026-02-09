@@ -57,12 +57,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     <script src="public/js/validation.js"></script>
 
     <!-- Sign In Page -->
-    <section class="container" style="padding: 60px 20px;">
-        <div style="max-width: 450px; margin: 0 auto;">
-            <div style="text-align: center; margin-bottom: 40px;">
-                <div style="font-size: 48px; margin-bottom: 15px;">🔐</div>
-                <h1 style="color: #2563eb; margin-bottom: 10px;">Welcome Back</h1>
-                <p style="color: #666;">
+    <section class="container auth-section">
+        <div class="auth-wrapper">
+            <div class="auth-header">
+                <div class="auth-icon-lg">🔐</div>
+                <h1 class="auth-title">Welcome Back</h1>
+                <p class="auth-subtitle">
                     <?php if (isset($_GET['redirect']) || isset($_SESSION['redirect_after_login'])): ?>
                         Sign in to complete your checkout
                     <?php else: ?>
@@ -73,9 +73,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 
             <!-- Display Errors -->
             <?php if (count($errors) > 0): ?>
-                <div style="background: #f8d7da; color: #721c24; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #f5c6cb;">
+                <div class="auth-alert-error">
                     <?php foreach ($errors as $error): ?>
-                        <p style="margin: 5px 0;">• <?php echo htmlspecialchars($error); ?></p>
+                        <p>• <?php echo htmlspecialchars($error); ?></p>
                     <?php endforeach; ?>
                 </div>
             <?php endif; ?>
@@ -85,63 +85,63 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 <input type="hidden" name="action" value="login">
 
                 <!-- Email Field -->
-                <div style="margin-bottom: 20px;">
-                    <label for="email" style="display: block; margin-bottom: 8px; font-weight: 500; color: #333;">Email Address</label>
+                <div class="auth-form-group">
+                    <label for="email" class="auth-label">Email Address</label>
                     <input type="email" id="email" name="email" placeholder="you@example.com" required 
                            value="<?php echo htmlspecialchars($_POST['email'] ?? ''); ?>"
-                           style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px; transition: border-color 0.3s;">
-                    <small id="emailError" style="color: #dc2626; display: none; margin-top: 5px; display: block;"></small>
+                           class="auth-input">
+                    <small id="emailError" class="auth-error-text"></small>
                 </div>
 
                 <!-- Password Field -->
-                <div style="margin-bottom: 25px;">
-                    <label for="password" style="display: block; margin-bottom: 8px; font-weight: 500; color: #333;">Password</label>
+                <div class="auth-form-group-mb25">
+                    <label for="password" class="auth-label">Password</label>
                     <input type="password" id="password" name="password" placeholder="••••••••" required 
-                           style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px; transition: border-color 0.3s;">
-                    <small id="passwordError" style="color: #dc2626; display: none; margin-top: 5px; display: block;"></small>
-                    <small style="color: #999; display: block; margin-top: 5px;">
+                           class="auth-input">
+                    <small id="passwordError" class="auth-error-text"></small>
+                    <small class="auth-hint-text">
                         Demo: password123
                     </small>
                 </div>
 
                 <!-- Remember Me -->
-                <div style="display: flex; align-items: center; margin-bottom: 25px;">
-                    <input type="checkbox" id="remember" name="remember" style="margin-right: 8px; cursor: pointer;">
-                    <label for="remember" style="margin: 0; cursor: pointer; color: #666;">Remember me</label>
+                <div class="auth-remember-row">
+                    <input type="checkbox" id="remember" name="remember" class="auth-checkbox">
+                    <label for="remember" class="auth-remember-label">Remember me</label>
                 </div>
 
                 <!-- Sign In Button -->
-                <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px; font-size: 16px; cursor: pointer;">
+                <button type="submit" class="btn btn-primary auth-btn-submit">
                     Sign In
                 </button>
             </form>
 
             <!-- Divider -->
-            <div style="text-align: center; margin: 30px 0; color: #999;">
-                <span style="background: white; padding: 0 10px;">or</span>
-                <div style="border-top: 1px solid #ddd; position: relative; top: -15px;"></div>
+            <div class="auth-divider">
+                <span>or</span>
+                <div></div>
             </div>
 
             <!-- Demo Info -->
-            <div style="background: #e8f4f8; padding: 15px; border-radius: 8px; margin-bottom: 25px; border-left: 4px solid #2563eb;">
-                <p style="margin: 0 0 10px 0; font-weight: 500; color: #0c5460;">Demo Account Available</p>
-                <p style="margin: 0; font-size: 14px; color: #0c5460;">
+            <div class="auth-demo-box">
+                <p class="auth-demo-title">Demo Account Available</p>
+                <p class="auth-demo-content">
                     <strong>Email:</strong> demo@example.com<br>
                     <strong>Password:</strong> password123
                 </p>
             </div>
 
             <!-- Sign Up Link -->
-            <div style="text-align: center; padding: 20px 0; border-top: 1px solid #eee;">
-                <p style="margin: 0; color: #666;">
+            <div class="auth-footer-links">
+                <p class="auth-footer-text">
                     Don't have an account?
-                    <a href="signup" style="color: #2563eb; text-decoration: none; font-weight: 500;">Create one now</a>
+                    <a href="signup" class="auth-footer-link">Create one now</a>
                 </p>
             </div>
 
             <!-- Continue as Guest -->
-            <div style="text-align: center; padding: 15px 0;">
-                <a href="products" style="color: #666; text-decoration: none; font-size: 14px;">
+            <div class="auth-guest-link-box">
+                <a href="products" class="auth-guest-link">
                     Continue browsing as guest →
                 </a>
             </div>

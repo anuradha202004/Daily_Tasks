@@ -1,0 +1,209 @@
+/* Authentication Pages (Sign In / Sign Up) Styles */
+
+.auth-section {
+    padding: 60px 20px;
+}
+
+.auth-container-center {
+    padding: 60px 0;
+    display: flex;
+    justify-content: center;
+}
+
+.auth-wrapper {
+    max-width: 450px;
+    margin: 0 auto;
+}
+
+/* For Signup using modal-content style reuse */
+.auth-card-static {
+    display: block !important;
+    position: static !important;
+    transform: none !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 450px;
+}
+
+.auth-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.auth-icon-lg {
+    font-size: 48px;
+    margin-bottom: 15px;
+}
+
+.auth-title {
+    color: #2563eb;
+    margin-bottom: 10px;
+}
+
+.auth-subtitle {
+    color: #666;
+}
+
+.auth-alert-error {
+    background: #f8d7da;
+    color: #721c24;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    border-left: 4px solid #f5c6cb;
+}
+
+.auth-alert-error p {
+    margin: 5px 0;
+}
+
+/* Slightly different style used in Signup */
+.auth-alert-error-red {
+    background: #fee2e2;
+    color: #b91c1c;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    font-size: 14px;
+}
+
+.auth-alert-error-red p {
+    margin: 5px 0;
+}
+
+.auth-form-group {
+    margin-bottom: 20px;
+}
+
+.auth-form-group-mb25 {
+    margin-bottom: 25px;
+}
+
+.auth-label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #333;
+}
+
+.auth-input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 14px;
+    transition: border-color 0.3s;
+}
+
+.auth-error-text {
+    color: #dc2626;
+    display: none;
+    margin-top: 5px;
+    display: block;
+}
+
+.auth-hint-text {
+    color: #999;
+    display: block;
+    margin-top: 5px;
+}
+
+.auth-hint-text-small {
+    font-size: 12px;
+    color: #666;
+    margin-top: 5px;
+}
+
+.auth-remember-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.auth-checkbox {
+    margin-right: 8px;
+    cursor: pointer;
+}
+
+.auth-checkbox-label {
+    margin: 0;
+    cursor: pointer;
+    color: #666;
+}
+
+.auth-btn-submit {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.auth-divider {
+    text-align: center;
+    margin: 30px 0;
+    color: #999;
+}
+
+.auth-divider span {
+    background: white;
+    padding: 0 10px;
+}
+
+.auth-divider div {
+    border-top: 1px solid #ddd;
+    position: relative;
+    top: -15px;
+}
+
+.auth-demo-box {
+    background: #e8f4f8;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 25px;
+    border-left: 4px solid #2563eb;
+}
+
+.auth-demo-title {
+    margin: 0 0 10px 0;
+    font-weight: 500;
+    color: #0c5460;
+}
+
+.auth-demo-content {
+    margin: 0;
+    font-size: 14px;
+    color: #0c5460;
+}
+
+.auth-footer-links {
+    text-align: center;
+    padding: 20px 0;
+    border-top: 1px solid #eee;
+}
+
+.auth-footer-text {
+    margin: 0;
+    color: #666;
+}
+
+.auth-footer-link {
+    color: #2563eb;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.auth-guest-link-box {
+    text-align: center;
+    padding: 15px 0;
+}
+
+.auth-guest-link {
+    color: #666;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.auth-guest-link-muted {
+    color: #999;
+    font-weight: normal;
+}

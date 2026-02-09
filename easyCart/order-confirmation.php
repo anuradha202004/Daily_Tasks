@@ -83,29 +83,29 @@ if (!isset($_SESSION['last_order']['status'])) {
     <script src="public/js/order-confirmation.js"></script>
 
     <!-- Order Confirmation Page -->
-    <section class="container" style="padding: 40px 0;">
-        <div style="text-align: center; margin-bottom: 40px;">
+    <section class="container order-confirmation-section">
+        <div class="order-header">
             <?php if (isset($_SESSION['last_order']['status']) && $_SESSION['last_order']['status'] === 'Cancelled'): ?>
-                <div style="font-size: 60px; margin-bottom: 20px; color: #dc2626;">✗</div>
-                <h1 style="margin-bottom: 10px;">Order Cancelled</h1>
-                <p style="color: #666; font-size: 18px;">This order has been cancelled.</p>
+                <div class="status-icon error">✗</div>
+                <h1 class="order-title">Order Cancelled</h1>
+                <p class="order-subtitle">This order has been cancelled.</p>
             <?php else: ?>
-                <div style="font-size: 60px; margin-bottom: 20px; color: #28a745;">✓</div>
-                <h1 style="margin-bottom: 10px;">Order Confirmed!</h1>
-                <p style="color: #666; font-size: 18px;">Thank you for your purchase</p>
+                <div class="status-icon success">✓</div>
+                <h1 class="order-title">Order Confirmed!</h1>
+                <p class="order-subtitle">Thank you for your purchase</p>
             <?php endif; ?>
-            <p style="color: #999; font-size: 14px;">Order Number: <strong><?php echo htmlspecialchars($_SESSION['last_order']['order_number']); ?></strong></p>
+            <p class="order-number">Order Number: <strong><?php echo htmlspecialchars($_SESSION['last_order']['order_number']); ?></strong></p>
         </div>
 
         <?php if (isset($cancellationMessage)): ?>
-            <div style="background: #d4edda; border: 1px solid #c3e6cb; color: #155724; padding: 15px; border-radius: 8px; margin-bottom: 30px; text-align: center;">
+            <div class="alert-box alert-success">
                 ✓ <?php echo htmlspecialchars($cancellationMessage); ?>
             </div>
         <?php endif; ?>
 
         <!-- Order Tracking Timeline -->
-        <div style="background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 30px;">
-            <h3 style="margin-top: 0; margin-bottom: 25px;">Order Tracking</h3>
+        <div class="tracking-container">
+            <h3 class="tracking-title">Order Tracking</h3>
             
             <?php
             $statuses = ['Processing', 'Shipped', 'Delivered', 'Completed'];
@@ -120,13 +120,13 @@ if (!isset($_SESSION['last_order']['status'])) {
             $currentIndex = array_search($currentStatus, $statuses);
             ?>
 
-            <div style="position: relative; padding: 20px 0; display: flex; justify-content: space-between;">
+            <div class="timeline-wrapper">
                 <!-- Timeline line background -->
-                <div style="position: absolute; top: 40px; left: 60px; right: 60px; height: 2px; background: #e5e7eb; z-index: 1;"></div>
+                <div class="timeline-line-bg"></div>
                 
                 <!-- Timeline line progress -->
                 <?php if ($currentIndex >= 0): ?>
-                    <div style="position: absolute; top: 40px; left: 60px; height: 2px; background: linear-gradient(90deg, #f59e0b 0%, #3b82f6 33%, #10b981 66%, #6b7280 100%); z-index: 2; width: calc(<?php echo (($currentIndex / 3) * 100); ?>% + 30px);"></div>
+                    <div class="timeline-line-progress" style="width: calc(<?php echo (($currentIndex / 3) * 100); ?>% + 30px);"></div>
                 <?php endif; ?>
 
                 <!-- Status Steps -->
@@ -136,44 +136,22 @@ if (!isset($_SESSION['last_order']['status'])) {
                     $isCurrentStatus = $currentStatus === $status;
                     $statusColor = $statusColors[$status];
                     ?>
-                    <div style="position: relative; z-index: 3; display: flex; flex-direction: column; align-items: center; flex: 1;">
+                    <div class="timeline-step">
                         <!-- Step Circle -->
-                        <div style="
-                            width: 50px;
-                            height: 50px;
-                            border-radius: 50%;
+                        <div class="step-circle" style="
                             background: <?php echo $isActive ? $statusColor : '#e5e7eb'; ?>;
-                            border: 3px solid white;
                             box-shadow: 0 0 0 2px <?php echo $isActive ? $statusColor : '#e5e7eb'; ?>;
-                            display: flex;
-                            align-items: center;
-                            justify-content: center;
-                            color: white;
-                            font-weight: bold;
-                            font-size: 20px;
-                            margin-bottom: 15px;
-                            transition: all 0.3s ease;
                         ">
                             <?php if ($isActive && $index !== 0): ?>✓<?php else: ?><?php echo $index + 1; ?><?php endif; ?>
                         </div>
                         
                         <!-- Step Label -->
-                        <span style="
-                            font-weight: 500;
-                            color: <?php echo $isCurrentStatus ? $statusColor : '#666'; ?>;
-                            font-size: 14px;
-                            text-align: center;
-                            margin-bottom: 5px;
-                        ">
+                        <span class="step-label" style="color: <?php echo $isCurrentStatus ? $statusColor : '#666'; ?>;">
                             <?php echo htmlspecialchars($status); ?>
                         </span>
                         
                         <!-- Step Date/Time -->
-                        <span style="
-                            font-size: 12px;
-                            color: #999;
-                            text-align: center;
-                        ">
+                        <span class="step-date">
                             <?php
                             if ($isActive) {
                                 if ($index === 0) {
@@ -193,11 +171,11 @@ if (!isset($_SESSION['last_order']['status'])) {
             </div>
 
             <!-- Current Status Info -->
-            <div style="margin-top: 30px; padding: 15px; background: #f3f4f6; border-radius: 8px; border-left: 4px solid <?php echo $statusColors[$currentStatus]; ?>;">
-                <h4 style="margin: 0 0 10px 0; color: <?php echo $statusColors[$currentStatus]; ?>;">
+            <div class="current-status-box" style="border-left-color: <?php echo $statusColors[$currentStatus]; ?>;">
+                <h4 class="current-status-title" style="color: <?php echo $statusColors[$currentStatus]; ?>;">
                     Current Status: <?php echo htmlspecialchars($currentStatus); ?>
                 </h4>
-                <p style="margin: 5px 0 0 0; font-size: 14px; color: #555;">
+                <p class="current-status-desc">
                     <?php
                     if ($currentStatus === 'Processing') {
                         echo 'Your order is being processed. We\'re preparing your items for shipment.';
@@ -216,8 +194,8 @@ if (!isset($_SESSION['last_order']['status'])) {
 
             <!-- Estimated Delivery -->
             <?php if ($currentStatus !== 'Cancelled' && $currentStatus !== 'Completed'): ?>
-                <div style="margin-top: 20px; padding: 15px; background: #e8f4f8; border-radius: 8px;">
-                    <p style="margin: 0; color: #0369a1; font-size: 14px;">
+                <div class="estimated-delivery-box">
+                    <p class="delivery-text">
                         <strong>📦 Estimated Delivery:</strong> <?php echo date('F d, Y', strtotime($_SESSION['last_order']['date'] . ' +5 days')); ?> to <?php echo date('F d, Y', strtotime($_SESSION['last_order']['date'] . ' +7 days')); ?>
                     </p>
                 </div>
@@ -226,44 +204,44 @@ if (!isset($_SESSION['last_order']['status'])) {
 
         </div>
 
-        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 30px; margin-bottom: 40px;">
+        <div class="order-grid">
             <!-- Order Details -->
             <div>
                 <!-- Customer Info -->
-                <div style="background: #fff; padding: 25px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-                    <h3 style="margin-top: 0; margin-bottom: 15px;">Shipping To</h3>
-                    <p style="margin: 5px 0; font-weight: 500;">
+                <div class="info-card">
+                    <h3 class="info-card-title">Shipping To</h3>
+                    <p class="customer-info-text customer-name">
                         <?php echo htmlspecialchars($lastOrder['customer']['first_name']) . ' ' . htmlspecialchars($lastOrder['customer']['last_name']); ?>
                     </p>
-                    <p style="margin: 5px 0; color: #666;">
+                    <p class="customer-info-text">
                         <?php echo htmlspecialchars($lastOrder['customer']['address']); ?><br>
                         <?php echo htmlspecialchars($lastOrder['customer']['city']) . ', ' . htmlspecialchars($lastOrder['customer']['state']) . ' ' . htmlspecialchars($lastOrder['customer']['zip']); ?>
                     </p>
-                    <p style="margin: 5px 0; color: #666;">
+                    <p class="customer-info-text">
                         Email: <?php echo htmlspecialchars($lastOrder['customer']['email']); ?><br>
                         Phone: <?php echo htmlspecialchars($lastOrder['customer']['phone']); ?>
                     </p>
                 </div>
 
                 <!-- Ordered Items -->
-                <div style="background: #fff; padding: 25px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-                    <h3 style="margin-top: 0; margin-bottom: 15px;">Ordered Items</h3>
+                <div class="info-card">
+                    <h3 class="info-card-title">Ordered Items</h3>
                     
                     <?php foreach ($lastOrder['items'] as $item): ?>
-                        <div style="display: flex; padding: 15px 0; border-bottom: 1px solid #eee; align-items: center;">
-                            <div style="font-size: 40px; margin-right: 15px;">
+                        <div class="item-row">
+                            <div class="item-emoji">
                                 <?php echo $item['product']['emoji']; ?>
                             </div>
-                            <div style="flex: 1;">
-                                <h4 style="margin: 0 0 5px 0;">
+                            <div class="item-details">
+                                <h4 class="item-name">
                                     <?php echo htmlspecialchars($item['product']['name']); ?>
                                 </h4>
-                                <p style="margin: 0; color: #666; font-size: 14px;">
+                                <p class="item-qty">
                                     Quantity: <?php echo $item['quantity']; ?>
                                 </p>
                             </div>
-                            <div style="text-align: right;">
-                                <p style="margin: 0; font-weight: bold;">
+                            <div class="item-total-col">
+                                <p class="item-price">
                                     $<?php echo number_format($item['itemTotal'], 2); ?>
                                 </p>
                             </div>
@@ -274,59 +252,59 @@ if (!isset($_SESSION['last_order']['status'])) {
 
             <!-- Order Summary -->
             <div>
-                <div style="background: #f8f9fa; padding: 25px; border-radius: 8px; border: 2px solid #dee2e6;">
-                    <h3 style="margin-top: 0; margin-bottom: 20px;">Order Summary</h3>
+                <div class="summary-card">
+                    <h3 class="info-card-title">Order Summary</h3>
 
-                    <div style="margin-bottom: 20px;">
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                    <div class="summary-details">
+                        <div class="summary-row">
                             <span>Subtotal</span>
                             <span>$<?php echo number_format($lastOrder['subtotal'], 2); ?></span>
                         </div>
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                        <div class="summary-row">
                             <span>Tax (18%)</span>
                             <span>$<?php echo number_format($lastOrder['tax'], 2); ?></span>
                         </div>
                         <?php if (isset($lastOrder['promo_discount']) && $lastOrder['promo_discount'] > 0): ?>
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px; color: #10b981;">
+                        <div class="summary-row summary-discount">
                             <span>Promo Discount</span>
                             <span>-$<?php echo number_format($lastOrder['promo_discount'], 2); ?></span>
                         </div>
                         <?php endif; ?>
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
+                        <div class="summary-row">
                             <span>Shipping (<?php echo htmlspecialchars($lastOrder['shipping_method_name'] ?? 'Standard'); ?>)</span>
                             <span>$<?php echo number_format($lastOrder['shipping_cost'] ?? 0, 2); ?></span>
                         </div>
                     </div>
 
-                    <div style="display: flex; justify-content: space-between; font-size: 18px; font-weight: bold; padding: 15px 0; border-top: 2px solid #dee2e6; border-bottom: 2px solid #dee2e6;">
+                    <div class="summary-total-row">
                         <span>Total</span>
-                        <span style="color: #d32f2f;">$<?php echo number_format($lastOrder['total'], 2); ?></span>
+                        <span class="total-price">$<?php echo number_format($lastOrder['total'], 2); ?></span>
                     </div>
 
                     <?php if (isset($_SESSION['last_order']['status']) && $_SESSION['last_order']['status'] === 'Cancelled'): ?>
-                        <div style="margin-top: 20px; padding: 15px; background: #fee2e2; border-radius: 8px;">
-                            <p style="margin: 0; color: #991b1b; font-weight: 500; text-align: center;">
+                        <div class="alert-box alert-danger" style="margin-top: 20px;">
+                            <p style="margin: 0; font-weight: 500;">
                                 ✗ Order Cancelled
                             </p>
-                            <p style="margin: 5px 0 0 0; color: #991b1b; font-size: 12px; text-align: center;">
+                            <p style="margin: 5px 0 0 0; font-size: 12px;">
                                 Refund pending (5-7 days)
                             </p>
                         </div>
                     <?php else: ?>
-                        <div style="margin-top: 20px; padding: 15px; background: #d4edda; border-radius: 8px;">
-                            <p style="margin: 0; color: #155724; font-weight: 500; text-align: center;">
+                        <div class="alert-box alert-success" style="margin-top: 20px;">
+                            <p style="margin: 0; font-weight: 500;">
                                 ✓ Order Placed Successfully
                             </p>
-                            <p style="margin: 5px 0 0 0; color: #155724; font-size: 12px; text-align: center;">
+                            <p style="margin: 5px 0 0 0; font-size: 12px;">
                                 Order placed on <?php echo date('F d, Y \a\t h:i A', strtotime($lastOrder['date'])); ?>
                             </p>
                         </div>
                     <?php endif; ?>
 
                     <!-- Next Steps -->
-                    <div style="margin-top: 20px;">
+                    <div class="next-steps-container">
                         <h4 style="margin-bottom: 10px;">What's Next?</h4>
-                        <ul style="margin: 0; padding-left: 20px; font-size: 14px; color: #666;">
+                        <ul class="next-steps-list">
                             <li>Confirmation email sent to your inbox</li>
                             <li>Order processing within 24 hours</li>
                             <li>Tracking info will be emailed</li>
@@ -335,23 +313,23 @@ if (!isset($_SESSION['last_order']['status'])) {
                     </div>
 
                     <!-- Action Buttons -->
-                    <div style="margin-top: 20px;">
+                    <div class="action-buttons">
                         <?php if (isset($_SESSION['last_order']['status']) && $_SESSION['last_order']['status'] === 'Processing'): ?>
-                            <button onclick="openCancelModal()" class="btn" style="width: 100%; margin-bottom: 10px; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; padding: 12px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">
+                            <button onclick="openCancelModal()" class="btn-cancel">
                                 ❌ Cancel Order
                             </button>
                         <?php endif; ?>
-                        <a href="profile" class="btn btn-primary" style="display: block; text-align: center; padding: 12px; text-decoration: none; margin-bottom: 10px;">
+                        <a href="profile" class="btn btn-primary btn-dashboard">
                             Go to Dashboard
                         </a>
-                        <a href="invoice?latest=true" target="_blank" class="btn" style="display: block; text-align: center; padding: 12px; text-decoration: none; margin-bottom: 10px; background: #4b5563; color: white; border-radius: 4px;">
+                        <a href="invoice?latest=true" target="_blank" class="btn btn-download">
                             📄 Download Invoice
                         </a>
-                        <a href="products" style="display: block; text-align: center; padding: 12px; color: #2563eb; text-decoration: none; border: 1px solid #2563eb; border-radius: 4px;">
+                        <a href="products" class="btn-shopping">
                             Continue Shopping
                         </a>
                         <?php if (isset($_SESSION['last_order']['status']) && $_SESSION['last_order']['status'] === 'Cancelled'): ?>
-                            <button onclick="window.location.href='products'" class="btn" style="width: 100%; margin-top: 10px; background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%); color: white; padding: 12px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">
+                            <button onclick="window.location.href='products'" class="btn-buy-again">
                                 🔄 Buy Again
                             </button>
                         <?php endif; ?>
@@ -361,12 +339,12 @@ if (!isset($_SESSION['last_order']['status'])) {
         </div>
 
         <!-- Info Section -->
-        <div style="background: #e8f4f8; padding: 20px; border-radius: 8px; margin-top: 40px;">
+        <div class="help-section">
             <h3 style="margin-top: 0;">Need Help?</h3>
-            <p style="margin: 10px 0; color: #555;">
+            <p class="help-text">
                 For any questions about your order, please contact our customer support:
             </p>
-            <p style="margin: 5px 0; color: #555;">
+            <p class="contact-info">
                 📧 Email: <strong>support@easycart.com</strong><br>
                 📞 Phone: <strong>+1 (555) 123-4567</strong><br>
                 ⏰ Available: Monday - Friday, 9:00 AM - 6:00 PM
@@ -375,59 +353,19 @@ if (!isset($_SESSION['last_order']['status'])) {
     </section>
 
     <!-- Cancel Order Modal -->
-    <div id="cancelModal" style="
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(0, 0, 0, 0.5);
-        z-index: 1000;
-        align-items: center;
-        justify-content: center;
-    ">
-        <div style="
-            background: white;
-            border-radius: 12px;
-            padding: 30px;
-            max-width: 500px;
-            width: 90%;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
-        ">
-            <h2 style="margin: 0 0 15px 0; color: #333;">Cancel Order?</h2>
-            <p style="color: #666; margin: 0 0 20px 0; line-height: 1.6;">
+    <div id="cancelModal" class="modal-overlay">
+        <div class="modal-content">
+            <h2 class="modal-title">Cancel Order?</h2>
+            <p class="modal-text">
                 Are you sure you want to cancel this order? This action cannot be undone. Your refund will be processed within 5-7 business days.
             </p>
             
-            <form method="POST" style="display: flex; gap: 10px;">
+            <form method="POST" class="modal-actions">
                 <input type="hidden" name="action" value="cancel_order">
-                <button type="submit" style="
-                    flex: 1;
-                    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-                    color: white;
-                    border: none;
-                    padding: 12px;
-                    border-radius: 8px;
-                    cursor: pointer;
-                    font-weight: 500;
-                    font-size: 14px;
-                    transition: transform 0.2s ease;
-                " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                <button type="submit" class="btn-confirm-cancel">
                     Yes, Cancel Order
                 </button>
-                <button type="button" onclick="closeCancelModal()" style="
-                    flex: 1;
-                    background: #e5e7eb;
-                    color: #333;
-                    border: none;
-                    padding: 12px;
-                    border-radius: 8px;
-                    cursor: pointer;
-                    font-weight: 500;
-                    font-size: 14px;
-                    transition: transform 0.2s ease;
-                " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                <button type="button" onclick="closeCancelModal()" class="btn-keep-order">
                     No, Keep Order
                 </button>
             </form>

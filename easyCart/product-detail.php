@@ -68,7 +68,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             <div class="breadcrumb">
                 <a href="products">Products</a> / 
                 <a href="products?category=<?php echo $product['category_id']; ?>"><?php echo htmlspecialchars($category['name']); ?></a> / 
-                <span style="color: var(--text-main); font-weight: 500;"><?php echo htmlspecialchars($product['name']); ?></span>
+                <span class="text-main-500"><?php echo htmlspecialchars($product['name']); ?></span>
             </div>
 
             <div class="product-main-grid">
@@ -78,14 +78,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                         <?php if (!empty($product['image'])): ?>
                             <img src="<?php echo $product['image']; ?>" alt="<?php echo htmlspecialchars($product['name']); ?>">
                         <?php else: ?>
-                            <div style="font-size: 6rem;"><?php echo $product['emoji']; ?></div>
+                            <div class="emoji-large"><?php echo $product['emoji']; ?></div>
                         <?php endif; ?>
                         
                         <?php if (isLoggedIn()): ?>
                         <!-- Wishlist Toggle -->
                         <div onclick="toggleWishlist(event, <?php echo $product['id']; ?>)" 
-                             style="position: absolute; top: 15px; right: 15px; background: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.1); cursor: pointer; font-size: 1.2rem; transition: transform 0.2s;"
-                             onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
+                             class="wishlist-toggle-btn">
                              <?php echo (isset($_SESSION['wishlist']) && in_array($product['id'], $_SESSION['wishlist'])) ? '❤️' : '🤍'; ?>
                         </div>
                         <?php endif; ?>
@@ -99,7 +98,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                     <div class="meta-row">
                         <span class="rating-badge">★ <?php echo $product['rating']; ?></span>
                         <span><?php echo $product['reviews']; ?> Reviews</span>
-                        <span style="color: #d1d5db;">|</span>
+                        <span class="separator">|</span>
                         <span>Brand: <strong><?php echo htmlspecialchars($brand['name'] ?? 'Generic'); ?></strong></span>
                     </div>
 
@@ -122,10 +121,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                             <div class="option-group">
                                 <label class="option-label">Select Color</label>
                                 <div class="color-selector">
-                                    <div class="color-dot active" style="background: #111827;"></div>
-                                    <div class="color-dot" style="background: #3b82f6;"></div>
-                                    <div class="color-dot" style="background: #ef4444;"></div>
-                                    <div class="color-dot" style="background: #10b981;"></div>
+                                    <div class="color-dot active color-dot-black"></div>
+                                    <div class="color-dot color-dot-blue"></div>
+                                    <div class="color-dot color-dot-red"></div>
+                                    <div class="color-dot color-dot-green"></div>
                                 </div>
                             </div>
 
@@ -148,7 +147,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                                     Buy Now
                                 </button>
                             <?php else: ?>
-                                <button type="button" class="btn-action btn-cart" style="grid-column: span 2; opacity: 0.5;" disabled>
+                                <button type="button" class="btn-action btn-cart btn-unavailable" disabled>
                                     Currently Unavailable
                                 </button>
                             <?php endif; ?>
@@ -173,7 +172,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             </div>
 
             <!-- Recommended Products Reuse -->
-            <h3 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 25px;">You Might Also Like</h3>
+            <h3 class="section-title-small">You Might Also Like</h3>
             <div class="products-grid">
                 <?php
                 $related = array_slice(getProductsByCategory($product['category_id']), 0, 4);
@@ -196,7 +195,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                                 <?php if (!empty($rel['image'])): ?>
                                     <img src="<?php echo $rel['image']; ?>" alt="<?php echo htmlspecialchars($rel['name']); ?>">
                                 <?php else: ?>
-                                    <span style="font-size: 60px;"><?php echo $rel['emoji']; ?></span>
+                                    <span class="emoji-medium"><?php echo $rel['emoji']; ?></span>
                                 <?php endif; ?>
                             </div>
                         </div>
@@ -208,7 +207,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                             <div class="product-price-row">
                                 <div class="price-current"><?php echo formatPrice($rel['price']); ?></div>
                                 <div class="rating-block">
-                                    ⭐ <?php echo $rel['rating']; ?> <span style="color: #9ca3af; font-weight: 400;">(<?php echo $rel['reviews']; ?>)</span>
+                                    ⭐ <?php echo $rel['rating']; ?> <span class="review-text-muted">(<?php echo $rel['reviews']; ?>)</span>
                                 </div>
                             </div>
 

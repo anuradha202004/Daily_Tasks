@@ -11,12 +11,20 @@ $currentUser = getCurrentUser();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo isset($pageTitle) ? htmlspecialchars($pageTitle) . ' - EasyCart' : 'EasyCart'; ?></title>
     <link rel="stylesheet" href="/public/css/style.css">
+    <link rel="stylesheet" href="/public/css/home.css">
+    <link rel="stylesheet" href="/public/css/auth.css">
+    <link rel="stylesheet" href="/public/css/cart.css">
+    <link rel="stylesheet" href="/public/css/product.css">
+    <link rel="stylesheet" href="/public/css/wishlist.css">
+    <link rel="stylesheet" href="/public/css/order.css">
+    <link rel="stylesheet" href="/public/css/checkout.css">
+    <link rel="stylesheet" href="/public/css/admin.css">
     <link rel="stylesheet" href="/public/css/user-menu.css">
     <script src="/public/js/common.js"></script>
     <script src="/public/js/header.js"></script>
 
 </head>
-<body>
+<body class="<?php echo strpos($_SERVER['REQUEST_URI'], '/admin') !== false ? 'admin-body' : ''; ?>">
     <!-- Header -->
     <header class="main-header">
         <div class="header-wrapper">

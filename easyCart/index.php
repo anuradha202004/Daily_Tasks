@@ -46,102 +46,54 @@ $featuredProducts = array_slice($products, 0, 4, true);
     <!-- Modern Hero Section - Split Design with Glassmorphism -->
     <!-- Modern Interactive Ad Hero Section -->
     <!-- Modern Clean Hero Section -->
-    <section class="hero-section" style="background: #ffffff; padding: 20px 0 40px; position: relative; overflow: hidden;">
-        <div class="container" style="display: flex; align-items: center; gap: 40px; min-height: 450px;">
+    <section class="hero-section">
+        <div class="container hero-container">
             
             <!-- Left: Image (Person) -->
-            <div class="hero-image" style="flex: 1; text-align: center; position: relative;">
+            <div class="hero-image">
                 <!-- Using hero_model.png as placeholder for the person image -->
-                <img src="public/img/hero_model.png" alt="Happy Shopper" style="
-                    position: relative;
-                    z-index: 1;
-                    max-width: 100%;
-                    height: auto;
-                ">
+                <img src="public/img/hero_model.png" alt="Happy Shopper">
             </div>
 
             <!-- Right: Content -->
-            <div class="hero-content" style="flex: 1; padding-left: 20px;">
-                <span style="
-                    display: inline-block;
-                    padding: 8px 16px;
-                    background: #ebf5ff;
-                    color: #2563eb;
-                    border-radius: 30px;
-                    font-weight: 700;
-                    font-size: 0.9rem;
-                    margin-bottom: 24px;
-                ">
+            <div class="hero-content">
+                <span class="hero-badge">
                     ✨ NEW COLLECTION 2026
                 </span>
                 
-                <h1 style="
-                    font-size: 4.5rem;
-                    line-height: 1.1;
-                    font-weight: 800;
-                    color: #111827;
-                    margin-bottom: 24px;
-                    letter-spacing: -0.02em;
-                ">
+                <h1 class="hero-title">
                     Discover Your <br>
-                    <span style="color: #2563eb;">Style Today.</span>
+                    <span class="highlight">Style Today.</span>
                 </h1>
                 
-                <p style="
-                    font-size: 1.25rem;
-                    line-height: 1.7;
-                    color: #6b7280;
-                    margin-bottom: 40px;
-                    max-width: 500px;
-                ">
+                <p class="hero-description">
                     Explore our latest arrivals and find the perfect look for any occasion. Premium quality, best prices.
                 </p>
                 
-                <div style="display: flex; gap: 20px; align-items: center;">
-                    <button onclick="window.location.href='products'" style="
-                        cursor: pointer;
-                        padding: 18px 40px;
-                        background: #2563eb;
-                        color: white;
-                        border: none;
-                        border-radius: 50px;
-                        font-size: 1.1rem;
-                        font-weight: 600;
-                        box-shadow: 0 10px 25px rgba(37, 99, 235, 0.3);
-                        transition: transform 0.2s, box-shadow 0.2s;
-                    " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 15px 30px rgba(37, 99, 235, 0.4)'"
-                      onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 10px 25px rgba(37, 99, 235, 0.3)'">
+                <div class="hero-actions">
+                    <button onclick="window.location.href='products'" class="btn-hero-primary">
                         Shop Now
                     </button>
                     
-                    <a href="#about" style="
-                        color: #4b5563;
-                        text-decoration: none;
-                        font-weight: 500;
-                        font-size: 1.1rem;
-                        display: flex;
-                        align-items: center;
-                        gap: 8px;
-                        transition: color 0.2s;
-                    " onmouseover="this.style.color='#111827'" onmouseout="this.style.color='#4b5563'">
+                    <a href="#about" class="btn-hero-secondary">
                         <span>Learn More</span>
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
                     </a>
                 </div>
 
                 <!-- Trust Indicators -->
-                <div style="margin-top: 60px; display: flex; gap: 40px; border-top: 1px solid #f3f4f6; padding-top: 1px;">
-                    <div>
-                        <strong style="display: block; font-size: 1.5rem; color: #111827;">50k+</strong>
-                        <span style="color: #6b7280; font-size: 0.95rem;">Happy Customers</span>
+                <div class="hero-trust-indicators">
+                    <div class="trust-item">
+                        <strong>50k+</strong>
+                        <span>Happy Customers</span>
                     </div>
-                    <div>
-                        <strong style="display: block; font-size: 1.5rem; color: #111827;">2k+</strong>
-                        <span style="color: #6b7280; font-size: 0.95rem;">Top Products</span>
+                    <div class="trust-item">
+                        <strong>2k+</strong>
+                        <span>Top Products</span>
                     </div>
-                    <div>
-                        <strong style="display: block; font-size: 1.5rem; color: #111827;">24/7</strong>
-                        <span style="color: #6b7280; font-size: 0.95rem;">Customer Support</span>
+                    <div class="trust-item">
+                        <strong>24/7</strong>
+                        <span>Customer Support</span>
                     </div>
                 </div>
             </div>
@@ -149,35 +101,29 @@ $featuredProducts = array_slice($products, 0, 4, true);
     </section>
 
     <!-- Quick Access / Services Section -->
-    <section style="padding: 0 0 80px; background: #ffffff;">
+    <!-- Quick Access / Services Section -->
+    <section class="services-section">
         <div class="container">
-            <div style="
-                display: grid;
-                grid-template-columns: repeat(4, 1fr);
-                gap: 30px;
-                background: #f8fafc;
-                padding: 40px;
-                border-radius: 20px;
-            ">
-                <div style="text-align: center;">
-                    <div style="font-size: 2.5rem; margin-bottom: 15px;">🚚</div>
-                    <h3 style="margin-bottom: 10px; color: #1e293b;">Fast Shipping</h3>
-                    <p style="color: #64748b; font-size: 0.95rem;">Free delivery on orders over $50</p>
+            <div class="services-grid">
+                <div class="service-item">
+                    <div class="service-icon">🚚</div>
+                    <h3 class="service-title">Fast Shipping</h3>
+                    <p class="service-desc">Free delivery on orders over $50</p>
                 </div>
-                <div style="text-align: center;">
-                    <div style="font-size: 2.5rem; margin-bottom: 15px;">🛡️</div>
-                    <h3 style="margin-bottom: 10px; color: #1e293b;">Secure Payment</h3>
-                    <p style="color: #64748b; font-size: 0.95rem;">100% secure payment processing</p>
+                <div class="service-item">
+                    <div class="service-icon">🛡️</div>
+                    <h3 class="service-title">Secure Payment</h3>
+                    <p class="service-desc">100% secure payment processing</p>
                 </div>
-                <div style="text-align: center;">
-                    <div style="font-size: 2.5rem; margin-bottom: 15px;">↩️</div>
-                    <h3 style="margin-bottom: 10px; color: #1e293b;">Easy Returns</h3>
-                    <p style="color: #64748b; font-size: 0.95rem;">Hassle-free 30-day return policy</p>
+                <div class="service-item">
+                    <div class="service-icon">↩️</div>
+                    <h3 class="service-title">Easy Returns</h3>
+                    <p class="service-desc">Hassle-free 30-day return policy</p>
                 </div>
-                <div style="text-align: center;">
-                    <div style="font-size: 2.5rem; margin-bottom: 15px;">💬</div>
-                    <h3 style="margin-bottom: 10px; color: #1e293b;">24/7 Support</h3>
-                    <p style="color: #64748b; font-size: 0.95rem;">Dedicated support anytime</p>
+                <div class="service-item">
+                    <div class="service-icon">💬</div>
+                    <h3 class="service-title">24/7 Support</h3>
+                    <p class="service-desc">Dedicated support anytime</p>
                 </div>
             </div>
         </div>
@@ -349,28 +295,29 @@ $featuredProducts = array_slice($products, 0, 4, true);
     </section>
     
     <!-- About Section (Home Page) -->
+    <!-- About Section (Home Page) -->
     <section id="about" class="container" style="padding: 60px 20px;">
         <h2 class="section-title">About EasyCart</h2>
-        <div class="about-section" style="background: white; padding: 40px; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center;">
+        <div class="about-section-container">
+            <div class="about-grid">
                 <div>
                     <h3 style="margin-bottom: 20px; font-size: 1.5rem;">Our Mission</h3>
                     <p style="color: #4b5563; line-height: 1.7; margin-bottom: 20px;">
                         EasyCart is a professional e-commerce platform designed to provide seamless online shopping experiences. 
                         Started in 2024, we built this on a simple premise: online shopping shouldn't be complicated.
                     </p>
-                    <div style="display: flex; gap: 20px;">
-                        <div style="text-align: center;">
-                            <strong style="display: block; font-size: 1.5rem; color: #4f46e5;">50K+</strong>
-                            <span style="font-size: 0.9rem; color: #6b7280;">Customers</span>
+                    <div class="about-stats">
+                        <div class="about-stat-item">
+                            <strong class="about-stat-number">50K+</strong>
+                            <span class="about-stat-label">Customers</span>
                         </div>
-                        <div style="text-align: center;">
-                            <strong style="display: block; font-size: 1.5rem; color: #4f46e5;">100+</strong>
-                            <span style="font-size: 0.9rem; color: #6b7280;">Brands</span>
+                        <div class="about-stat-item">
+                            <strong class="about-stat-number">100+</strong>
+                            <span class="about-stat-label">Brands</span>
                         </div>
                     </div>
                 </div>
-                <div style="background: #f3f4f6; padding: 40px; border-radius: 20px; text-align: center; font-size: 5rem;">
+                <div class="about-image-placeholder">
                     🛍️
                 </div>
             </div>
@@ -378,39 +325,40 @@ $featuredProducts = array_slice($products, 0, 4, true);
     </section>
 
     <!-- Contact Section (Home Page) -->
+    <!-- Contact Section (Home Page) -->
     <section id="contact" class="container" style="padding: 60px 20px;">
         <h2 class="section-title">Contact Us</h2>
-        <div class="contact-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
-            <div class="contact-card" style="background: #4f46e5; color: white; padding: 40px; border-radius: 16px;">
+        <div class="contact-grid">
+            <div class="contact-info-card">
                 <h3 style="margin-bottom: 20px; font-size: 1.5rem;">Get in Touch</h3>
-                <div style="margin-bottom: 20px;">
+                <div class="contact-info-item">
                     <strong>📍 Address</strong>
-                    <p style="opacity: 0.9;">123 Commerce St, Tech City</p>
+                    <p>123 Commerce St, Tech City</p>
                 </div>
-                <div style="margin-bottom: 20px;">
+                <div class="contact-info-item">
                     <strong>📧 Email</strong>
-                    <p style="opacity: 0.9;">support@easycart.com</p>
+                    <p>support@easycart.com</p>
                 </div>
                 <div>
                     <strong>📞 Phone</strong>
-                    <p style="opacity: 0.9;">+1 (555) 123-4567</p>
+                    <p>+1 (555) 123-4567</p>
                 </div>
             </div>
 
-            <div class="contact-card" style="background: white; padding: 40px; border-radius: 16px; border: 1px solid #e5e7eb;">
+            <div class="contact-form-card">
                 <h3 style="margin-bottom: 20px; font-size: 1.5rem; color: #111827;">Send Message</h3>
                 <form id="contactForm" onsubmit="event.preventDefault(); submitContactForm(this);">
-                    <div style="margin-bottom: 15px;">
-                        <label style="display: block; margin-bottom: 5px; color: #374151;">Name</label>
-                        <input type="text" name="name" required style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 8px;">
+                    <div class="contact-form-group">
+                        <label class="contact-label">Name</label>
+                        <input type="text" name="name" required class="contact-input">
                     </div>
-                    <div style="margin-bottom: 15px;">
-                        <label style="display: block; margin-bottom: 5px; color: #374151;">Email</label>
-                        <input type="email" name="email" required style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 8px;">
+                    <div class="contact-form-group">
+                        <label class="contact-label">Email</label>
+                        <input type="email" name="email" required class="contact-input">
                     </div>
-                    <div style="margin-bottom: 15px;">
-                        <label style="display: block; margin-bottom: 5px; color: #374151;">Message</label>
-                        <textarea name="message" required rows="3" style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 8px;"></textarea>
+                    <div class="contact-form-group">
+                        <label class="contact-label">Message</label>
+                        <textarea name="message" required rows="3" class="contact-input"></textarea>
                     </div>
                     <button type="submit" class="btn btn-primary" style="width: 100%;">Send Message</button>
                 </form>

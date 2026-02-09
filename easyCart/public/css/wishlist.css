@@ -1,0 +1,67 @@
+/* Wishlist Page Styles */
+
+.wishlist-section {
+    padding: 40px 0;
+}
+
+.wishlist-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.wishlist-count-badge {
+    background: #ffe8ee;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #dc2626;
+}
+
+.wishlist-grid {
+    margin-top: 30px;
+}
+
+/* Reusing utility or specific wishlist emoji class */
+.wishlist-emoji {
+    font-size: 60px;
+}
+
+.rating-text-muted {
+    color: #9ca3af;
+    font-weight: 400;
+}
+
+.btn-out-stock-wishlist {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Empty State */
+.empty-wishlist-container {
+    text-align: center;
+    padding: 60px 20px;
+}
+
+.empty-wishlist-icon {
+    font-size: 60px;
+    margin-bottom: 20px;
+}
+
+.empty-wishlist-title {
+    color: #666;
+    margin-bottom: 10px;
+}
+
+.empty-wishlist-text {
+    color: #999;
+    margin-bottom: 30px;
+}
+
+.btn-explore-wishlist {
+    display: inline-block;
+    padding: 12px 30px;
+    text-decoration: none;
+}

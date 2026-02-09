@@ -40,14 +40,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 <?php include TEMPLATES_PATH . '/header.php'; ?>
     <script src="public/js/validation.js"></script>
 
-    <section class="container" style="padding: 60px 0; display: flex; justify-content: center;">
-        <div class="modal-content" style="display: block; position: static; transform: none; box-shadow: 0 4px 20px rgba(0,0,0,0.1); width: 100%; max-width: 450px;">
+    <section class="container auth-container-center">
+        <div class="modal-content auth-card-static">
             <h1 class="modal-title">Create Account</h1>
             
             <?php if (count($errors) > 0): ?>
-                <div style="background: #fee2e2; color: #b91c1c; padding: 10px; border-radius: 5px; margin-bottom: 20px; font-size: 14px;">
+                <div class="auth-alert-error-red">
                     <?php foreach ($errors as $error): ?>
-                        <p style="margin: 5px 0;">• <?php echo htmlspecialchars($error); ?></p>
+                        <p>• <?php echo htmlspecialchars($error); ?></p>
                     <?php endforeach; ?>
                 </div>
             <?php endif; ?>
@@ -68,7 +68,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 <div class="form-group">
                     <label for="password">Password</label>
                     <input type="password" id="password" name="password" required placeholder="••••••••">
-                    <p style="font-size: 12px; color: #666; margin-top: 5px;">At least 6 characters</p>
+                    <p class="auth-hint-text-small">At least 6 characters</p>
                 </div>
 
                 <div class="form-group">
@@ -86,7 +86,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 
             <div class="form-footer">
                 <p>Already have an account? <a href="signin">Sign In</a></p>
-                <p style="margin-top: 10px;"><a href="products" style="color: #999; font-weight: normal;">Continue as Guest</a></p>
+                <p style="margin-top: 10px;"><a href="products" class="auth-guest-link-muted">Continue as Guest</a></p>
             </div>
         </div>
     </section>

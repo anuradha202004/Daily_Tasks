@@ -1,0 +1,50 @@
+/* Invoice specific styles */
+
+.print-btn-container {
+    text-align: center;
+}
+
+.sub-text-muted {
+    color: #999;
+    margin-top: 5px;
+    font-size: 12px;
+}
+
+/* Table Column Widths & Alignments */
+.col-item {
+    width: 50%;
+}
+
+.col-center {
+    text-align: center;
+}
+
+.col-right {
+    text-align: right;
+}
+
+/* Totals */
+.total-discount {
+    color: #10b981;
+}
+
+/* Styles that might be in style.css but defined here for standalone invoice if needed */
+.invoice-page {
+    font-family: Arial, sans-serif;
+    background-color: #f3f4f6;
+    padding: 20px;
+}
+
+.invoice-box {
+    max-width: 800px;
+    margin: 30px auto;
+    padding: 40px;
+    background: white;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+
+/* ... other invoice styles are presumed to be in style.css, 
+   but since I don't see them inline in the file I read, 
+   I assume they are already classes that work. 
+   I only extracted the specific inline styles I found. */

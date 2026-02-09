@@ -1,0 +1,213 @@
+/* Admin Panel Styles */
+
+/* Common Admin Layout */
+.admin-body {
+    background-color: #f3f4f6;
+}
+
+.admin-container {
+    max-width: 1000px;
+    margin: 40px auto;
+    padding: 20px;
+}
+
+/* Dashboard Specifics */
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.dashboard-title {
+    margin: 0;
+    color: #111827;
+    font-size: 28px;
+}
+
+.dashboard-subtitle {
+    margin: 8px 0 0 0;
+    color: #6b7280;
+    font-size: 16px;
+}
+
+.btn-back-store {
+    background: white;
+    color: #374151;
+    padding: 10px 16px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 500;
+    border: 1px solid #e5e7eb;
+    display: inline-flex;
+    align-items: center;
+    transition: all 0.2s;
+}
+
+.btn-back-store:hover {
+    background: #f9fafb;
+    border-color: #d1d5db;
+}
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 25px;
+}
+
+.dashboard-card {
+    background: white;
+    padding: 30px;
+    border-radius: 16px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    border: 1px solid #f0f0f0;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.dashboard-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    border-color: #e5e7eb;
+}
+
+.card-icon-wrapper {
+    margin-bottom: 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    font-size: 28px;
+}
+
+.card-title {
+    font-size: 19px;
+    font-weight: 700;
+    margin: 0 0 10px 0;
+    color: #111827;
+}
+
+.card-desc {
+    font-size: 15px;
+    color: #6b7280;
+    margin: 0;
+    line-height: 1.6;
+    flex-grow: 1;
+}
+
+.card-footer {
+    margin-top: 20px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #2563eb;
+    display: flex;
+    align-items: center;
+}
+
+.card-footer svg {
+    width: 16px;
+    height: 16px;
+    margin-left: 5px;
+    transition: transform 0.2s;
+}
+
+.dashboard-card:hover .card-footer svg {
+    transform: translateX(3px);
+}
+
+/* Import/Export Page Specifics */
+.admin-panel {
+    max-width: 800px;
+    margin: 50px auto;
+    background: white;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.admin-page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.admin-page-title {
+    margin: 0;
+}
+
+.btn-primary {
+    background: #2563eb;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.btn-secondary {
+    background: #4b5563;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn-success {
+    background: #059669;
+}
+
+.alert {
+    padding: 15px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+}
+
+.alert-success {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.alert-error {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.section {
+    margin-bottom: 40px;
+    border-bottom: 1px solid #e5e7eb;
+    padding-bottom: 30px;
+}
+
+.section:last-child {
+    border-bottom: none;
+}
+
+.section-title {
+    margin-top: 0;
+}
+
+.section-desc {
+    color: #666;
+    margin-bottom: 20px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.file-input {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    width: 100%;
+}

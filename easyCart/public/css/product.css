@@ -1,0 +1,105 @@
+/* Product Page Styles */
+
+/* Common Utilities */
+.emoji-large {
+    font-size: 6rem;
+}
+
+.emoji-medium {
+    font-size: 60px;
+}
+
+.emoji-60 {
+    font-size: 60px;
+}
+
+.font-40 {
+    font-size: 40px;
+}
+
+.mt-20-dark {
+    margin-top: 20px;
+    color: #333;
+}
+
+.mb-20-gray {
+    margin-bottom: 20px;
+    color: #666;
+}
+
+.text-main-500 {
+    color: var(--text-main, #374151);
+    font-weight: 500;
+}
+
+.separator {
+    color: #d1d5db;
+}
+
+.review-text-muted {
+    color: #9ca3af;
+    font-weight: 400;
+}
+
+/* Product Detail Specifics */
+.wishlist-toggle-btn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: transform 0.2s;
+}
+
+.wishlist-toggle-btn:hover {
+    transform: scale(1.1);
+}
+
+.btn-unavailable {
+    grid-column: span 2;
+    opacity: 0.5;
+}
+
+.section-title-small {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 25px;
+}
+
+/* Color Dots */
+.color-dot-black {
+    background: #111827;
+}
+
+.color-dot-blue {
+    background: #3b82f6;
+}
+
+.color-dot-red {
+    background: #ef4444;
+}
+
+.color-dot-green {
+    background: #10b981;
+}
+
+.badge-new {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    background: #ef4444;
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    z-index: 2;
+}

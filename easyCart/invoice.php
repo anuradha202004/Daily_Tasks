@@ -46,10 +46,10 @@ if (!$order) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Invoice #<?php echo htmlspecialchars($order['order_number']); ?> - EasyCart</title>
     <link rel="stylesheet" href="/public/css/style.css">
-    <!-- Page Styles Moved to style.css -->
+    <link rel="stylesheet" href="/public/css/invoice.css">
 </head>
 <body class="invoice-page">
-    <div style="text-align: center;">
+    <div class="print-btn-container">
         <button onclick="window.print()" class="print-btn">🖨️ Print Invoice</button>
     </div>
 
@@ -77,7 +77,7 @@ if (!$order) {
                     <p class="sub-text"><?php echo htmlspecialchars($order['customer']['address']); ?></p>
                     <p class="sub-text"><?php echo htmlspecialchars($order['customer']['city'] . ', ' . $order['customer']['state'] . ' ' . $order['customer']['zip']); ?></p>
                     <p class="sub-text"><?php echo htmlspecialchars($order['customer']['email']); ?></p>
-                    <p class="sub-text" style="color: #999; margin-top: 5px; font-size: 12px;">(Same as shipping)</p>
+                    <p class="sub-text sub-text-muted">(Same as shipping)</p>
                 <?php endif; ?>
             </div>
             <div class="column">
@@ -91,10 +91,10 @@ if (!$order) {
         <table>
             <thead>
                 <tr>
-                    <th style="width: 50%;">Item</th>
-                    <th style="text-align: center;">Quantity</th>
-                    <th style="text-align: right;">Price</th>
-                    <th style="text-align: right;">Total</th>
+                    <th class="col-item">Item</th>
+                    <th class="col-center">Quantity</th>
+                    <th class="col-right">Price</th>
+                    <th class="col-right">Total</th>
                 </tr>
             </thead>
             <tbody>
@@ -118,9 +118,9 @@ if (!$order) {
                     <td>
                         <strong><?php echo htmlspecialchars($productName); ?></strong>
                     </td>
-                    <td style="text-align: center;"><?php echo $qty; ?></td>
-                    <td style="text-align: right;">$<?php echo number_format($productPrice, 2); ?></td>
-                    <td style="text-align: right;">$<?php echo number_format($itemTotal, 2); ?></td>
+                    <td class="col-center"><?php echo $qty; ?></td>
+                    <td class="col-right">$<?php echo number_format($productPrice, 2); ?></td>
+                    <td class="col-right">$<?php echo number_format($itemTotal, 2); ?></td>
                 </tr>
                 <?php endforeach; ?>
             </tbody>
@@ -143,7 +143,7 @@ if (!$order) {
                 <?php 
                 $discount = ($order['discount'] ?? 0) + ($order['promo_discount'] ?? 0);
                 if ($discount > 0): ?>
-                <tr style="color: #10b981;">
+                <tr class="total-discount">
                     <td>Discount:</td>
                     <td>-$<?php echo number_format($discount, 2); ?></td>
                 </tr>

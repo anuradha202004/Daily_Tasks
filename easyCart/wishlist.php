@@ -91,16 +91,16 @@ if (!empty($_SESSION['wishlist'])) {
     <script src="public/js/cart.js"></script>
 
     <!-- My Wishlist Page -->
-    <section class="container" style="padding: 40px 0;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+    <section class="container wishlist-section">
+        <div class="wishlist-header">
             <h1 class="section-title">❤️ My Wishlist</h1>
-            <div style="background: #ffe8ee; padding: 8px 16px; border-radius: 20px; font-size: 14px; font-weight: 600; color: #dc2626;">
+            <div class="wishlist-count-badge">
                 <?php echo count($wishlistItems); ?> item<?php echo count($wishlistItems) !== 1 ? 's' : ''; ?>
             </div>
         </div>
 
         <?php if (count($wishlistItems) > 0): ?>
-            <div class="products-grid" style="margin-top: 30px;">
+            <div class="products-grid wishlist-grid">
                 <?php foreach ($wishlistItems as $product): ?>
                     <?php $isWishlisted = true; // Always true on wishlist page ?>
                     
@@ -118,7 +118,7 @@ if (!empty($_SESSION['wishlist'])) {
                                 <?php if (!empty($product['image'])): ?>
                                     <img src="<?php echo $product['image']; ?>" alt="<?php echo htmlspecialchars($product['name']); ?>">
                                 <?php else: ?>
-                                    <span style="font-size: 60px;"><?php echo $product['emoji']; ?></span>
+                                    <span class="wishlist-emoji"><?php echo $product['emoji']; ?></span>
                                 <?php endif; ?>
                             </div>
                         </div>
@@ -130,7 +130,7 @@ if (!empty($_SESSION['wishlist'])) {
                             <div class="product-price-row">
                                 <div class="price-current"><?php echo formatPrice($product['price']); ?></div>
                                 <div class="rating-block">
-                                    ⭐ <?php echo $product['rating']; ?> <span style="color: #9ca3af; font-weight: 400;">(<?php echo $product['reviews']; ?>)</span>
+                                    ⭐ <?php echo $product['rating']; ?> <span class="rating-text-muted">(<?php echo $product['reviews']; ?>)</span>
                                 </div>
                             </div>
 
@@ -160,7 +160,7 @@ if (!empty($_SESSION['wishlist'])) {
                                             Buy Now
                                         </a>
                                     <?php else: ?>
-                                        <button class="btn-modern btn-outline-cart" style="opacity: 0.5; cursor: not-allowed;" disabled>Out of Stock</button>
+                                        <button class="btn-modern btn-outline-cart btn-out-stock-wishlist" disabled>Out of Stock</button>
                                     <?php endif; ?>
                                 </div>
                             </div>
@@ -171,11 +171,11 @@ if (!empty($_SESSION['wishlist'])) {
 
         <?php else: ?>
             <!-- Empty Wishlist Message -->
-            <div style="text-align: center; padding: 60px 20px;">
-                <div style="font-size: 60px; margin-bottom: 20px;">🤍</div>
-                <h2 style="color: #666; margin-bottom: 10px;">Your Wishlist is Empty</h2>
-                <p style="color: #999; margin-bottom: 30px;">Start adding products to your wishlist to save them for later!</p>
-                <a href="products" class="btn btn-primary" style="display: inline-block; padding: 12px 30px; text-decoration: none;">
+            <div class="empty-wishlist-container">
+                <div class="empty-wishlist-icon">🤍</div>
+                <h2 class="empty-wishlist-title">Your Wishlist is Empty</h2>
+                <p class="empty-wishlist-text">Start adding products to your wishlist to save them for later!</p>
+                <a href="products" class="btn btn-primary btn-explore-wishlist">
                     Explore Products
                 </a>
             </div>
