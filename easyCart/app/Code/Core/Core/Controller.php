@@ -2,6 +2,33 @@
 // app/Code/Core/Core/Controller.php
 
 class Core_Controller {
+    
+    /**
+     * Constructor - runs on every controller instantiation
+     * Checks if logged-in user is still active, logs out if deactivated
+     */
+    public function __construct() {
+        $this->checkUserStatus();
+    }
+    
+    /**
+     * Check if current user is active, logout if deactivated
+     */
+    protected function checkUserStatus() {
+        if (isLoggedIn()) {
+            $user = getCurrentUser();
+            
+            // Check if user is deactivated
+            if (isset($user['is_active']) && !$user['is_active']) {
+                // Log out the deactivated user
+                logoutUser();
+                
+                // Redirect to signin with message
+                $this->redirect('signin?message=account_deactivated');
+            }
+        }
+    }
+    
     protected function view($viewPath, $data = []) {
         // Updated to support new View class structure if needed, 
         // but keeping compatibility with existing simple file-based views for now

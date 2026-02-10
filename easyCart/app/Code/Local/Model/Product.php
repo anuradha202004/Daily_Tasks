@@ -33,6 +33,19 @@ class Model_Product extends Core_Model {
         return null;
     }
 
+    /**
+     * Load product by URL slug
+     * @param string $slug
+     * @return array|null
+     */
+    public function loadBySlug($slug) {
+        $productId = $this->resource->getProductIdBySlug($slug);
+        if ($productId) {
+            return $this->load($productId);
+        }
+        return null;
+    }
+
     public function getCollection() {
         return new Model_Product_Collection();
     }

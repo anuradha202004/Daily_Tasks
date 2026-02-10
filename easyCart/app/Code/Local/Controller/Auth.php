@@ -50,13 +50,23 @@ class Controller_Auth extends Core_Controller {
         }
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $name = $_POST['name'] ?? '';
-            $email = $_POST['email'] ?? '';
-            $password = $_POST['password'] ?? '';
-            $confirm = $_POST['confirm_password'] ?? '';
+            // Use Core_Validator for validation
+            $validator = new Core_Validator();
+            $validator->addRule('name', 'required|min:2|max:100', 'Full Name')
+                      ->addRule('email', 'required|email|unique:users,email', 'Email')
+                      ->addRule('password', 'required|min:8', 'Password')
+                      ->addRule('confirm_password', 'required|match:password', 'Password Confirmation');
             
-            // Using existing global logic for now
-            $result = registerUser($email, $password, $name, $confirm);
+            if (!$validator->validate($_POST)) {
+                $this->view('auth/signup', [
+                    'errors' => $validator->getErrors(),
+                    'values' => $_POST
+                ]);
+                return;
+            }
+            
+            // Validation passed, use existing registration function
+            $result = registerUser($_POST['email'], $_POST['password'], $_POST['name'], $_POST['confirm_password']);
             
             if ($result['success']) {
                 $this->redirect('');

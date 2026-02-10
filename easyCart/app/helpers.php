@@ -87,8 +87,8 @@ function getGuestSessionId() {
     // Store in session for this request
     $_SESSION['guest_session_id'] = $guestId;
     
-    // Set cookie for 30 days (will be available on next request)
-    setcookie('guest_session_id', $guestId, time() + (86400 * 30), "/");
+    // Set cookie as session cookie (expires when browser is closed)
+    setcookie('guest_session_id', $guestId, 0, "/");
     
     return $guestId;
 }

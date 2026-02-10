@@ -66,34 +66,19 @@ class Controller_Product extends Core_Controller {
     }
 
     public function detail($slug = null) {
-        $productId = null;
+        $product = null;
+        $model = new Model_Product();
         
         if ($slug) {
-             // Handle Slug (e.g. yeti-water-bottle)
-             // Convert back to Name? Or search by LOWER(name)
-             $searchName = str_replace('-', ' ', $slug);
-             
-             // Ideally use a dedicated method in Resource
-             $resource = new Model_Product_Resource();
-             // Since we don't have a getBySlug method, let's query directly or add one
-             // Adding ad-hoc query here via DB instance for speed, but should be in Resource
-             $db = Core_Database::getInstance();
-             // Replace hyphens with spaces in both DB name and search term for robust matching
-             $sql = "SELECT entity_id FROM catalog_product_entity WHERE REPLACE(LOWER(name), '-', ' ') = :name LIMIT 1";
-             $searchName = str_replace('-', ' ', $slug);
-             $row = $db->fetchOne($sql, ['name' => strtolower($searchName)]);
-             $productId = $row ? $row['entity_id'] : null;
+             // Use Model to load by slug (NO SQL in Controller!)
+             $product = $model->loadBySlug($slug);
         } else {
+             // Fallback to legacy id parameter
              $productId = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+             if ($productId) {
+                  $product = $model->load($productId);
+             }
         }
-
-        if (!$productId) {
-            $this->redirect('products');
-            return;
-        }
-
-        $model = new Model_Product();
-        $product = $model->load($productId);
 
         if (!$product) {
             $this->redirect('products');
@@ -110,8 +95,8 @@ class Controller_Product extends Core_Controller {
         $collection->addFilter('category_id', $product['category_id']);
         $relatedProducts = $collection->getData();
         // Filter out current product
-        $relatedProducts = array_filter($relatedProducts, function($p) use ($productId) {
-            return $p['id'] != $productId;
+        $relatedProducts = array_filter($relatedProducts, function($p) use ($product) {
+            return $p['id'] != $product['id'];
         });
         $relatedProducts = array_slice($relatedProducts, 0, 4);
 

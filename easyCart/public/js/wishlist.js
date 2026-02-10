@@ -17,7 +17,7 @@ function toggleWishlist(event, productId) {
     formData.append('product_id', productId);
 
     // Send AJAX request
-    fetch('wishlist.php', {
+    fetch(BASE_URL + 'wishlist', {
         method: 'POST',
         body: formData
     })
@@ -136,7 +136,7 @@ function updateWishlistCount() {
  */
 function initWishlistIcons() {
     // Fetch current wishlist and update all heart icons
-    fetch('wishlist.php', {
+    fetch(BASE_URL + 'wishlist', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
@@ -146,8 +146,11 @@ function initWishlistIcons() {
         .then(response => response.json())
         .then(data => {
             if (data.wishlist && Array.isArray(data.wishlist)) {
-                // Update all heart icons on the page (only elements with heart-icon class)
-                document.querySelectorAll('.heart-icon').forEach(icon => {
+                // Find wishlist buttons - they use different classes in different views
+                const wishlistIcons = document.querySelectorAll('.card-wishlist-btn, .wishlist-toggle-btn, .heart-icon');
+
+                // Update all wishlist icons on the page
+                wishlistIcons.forEach(icon => {
                     const productId = parseInt(icon.dataset.productId || icon.getAttribute('data-product-id'));
                     if (data.wishlist.includes(productId)) {
                         icon.textContent = '❤️';
@@ -159,7 +162,7 @@ function initWishlistIcons() {
         })
         .catch(error => {
             // User might not be logged in, ignore silently
-            console.log('Wishlist not available');
+            console.log('Wishlist not available:', error);
         });
 }
 

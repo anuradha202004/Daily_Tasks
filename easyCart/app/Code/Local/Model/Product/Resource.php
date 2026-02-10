@@ -24,4 +24,22 @@ class Model_Product_Resource extends Core_Model {
         ";
         return $this->db->fetchOne($sql, ['id' => $id]);
     }
+
+    /**
+     * Get product ID by URL slug (name-based)
+     * Normalizes both database name and slug for comparison
+     * @param string $slug
+     * @return int|null
+     */
+    public function getProductIdBySlug($slug) {
+        // Normalize slug: replace hyphens with spaces for matching
+        $searchName = str_replace('-', ' ', $slug);
+        
+        $sql = "SELECT entity_id FROM {$this->tableName} 
+                WHERE REPLACE(LOWER(name), '-', ' ') = :name 
+                LIMIT 1";
+        
+        $row = $this->db->fetchOne($sql, ['name' => strtolower($searchName)]);
+        return $row ? $row['entity_id'] : null;
+    }
 }

@@ -178,13 +178,13 @@ function validateCheckoutForm() {
         isValid = false;
     }
 
-    // Phone Validation: Starts with 6-9, exactly 10 digits
-    const phonePattern = /^[6-9]\d{9}$/;
+    // Phone Validation: Generic digits check, 10-15 digits
+    const phonePattern = /^\d{10,15}$/;
     if (!phone) {
         showError('phoneError', 'Phone number is required');
         isValid = false;
-    } else if (!phonePattern.test(phone)) {
-        showError('phoneError', 'Invalid phone number (Start with 6-9, 10 digits)');
+    } else if (!phonePattern.test(phone.replace(/[\s\-\(\)\+]/g, ''))) {
+        showError('phoneError', 'Invalid phone number (enter 10-15 digits)');
         isValid = false;
     }
 

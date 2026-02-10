@@ -16,7 +16,7 @@ function syncQuantityWithSession(productId, quantity) {
     formData.append('product_id', productId);
     formData.append('quantity', quantity);
 
-    fetch('cart.php', {
+    fetch('cart', { // Removed .php for clean URLs
         method: 'POST',
         headers: { 'X-Requested-With': 'XMLHttpRequest' },
         body: formData
@@ -85,7 +85,7 @@ function saveShippingToSession(method) {
     formData.append('action', 'save_shipping');
     formData.append('method', method);
 
-    fetch('checkout.php', {
+    fetch('checkout', { // Removed .php for clean URLs
         method: 'POST',
         headers: { 'X-Requested-With': 'XMLHttpRequest' },
         body: formData
@@ -139,7 +139,7 @@ function applyPromoCode() {
     formData.append('action', 'apply_promo');
     formData.append('code', code);
 
-    fetch('checkout.php', {
+    fetch('checkout', { // Removed .php for clean URLs
         method: 'POST',
         headers: { 'X-Requested-With': 'XMLHttpRequest' },
         body: formData
@@ -188,7 +188,7 @@ function removePromoCode() {
     const formData = new FormData();
     formData.append('action', 'remove_promo');
 
-    fetch('checkout.php', {
+    fetch('checkout', { // Removed .php for clean URLs
         method: 'POST',
         headers: { 'X-Requested-With': 'XMLHttpRequest' },
         body: formData

@@ -6,11 +6,11 @@
         <a href="dashboard" class="btn-secondary">← Back to Dashboard</a>
     </div>
 
-    <?php if ($data['message']): ?>
+    <?php if (!empty($data['message'])): ?>
         <div class="alert alert-success"><?php echo htmlspecialchars($data['message']); ?></div>
     <?php endif; ?>
     
-    <?php if ($data['error']): ?>
+    <?php if (!empty($data['error'])): ?>
         <div class="alert alert-error"><?php echo htmlspecialchars($data['error']); ?></div>
     <?php endif; ?>
 

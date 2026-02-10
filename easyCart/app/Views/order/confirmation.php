@@ -1,5 +1,9 @@
 <?php include TEMPLATES_PATH . '/header.php'; ?>
 <script src="<?php echo URL_ROOT; ?>/js/order-confirmation.js"></script>
+<script>
+    // Successfully placed order, clear checkout persistence
+    localStorage.removeItem('easycart_checkout_data');
+</script>
 
 <!-- Order Confirmation Page -->
 <section class="container order-confirmation-section">
@@ -29,6 +33,7 @@
         <?php
         $statuses = ['Processing', 'Shipped', 'Delivered', 'Completed'];
         $statusColors = [
+            'Pending' => '#f59e0b',
             'Processing' => '#f59e0b',
             'Shipped' => '#3b82f6',
             'Delivered' => '#10b981',
@@ -37,6 +42,9 @@
         ];
         $currentStatus = $data['order']['status'];
         $currentIndex = array_search($currentStatus, $statuses);
+        if ($currentIndex === false && $currentStatus === 'Pending') {
+            $currentIndex = 0; // Treat Pending as the first stage for timeline purposes
+        }
         ?>
 
         <div class="timeline-wrapper">
@@ -96,7 +104,7 @@
             </h4>
             <p class="current-status-desc">
                 <?php
-                if ($currentStatus === 'Processing') {
+                if ($currentStatus === 'Pending' || $currentStatus === 'Processing') {
                     echo 'Your order is being processed. We\'re preparing your items for shipment.';
                 } elseif ($currentStatus === 'Shipped') {
                     echo 'Your order has been shipped! Track your package with the tracking number provided in your email.';

@@ -1,5 +1,9 @@
 <?php include TEMPLATES_PATH . '/header.php'; ?>
 <script src="<?php echo URL_ROOT; ?>/js/validation.js"></script>
+<script>
+    // Clear checkout persistence data on login page to prevent data leakage between users
+    localStorage.removeItem('easycart_checkout_data');
+</script>
 
 <!-- Sign In Page -->
 <section class="container auth-section">
@@ -17,10 +21,24 @@
         </div>
 
         <!-- Display Errors -->
-        <?php if (!empty($data['errors'])): ?>
+        <?php 
+            // Normalize error messages into a flat array
+            $allErrors = [];
+            // Check for 'errors' (plural) and 'error' (singular) for flexibility
+            $rawErrors = $data['errors'] ?? ($errors ?? ($data['error'] ?? ($error ?? [])));
+            if (!empty($rawErrors)) {
+                if (is_array($rawErrors)) {
+                    array_walk_recursive($rawErrors, function($v) use (&$allErrors) { $allErrors[] = $v; });
+                } else {
+                    $allErrors[] = $rawErrors;
+                }
+            }
+        ?>
+
+        <?php if (!empty($allErrors)): ?>
             <div class="auth-alert-error">
-                <?php foreach ($data['errors'] as $error): ?>
-                    <p>• <?php echo htmlspecialchars($error); ?></p>
+                <?php foreach ($allErrors as $msg): ?>
+                    <p>• <?php echo htmlspecialchars((string)$msg); ?></p>
                 <?php endforeach; ?>
             </div>
         <?php endif; ?>

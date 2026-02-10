@@ -33,6 +33,27 @@ function getCurrentUser() {
 }
 
 /**
+ * Verify if the logged-in user still exists in DB
+ * Used for auto-logout if user is deleted
+ */
+function checkUserExists() {
+    if (!isLoggedIn()) return true;
+    
+    global $pdo;
+    try {
+        $stmt = $pdo->prepare("SELECT 1 FROM users WHERE id = :id");
+        $stmt->execute(['id' => $_SESSION['user_id']]);
+        if (!$stmt->fetch()) {
+            logoutUser();
+            return false;
+        }
+        return true;
+    } catch (PDOException $e) {
+        return true; // Don't logout on DB error
+    }
+}
+
+/**
  * Register new user
  */
 function registerUser($email, $password, $name, $confirmPassword) {
@@ -154,7 +175,7 @@ function loginUser($email, $password) {
         $user = $stmt->fetch();
         
         if (!$user) {
-            return ['success' => false, 'errors' => ['Email not found']];
+            return ['success' => false, 'errors' => ['invalid email id']];
         }
         
         // Verify Password using password_verify()
@@ -222,6 +243,13 @@ function logoutUser() {
     unset($_SESSION['user_name']);
     unset($_SESSION['user_role']);
     unset($_SESSION['login_time']);
+    
+    // Clear guest session cookie to ensure fresh start as guest after logout
+    if (isset($_COOKIE['guest_session_id'])) {
+        setcookie('guest_session_id', '', time() - 3600, "/");
+        unset($_COOKIE['guest_session_id']);
+    }
+    
     session_destroy();
     return true;
 }

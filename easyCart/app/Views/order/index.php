@@ -33,13 +33,14 @@
                             <p class="order-value">
                                 <?php
                                 $statusColors = [
+                                    'Pending' => ['bg' => '#fff3cd', 'color' => '#856404'],
                                     'Processing' => ['bg' => '#fff3cd', 'color' => '#856404'],
                                     'Shipped' => ['bg' => '#cfe2ff', 'color' => '#084298'],
                                     'Delivered' => ['bg' => '#d4edda', 'color' => '#155724'],
                                     'Completed' => ['bg' => '#e2e3e5', 'color' => '#41464b'],
                                     'Cancelled' => ['bg' => '#f8d7da', 'color' => '#842029']
                                 ];
-                                $orderStatus = $order['status'] ?? 'Processing';
+                                $orderStatus = $order['status'] ?? 'Pending';
                                 $statusColor = $statusColors[$orderStatus] ?? ['bg' => '#e5e7eb', 'color' => '#374151'];
                                 ?>
                                 <span class="order-status-badge" style="background: <?php echo $statusColor['bg']; ?>; color: <?php echo $statusColor['color']; ?>;">
@@ -64,6 +65,9 @@
                         $statuses = ['Processing', 'Shipped', 'Delivered', 'Completed'];
                         $currentStatus = $order['status'] ?? 'Processing';
                         $currentIndex = array_search($currentStatus, $statuses);
+                        if ($currentIndex === false && $currentStatus === 'Pending') {
+                            $currentIndex = 0; // Treat Pending as the first stage for timeline purposes
+                        }
                         if ($currentStatus === 'Cancelled') {
                             $currentIndex = -1;
                         }

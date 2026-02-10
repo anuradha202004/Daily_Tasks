@@ -1,4 +1,5 @@
 <?php include TEMPLATES_PATH . '/header.php'; ?>
+<link rel="stylesheet" href="<?php echo baseUrl('css/profile.css'); ?>">
 
 <!-- Profile Page - Modern Design -->
 <section class="container profile-section">
@@ -201,138 +202,126 @@
     
     <!-- Order Analytics Chart Script -->
     <script>
-    <?php if (count($data['orders']) > 0): ?>
-        // Prepare chart data from PHP backend
-        const orderData = <?php 
-            // Sort orders by date
-            $chartOrders = $data['orders']; // Create copy to avoid modifying original info
-            usort($chartOrders, function($a, $b) {
-                return strtotime($a['date']) - strtotime($b['date']);
-            });
-            
-            // Prepare data for chart
-            $chartData = array_map(function($order) {
-                return [
-                    'date' => date('M d', strtotime($order['date'])),
-                    'amount' => floatval($order['subtotal'] + ($order['tax'] ?? 0) + ($order['shipping'] ?? 0)),
-                    'status' => $order['status'] ?? 'Completed',
-                    'orderNumber' => $order['order_number']
-                ];
-            }, $chartOrders);
-            
-            echo json_encode($chartData);
-        ?>;
+    window.addEventListener('load', function() {
+        <?php if (!empty($data['orders'])): ?>
+            try {
+                // Prepare chart data from PHP backend
+                const rawOrderData = <?php 
+                    // Sort orders by date
+                    $chartOrders = $data['orders'];
+                    usort($chartOrders, function($a, $b) {
+                        return strtotime($a['date']) - strtotime($b['date']);
+                    });
+                    
+                    // Prepare data for chart
+                    $chartData = array_map(function($order) {
+                        return [
+                            'date' => date('M d', strtotime($order['date'])),
+                            'amount' => floatval($order['total'] ?? ($order['subtotal'] + ($order['tax'] ?? 0) + ($order['shipping'] ?? 0))),
+                            'status' => $order['status'] ?? 'Pending',
+                            'orderNumber' => $order['order_number']
+                        ];
+                    }, $chartOrders);
+                    
+                    echo json_encode($chartData);
+                ?>;
 
-        // Prepare chart data
-        const orderLabels = orderData.map(item => item.date);
-        const successAmounts = orderData.map(item => {
-            if (item.status === 'Cancelled') return 0;
-            return item.amount;
-        });
-        const cancelledAmounts = orderData.map(item => {
-            if (item.status === 'Cancelled') return item.amount;
-            return 0;
-        });
-        
-        const ctx = document.getElementById('orderChart').getContext('2d');
-        
-        // Gradients
-        const gradientSuccess = ctx.createLinearGradient(0, 0, 0, 400);
-        gradientSuccess.addColorStop(0, 'rgba(16, 185, 129, 0.7)');
-        gradientSuccess.addColorStop(1, 'rgba(16, 185, 129, 0.1)');
-
-        const gradientCancel = ctx.createLinearGradient(0, 0, 0, 400);
-        gradientCancel.addColorStop(0, 'rgba(239, 68, 68, 0.7)');
-        gradientCancel.addColorStop(1, 'rgba(239, 68, 68, 0.1)');
-
-        new Chart(ctx, {
-            type: 'bar', // Switch to bar for better comparison
-            data: {
-                labels: orderLabels,
-                datasets: [
-                    {
-                        label: 'Successful Orders',
-                        data: successAmounts,
-                        backgroundColor: gradientSuccess,
-                        borderColor: '#10b981',
-                        borderWidth: 2,
-                        borderRadius: 6,
-                        barPercentage: 0.6,
-                    },
-                    {
-                        label: 'Cancelled Orders',
-                        data: cancelledAmounts,
-                        backgroundColor: gradientCancel,
-                        borderColor: '#ef4444',
-                        borderWidth: 2,
-                        borderRadius: 6,
-                        barPercentage: 0.6,
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                interaction: {
-                    mode: 'index',
-                    intersect: false,
-                },
-                plugins: {
-                    legend: {
-                        display: false // Custom legend used
-                    },
-                    tooltip: {
-                        backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                        titleColor: '#1f2937',
-                        bodyColor: '#4b5563',
-                        borderColor: '#e5e7eb',
-                        borderWidth: 1,
-                        padding: 12,
-                        callbacks: {
-                            label: function(context) {
-                                let label = context.dataset.label || '';
-                                if (label) {
-                                    label += ': ';
-                                }
-                                if (context.parsed.y !== null) {
-                                    label += new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(context.parsed.y);
-                                }
-                                return label;
-                            }
-                        }
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        grid: {
-                            color: 'rgba(0, 0, 0, 0.05)',
-                            drawBorder: false
-                        },
-                        ticks: {
-                            callback: function(value) {
-                                return '$' + value;
-                            },
-                            font: {
-                                family: "'Inter', sans-serif"
-                            }
-                        }
-                    },
-                    x: {
-                        grid: {
-                            display: false
-                        },
-                        ticks: {
-                            font: {
-                                family: "'Inter', sans-serif"
-                            }
-                        }
-                    }
+                if (!rawOrderData || rawOrderData.length === 0) {
+                    console.warn('No order data found for chart');
+                    return;
                 }
-            }
-        });
 
-    <?php endif; ?>
+                // Prepare chart data
+                const orderLabels = rawOrderData.map(item => item.date);
+                const successAmounts = rawOrderData.map(item => (item.status !== 'Cancelled') ? item.amount : 0);
+                const cancelledAmounts = rawOrderData.map(item => (item.status === 'Cancelled') ? item.amount : 0);
+                
+                const canvas = document.getElementById('orderChart');
+                if (!canvas) return;
+                const ctx = canvas.getContext('2d');
+                
+                // Gradients
+                const gradientSuccess = ctx.createLinearGradient(0, 0, 0, 400);
+                gradientSuccess.addColorStop(0, 'rgba(16, 185, 129, 0.7)');
+                gradientSuccess.addColorStop(1, 'rgba(16, 185, 129, 0.05)');
+
+                const gradientCancel = ctx.createLinearGradient(0, 0, 0, 400);
+                gradientCancel.addColorStop(0, 'rgba(239, 68, 68, 0.7)');
+                gradientCancel.addColorStop(1, 'rgba(239, 68, 68, 0.05)');
+
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: orderLabels,
+                        datasets: [
+                            {
+                                label: 'Successful',
+                                data: successAmounts,
+                                backgroundColor: gradientSuccess,
+                                borderColor: '#10b981',
+                                borderWidth: 1.5,
+                                borderRadius: 4,
+                                barPercentage: 0.7,
+                                categoryPercentage: 0.8
+                            },
+                            {
+                                label: 'Cancelled',
+                                data: cancelledAmounts,
+                                backgroundColor: gradientCancel,
+                                borderColor: '#ef4444',
+                                borderWidth: 1.5,
+                                borderRadius: 4,
+                                barPercentage: 0.7,
+                                categoryPercentage: 0.8
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                backgroundColor: 'rgba(255, 255, 255, 0.98)',
+                                titleColor: '#1f2937',
+                                bodyColor: '#4b5563',
+                                borderColor: '#e5e7eb',
+                                borderWidth: 1,
+                                padding: 12,
+                                boxPadding: 6,
+                                callbacks: {
+                                    label: function(context) {
+                                        let label = context.dataset.label || '';
+                                        if (label) label += ': ';
+                                        if (context.parsed.y !== null) {
+                                            label += new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(context.parsed.y);
+                                        }
+                                        return label;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: { color: 'rgba(0, 0, 0, 0.03)', drawBorder: false },
+                                ticks: {
+                                    callback: value => '$' + value,
+                                    font: { family: "'Inter', sans-serif", size: 11 }
+                                }
+                            },
+                            x: {
+                                grid: { display: false },
+                                ticks: { font: { family: "'Inter', sans-serif", size: 11 } }
+                            }
+                        }
+                    }
+                });
+            } catch (e) {
+                console.error('Chart failed to initialize:', e);
+            }
+        <?php endif; ?>
+    });
     </script>
 </section>
 

@@ -35,7 +35,8 @@
                     <?php if (isLoggedIn()): ?>
                     <!-- Wishlist Toggle -->
                     <div onclick="toggleWishlist(event, <?php echo $data['product']['id']; ?>)" 
-                            class="wishlist-toggle-btn">
+                            class="wishlist-toggle-btn"
+                            data-product-id="<?php echo $data['product']['id']; ?>">
                             <?php echo (isset($_SESSION['wishlist']) && in_array($data['product']['id'], $_SESSION['wishlist'])) ? '❤️' : '🤍'; ?>
                     </div>
                     <?php endif; ?>

@@ -44,7 +44,7 @@
         <div class="checkout-grid">
             <!-- Checkout Form -->
             <div class="checkout-form-wrapper">
-                <form method="POST" action="" id="checkoutForm" onsubmit="return validateCheckoutForm()">
+                <form method="POST" action="<?php echo URL_ROOT; ?>/checkout" id="checkoutForm" onsubmit="return validateCheckoutForm()">
                     <input type="hidden" name="action" value="complete_order">
                     <?php if ($data['isBuyNow'] && $data['directProduct']): ?>
                         <input type="hidden" name="product_id" value="<?php echo $data['directProduct']['id']; ?>">

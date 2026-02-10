@@ -37,6 +37,9 @@ if (file_exists(CONFIG_PATH . '/database/config.php')) {
 require_once CORE_PATH . '/data.php'; // Still needed for now
 require_once CORE_PATH . '/auth.php'; // Still needed for now
 
+// Auto-logout if user was deleted from DB
+checkUserExists();
+
 // Initialize database connection using new Core_Database if needed globally
 // But for now, we let classes instantiate it on demand.
 

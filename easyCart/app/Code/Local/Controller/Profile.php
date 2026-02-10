@@ -3,6 +3,7 @@
 class Controller_Profile extends Core_Controller {
     
     public function __construct() {
+        parent::__construct();
         if (!isLoggedIn()) {
             $this->redirect('signin');
             exit;
@@ -14,7 +15,21 @@ class Controller_Profile extends Core_Controller {
         
         // Fetch Orders using Model_Order
         $orderModel = new Model_Order();
-        $orders = $orderModel->getOrdersByUserId($user['id']);
+        $rawOrders = $orderModel->getOrdersByUserId($user['id']);
+        
+        // Map order data to match view expectations
+        $orders = array_map(function($order) {
+            return [
+                'order_number' => $order['increment_id'],
+                'date' => $order['created_at'],
+                'status' => ucfirst($order['status']),
+                'subtotal' => (float)$order['subtotal'],
+                'tax' => (float)($order['tax_amount'] ?? 0),
+                'shipping' => (float)($order['shipping_amount'] ?? 0),
+                'total' => (float)$order['grand_total'],
+                'discount' => (float)($order['discount_amount'] ?? 0)
+            ];
+        }, $rawOrders);
         
         $view = new View_Product('profile/index');
         $view->assign('user', $user)

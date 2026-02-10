@@ -5,10 +5,23 @@
     <div class="modal-content auth-card-static">
         <h1 class="modal-title">Create Account</h1>
         
-        <?php if (!empty($data['errors'])): ?>
+        <?php 
+            // Normalize error messages into a flat array
+            $allErrors = [];
+            $rawErrors = $data['errors'] ?? ($errors ?? []);
+            if (!empty($rawErrors)) {
+                if (is_array($rawErrors)) {
+                    array_walk_recursive($rawErrors, function($v) use (&$allErrors) { $allErrors[] = $v; });
+                } else {
+                    $allErrors[] = $rawErrors;
+                }
+            }
+        ?>
+
+        <?php if (!empty($allErrors)): ?>
             <div class="auth-alert-error-red">
-                <?php foreach ($data['errors'] as $error): ?>
-                    <p>• <?php echo htmlspecialchars($error); ?></p>
+                <?php foreach ($allErrors as $msg): ?>
+                    <p>• <?php echo htmlspecialchars((string)$msg); ?></p>
                 <?php endforeach; ?>
             </div>
         <?php endif; ?>

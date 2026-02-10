@@ -29,7 +29,16 @@
                     <div class="product-image-container">
                         <div class="product-image-content">
                             <?php if (!empty($product['image'])): ?>
-                                <img src="<?php echo strpos($product['image'], 'http') === 0 ? $product['image'] : URL_ROOT . '/' . ltrim($product['image'], '/'); ?>" alt="<?php echo htmlspecialchars($product['name']); ?>">
+                                <?php 
+                                    $imgSrc = $product['image'];
+                                    if (strpos($imgSrc, 'http') === 0) {
+                                        // External URL
+                                    } else {
+                                        $imgSrc = preg_replace('/^(\/)?public\//', '', $imgSrc);
+                                        $imgSrc = baseUrl($imgSrc);
+                                    }
+                                ?>
+                                <img src="<?php echo $imgSrc; ?>" alt="<?php echo htmlspecialchars($product['name']); ?>">
                             <?php else: ?>
                                 <span class="wishlist-emoji"><?php echo $product['emoji']; ?></span>
                             <?php endif; ?>
