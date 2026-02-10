@@ -24,38 +24,21 @@ define('TEMPLATES_PATH', RESOURCES_PATH . '/templates');
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-// Autoloader
-spl_autoload_register(function ($class) {
-    // Convert namespace to file path
-    $file = APP_PATH . '/' . str_replace('\\', '/', $class) . '.php';
-    
-    if (file_exists($file)) {
-        require_once $file;
-        return true;
-    }
-    
-    return false;
-});
+// Autoloader - Register logic for standard classes
+require_once __DIR__ . '/Autoloader.php';
 
 // Load configuration
 if (file_exists(CONFIG_PATH . '/database/config.php')) {
     require_once CONFIG_PATH . '/database/config.php';
 }
 
-// Load Core Components
-require_once CORE_PATH . '/db.php';
-require_once CORE_PATH . '/data.php';
+// Load legacy components temporarily until refactored
+// require_once CORE_PATH . '/db.php'; // Replaced by Core_Database
+require_once CORE_PATH . '/data.php'; // Still needed for now
+require_once CORE_PATH . '/auth.php'; // Still needed for now
 
-// Initialize database connection
-// getDBConnection() is defined in db.php
-try {
-    $pdo = getDBConnection();
-} catch (Exception $e) {
-    // Handle connection error safely
-}
-
-// Load Auth after DB
-require_once CORE_PATH . '/auth.php';
+// Initialize database connection using new Core_Database if needed globally
+// But for now, we let classes instantiate it on demand.
 
 // Load helper functions
 require_once APP_PATH . '/helpers.php';

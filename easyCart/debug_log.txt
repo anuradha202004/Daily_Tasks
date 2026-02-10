@@ -1,0 +1,1130 @@
+Request URI: /products
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /
+GET url: NOT SET
+Request URI: /
+GET url: NOT SET
+Request URI: /contact
+GET url: NOT SET
+Request URI: /signin
+GET url: NOT SET
+Request URI: /signin
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /
+GET url: NOT SET
+Request URI: /
+GET url: NOT SET
+Request URI: /
+GET url: NOT SET
+Request URI: /
+GET url: NOT SET
+Request URI: /
+GET url: NOT SET
+Request URI: /
+GET url: NOT SET
+Request URI: /
+GET url: NOT SET
+Request URI: /
+GET url: NOT SET
+Request URI: /
+GET url: NOT SET
+Request URI: /
+GET url: NOT SET
+Request URI: /
+GET url: NOT SET
+Request URI: /
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /product-detail?id=106
+GET url: NOT SET
+Request URI: /product-detail?id=106
+GET url: NOT SET
+Request URI: /
+GET url: NOT SET
+Request URI: /product-detail?id=106
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /product-detail?id=91
+GET url: NOT SET
+Request URI: /product-detail?id=81
+GET url: NOT SET
+Request URI: /product-detail?id=106
+GET url: NOT SET
+Request URI: /product-detail?id=106
+GET url: NOT SET
+Request URI: /product-detail?id=106
+GET url: NOT SET
+Request URI: /
+GET url: NOT SET
+Request URI: /
+GET url: NOT SET
+Request URI: /contact
+GET url: NOT SET
+Request URI: /
+GET url: NOT SET
+Request URI: /
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /product-detail?id=105
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /product-detail?id=105
+GET url: NOT SET
+Request URI: /
+GET url: NOT SET
+Request URI: /product-detail?id=106
+GET url: NOT SET
+Request URI: /
+GET url: NOT SET
+Request URI: /
+GET url: NOT SET
+Request URI: /
+GET url: NOT SET
+Request URI: /
+GET url: NOT SET
+Request URI: /product-detail?id=106
+GET url: NOT SET
+Request URI: /product-detail?id=105
+GET url: NOT SET
+Request URI: /
+GET url: NOT SET
+Request URI: /
+GET url: NOT SET
+Request URI: /
+GET url: NOT SET
+Request URI: /
+GET url: NOT SET
+Request URI: /
+GET url: NOT SET
+Request URI: /
+GET url: NOT SET
+Request URI: /
+GET url: NOT SET
+Request URI: /product-detail?id=105
+GET url: NOT SET
+Request URI: /product-detail?id=105
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /product-detail?id=106
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /product/106-new-test-product
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /product/new-test-product
+GET url: NOT SET
+Request URI: /product/new-test-product
+GET url: NOT SET
+Request URI: /product/new-test-product
+GET url: NOT SET
+Request URI: /product/new-test-product
+GET url: NOT SET
+Request URI: /product/yeti-water-bottle
+GET url: NOT SET
+Request URI: /product/yeti-water-bottle
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /products?categories%5B%5D=3&min_price=0&max_price=10000&sort=newest
+GET url: NOT SET
+Request URI: /product/modern-rug
+GET url: NOT SET
+Request URI: /product/modern-rug
+GET url: NOT SET
+Request URI: /products?categories%5B%5D=3&min_price=0&max_price=10000&sort=newest
+GET url: NOT SET
+Request URI: /product/modern-rug
+GET url: NOT SET
+Request URI: /product/modern-rug
+GET url: NOT SET
+Request URI: /product/vintage-chair
+GET url: NOT SET
+Request URI: /product/vintage-chair
+GET url: NOT SET
+Request URI: /product/vintage-chair
+GET url: NOT SET
+Request URI: /product/vintage-chair
+GET url: NOT SET
+Request URI: /product/vintage-chair
+GET url: NOT SET
+Request URI: /product/vintage-chair
+GET url: NOT SET
+Request URI: /product/vintage-chair
+GET url: NOT SET
+Request URI: /product/vintage-chair
+GET url: NOT SET
+Request URI: /product/product-detail?id=78
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /product/new-test-product
+GET url: NOT SET
+Request URI: /product/basic-atlas
+GET url: NOT SET
+Request URI: /product/product-detail?id=91
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /signin
+GET url: NOT SET
+Request URI: /signup
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /product/new-test-product
+GET url: NOT SET
+Request URI: /product/product-detail?id=91
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /product/sony-wh-1000xm5
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /product/sony-wh-1000xm5
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /product/sony-wh-1000xm5
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /product/sony-wh-1000xm5
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /product/yeti-water-bottle
+GET url: NOT SET
+Request URI: /product/yeti-water-bottle
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /product/sony-wh-1000xm5
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /product/macbook-air-m3
+GET url: NOT SET
+Request URI: /product/product-detail?id=81
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /product/sony-wh-1000xm5
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /product/sony-wh-1000xm5
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /product/yeti-water-bottle
+GET url: NOT SET
+Request URI: /product/yeti-water-bottle
+GET url: NOT SET
+Request URI: /product/sony-wh-1000xm5
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /product/smart-bat
+GET url: NOT SET
+Request URI: /product/sony-wh-1000xm5
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /product/new-test-product
+GET url: NOT SET
+Request URI: /product/product/vintage-laptop
+GET url: NOT SET
+Request URI: /product/product/vintage-laptop
+GET url: NOT SET
+Request URI: /product/product/vintage-laptop
+GET url: NOT SET
+Request URI: /product/product/vintage-laptop
+GET url: NOT SET
+Request URI: /product/product/vintage-laptop
+GET url: NOT SET
+Request URI: /product/product/vintage-laptop
+GET url: NOT SET
+Request URI: /product/new-test-product
+GET url: NOT SET
+Request URI: /product/product/vintage-laptop
+GET url: NOT SET
+Request URI: /product/product/vintage-laptop
+GET url: NOT SET
+Request URI: /product/product/vintage-laptop
+GET url: NOT SET
+Request URI: /product/new-test-product
+GET url: NOT SET
+Request URI: /product/new-test-product
+GET url: NOT SET
+Request URI: /product/new-test-product
+GET url: NOT SET
+Request URI: /product/new-test-product
+GET url: NOT SET
+Request URI: /product/product/vintage-laptop
+GET url: NOT SET
+Request URI: /product/product/vintage-laptop
+GET url: NOT SET
+Request URI: /product/product/vintage-laptop
+GET url: NOT SET
+Request URI: /product/product/vintage-laptop
+GET url: NOT SET
+Request URI: /product/product/vintage-laptop
+GET url: NOT SET
+Request URI: /product/product/vintage-laptop
+GET url: NOT SET
+Request URI: /product/product/vintage-laptop
+GET url: NOT SET
+Request URI: /product/new-test-product
+GET url: NOT SET
+Request URI: /product/new-test-product
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /product/yeti-water-bottle
+GET url: NOT SET
+Request URI: /product/vintage-laptop
+GET url: NOT SET
+Request URI: /product/vintage-laptop
+GET url: NOT SET
+Request URI: /product/vintage-laptop
+GET url: NOT SET
+Request URI: /product/yeti-water-bottle
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /product/classic-white-tee
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /product/vintage-comic
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /product/sony-wh-1000xm5
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /product/sony-wh-1000xm5
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /product/smart-bat
+GET url: NOT SET
+Request URI: /product/sony-wh-1000xm5
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /
+GET url: NOT SET
+Request URI: /product/sony-wh-1000xm5
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /
+GET url: NOT SET
+Request URI: /product/new-test-product
+GET url: NOT SET
+Request URI: /product/sony-wh-1000xm5
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /product/yeti-water-bottle
+GET url: NOT SET
+Request URI: /product/macbook-air-m3
+GET url: NOT SET
+Request URI: /product/sony-wh-1000xm5
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /product/sony-wh-1000xm5
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /product/pro-racket
+GET url: NOT SET
+Request URI: /product/pro-racket
+GET url: NOT SET
+Request URI: /product/pro-racket
+GET url: NOT SET
+Request URI: /product/smart-bat
+GET url: NOT SET
+Request URI: /product/pro-racket
+GET url: NOT SET
+Request URI: /product/pro-racket
+GET url: NOT SET
+Request URI: /product/yeti-water-bottle
+GET url: NOT SET
+Request URI: /product/new-test-product
+GET url: NOT SET
+Request URI: /product/macbook-air-m3
+GET url: NOT SET
+Request URI: /product/sony-wh-1000xm5
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /product/modern-textbook
+GET url: NOT SET
+Request URI: /
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /product/sony-wh-1000xm5
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /
+GET url: NOT SET
+Request URI: /
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /product/pro-racket
+GET url: NOT SET
+Request URI: /product/premium-jacket
+GET url: NOT SET
+Request URI: /product/cart
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /product/premium-jacket
+GET url: NOT SET
+Request URI: /product/cart
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /product/premium-jacket
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /product/sony-wh-1000xm5
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /
+GET url: NOT SET
+Request URI: /
+GET url: NOT SET
+Request URI: /
+GET url: NOT SET
+Request URI: /product/sony-wh-1000xm5
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /
+GET url: NOT SET
+Request URI: /
+GET url: NOT SET
+Request URI: /
+GET url: NOT SET
+Request URI: /
+GET url: NOT SET
+Request URI: /
+GET url: NOT SET
+Request URI: /product/sony-wh-1000xm5
+GET url: NOT SET
+Request URI: /product/sony-wh-1000xm5
+GET url: NOT SET
+Request URI: /product/sony-wh-1000xm5
+GET url: NOT SET
+Request URI: /product/cart
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /product/sony-wh-1000xm5
+GET url: NOT SET
+Request URI: /product/vintage-laptop
+GET url: NOT SET
+Request URI: /product/cart
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /product/vintage-laptop
+GET url: NOT SET
+Request URI: /product/cart
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /product/cart
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /product/cart
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /product/vintage-laptop
+GET url: NOT SET
+Request URI: /product/vintage-laptop
+GET url: NOT SET
+Request URI: /product/vintage-laptop
+GET url: NOT SET
+Request URI: /product/cart
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /product/cart
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /product/cart
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /product/vintage-laptop
+GET url: NOT SET
+Request URI: /product/vintage-laptop
+GET url: NOT SET
+Request URI: /
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /product/new-test-product
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /product/new-test-product
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /product/sony-wh-1000xm5
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /product/sony-wh-1000xm5
+GET url: NOT SET
+Request URI: /
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /about
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /about
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /product/vintage-scarf
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /product/vintage-scarf
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /product/pro-racket
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /product/pro-racket
+GET url: NOT SET
+Request URI: /product/vintage-laptop
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /product/vintage-laptop
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /product/sony-wh-1000xm5
+GET url: NOT SET
+Request URI: /product/sony-wh-1000xm5
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /
+GET url: NOT SET
+Request URI: /product/premium-jacket
+GET url: NOT SET
+Request URI: /product/checkout?product_id=100&qty=10&reset_shipping=1
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /product/premium-jacket
+GET url: NOT SET
+Request URI: /product/checkout?product_id=100&qty=10&reset_shipping=1
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /
+GET url: NOT SET
+Request URI: /checkout?product_id=104&qty=1&reset_shipping=1
+GET url: NOT SET
+Request URI: /signin?redirect=checkout
+GET url: NOT SET
+Request URI: /
+GET url: NOT SET
+Request URI: /checkout?product_id=104&qty=1&reset_shipping=1
+GET url: NOT SET
+Request URI: /signin?redirect=checkout
+GET url: NOT SET
+Request URI: /product/sony-wh-1000xm5
+GET url: NOT SET
+Request URI: /product/checkout?product_id=104&qty=1&reset_shipping=1
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /checkout?product_id=106&qty=1&reset_shipping=1
+GET url: NOT SET
+Request URI: /signin?redirect=checkout
+GET url: NOT SET
+Request URI: /product/new-test-product
+GET url: NOT SET
+Request URI: /product/checkout?product_id=106&qty=10&reset_shipping=1
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /product/new-test-product
+GET url: NOT SET
+Request URI: /product/signin?redirect=checkout%3Fproduct_id%3D106%26qty%3D10%26reset_shipping%3D1
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /product/new-test-product
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /product/yeti-water-bottle
+GET url: NOT SET
+Request URI: /product/signin?redirect=checkout%3Fproduct_id%3D105%26qty%3D7%26reset_shipping%3D1
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /product/yeti-water-bottle
+GET url: NOT SET
+Request URI: /product/yeti-water-bottle
+GET url: NOT SET
+Request URI: /product/signin?redirect=checkout%3Fproduct_id%3D105%26qty%3D7%26reset_shipping%3D1
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /checkout?product_id=105&qty=1&reset_shipping=1
+GET url: NOT SET
+Request URI: /signin?redirect=checkout
+GET url: NOT SET
+Request URI: /product/sony-wh-1000xm5
+GET url: NOT SET
+Request URI: /product/signin?redirect=checkout%3Fproduct_id%3D104%26qty%3D1%26reset_shipping%3D1
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /
+GET url: NOT SET
+Request URI: /
+GET url: NOT SET
+Request URI: /
+GET url: NOT SET
+Request URI: /product/sony-wh-1000xm5
+GET url: NOT SET
+Request URI: /product/signin?redirect=checkout%3Fproduct_id%3D104%26qty%3D1%26reset_shipping%3D1
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /product/sony-wh-1000xm5
+GET url: NOT SET
+Request URI: /product/sony-wh-1000xm5
+GET url: NOT SET
+Request URI: /product/sony-wh-1000xm5
+GET url: NOT SET
+Request URI: /product/sony-wh-1000xm5
+GET url: NOT SET
+Request URI: /signin?redirect=checkout%3Fproduct_id%3D104%26qty%3D1%26reset_shipping%3D1
+GET url: NOT SET
+Request URI: /product/sony-wh-1000xm5
+GET url: NOT SET
+Request URI: /products
+GET url: NOT SET
+Request URI: /
+GET url: NOT SET
+Request URI: /
+GET url: NOT SET
+Request URI: /product/macbook-air-m3
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /product/macbook-air-m3
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /cart
+GET url: NOT SET
+Request URI: /product/macbook-air-m3
+GET url: NOT SET
+Request URI: /product/macbook-air-m3
+GET url: NOT SET

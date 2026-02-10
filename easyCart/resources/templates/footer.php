@@ -11,10 +11,10 @@
                 </div>
                 <div class="footer-section">
                     <h4>Quick Links</h4>
-                    <a href="/">Home</a>
-                    <a href="products">Products</a>
-                    <a href="index.php#about">About</a>
-                    <a href="index.php#contact">Contact</a>
+                    <a href="<?php echo url(''); ?>">Home</a>
+                    <a href="<?php echo url('products'); ?>">Products</a>
+                    <a href="<?php echo url('about'); ?>">About</a>
+                    <a href="<?php echo url('contact'); ?>">Contact</a>
                 </div>
                 <div class="footer-section">
                     <h4>Customer Service</h4>
@@ -37,6 +37,6 @@
         </div>
     </footer>
 
-    <script src="public/js/footer.js"></script>
+    <script src="<?php echo baseUrl('js/footer.js'); ?>"></script>
 </body>
 </html>

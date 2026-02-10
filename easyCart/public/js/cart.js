@@ -17,7 +17,7 @@ function addToCart(productId, quantity = 1) {
         btn.disabled = true;
     }
 
-    fetch('cart', {
+    fetch(BASE_URL + 'cart', {
         method: 'POST',
         headers: {
             'X-Requested-With': 'XMLHttpRequest'
@@ -132,7 +132,7 @@ function updateQuantityAjax(cartItem, quantity) {
     // Show loading state
     cartItem.style.opacity = '0.7';
 
-    fetch('cart', {
+    fetch(BASE_URL + 'cart', {
         method: 'POST',
         headers: { 'X-Requested-With': 'XMLHttpRequest' },
         body: formData
@@ -192,7 +192,7 @@ function removeCartItem(btn) {
         cartItem.style.transform = 'translateX(100px)';
         cartItem.style.opacity = '0';
 
-        fetch('cart', {
+        fetch(BASE_URL + 'cart', {
             method: 'POST',
             headers: { 'X-Requested-With': 'XMLHttpRequest' },
             body: formData

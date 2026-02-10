@@ -20,13 +20,24 @@ function redirect($url) {
 }
 
 /**
- * Get the base URL
+ * Get the base URL of the application (root of project)
+ * @param string $path
+ * @return string
+ */
+function url($path = '') {
+    // If URL_ROOT is defined (points to /public), we go one level up for the project root
+    // Fix: dirname on URL is unreliable. We assume standard structure where we split by /public
+    $root = str_replace('/public', '', URL_ROOT);
+    return $root . '/' . ltrim($path, '/');
+}
+
+/**
+ * Get the base URL for public assets (points directly to /public)
+ * @param string $path
  * @return string
  */
 function baseUrl($path = '') {
-    $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
-    $host = $_SERVER['HTTP_HOST'];
-    return $protocol . '://' . $host . '/' . ltrim($path, '/');
+    return URL_ROOT . '/' . ltrim($path, '/');
 }
 
 /**
@@ -59,14 +70,24 @@ function e($string) {
  * Uses a long-lived cookie to track guests
  */
 function getGuestSessionId() {
+    // First check session (for current request consistency)
+    if (isset($_SESSION['guest_session_id'])) {
+        return $_SESSION['guest_session_id'];
+    }
+    
+    // Then check cookie (for persistence across requests)
     if (isset($_COOKIE['guest_session_id'])) {
+        $_SESSION['guest_session_id'] = $_COOKIE['guest_session_id'];
         return $_COOKIE['guest_session_id'];
     }
     
     // Generate new unique ID
     $guestId = bin2hex(random_bytes(16));
     
-    // Set cookie for 30 days
+    // Store in session for this request
+    $_SESSION['guest_session_id'] = $guestId;
+    
+    // Set cookie for 30 days (will be available on next request)
     setcookie('guest_session_id', $guestId, time() + (86400 * 30), "/");
     
     return $guestId;

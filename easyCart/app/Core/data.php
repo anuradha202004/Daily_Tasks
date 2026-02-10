@@ -81,7 +81,7 @@ try {
         // Use image from database (already fetched in JOIN at line 65)
         // If no image in DB, use a default fallback
         if (!$row['image']) {
-            $row['image'] = 'public/img/products/laptop.png';
+            $row['image'] = 'img/products/laptop.png';
         }
         
         // Get category for this product
