@@ -216,13 +216,13 @@ function updateCheckoutPrices() {
     let subtotal = 0;
     let discount = 0;
 
-    // Calculate new subtotal and update each item's price
+    // Calculate bulk discount: 1% discount per item (e.g. 2 items = 2%, 5 items = 5%)
     summaryItems.forEach(item => {
         const price = parseFloat(item.dataset.productPrice);
         const qty = parseInt(item.querySelector('.qty-input-small').value);
         const itemTotal = price * qty;
 
-        // Calculate bulk discount: 1% discount per item (e.g. 2 items = 2%, 5 items = 5%)
+        // Apply rule: 1% discount per item quantity
         if (qty > 0) {
             discount += itemTotal * (qty / 100);
         }
@@ -234,6 +234,21 @@ function updateCheckoutPrices() {
         // Add to subtotal
         subtotal += itemTotal;
     });
+
+    // Update dynamic discount message
+    const discountInfoBox = document.getElementById('checkout-discount-info');
+    const discountMsgEl = document.getElementById('discount-tier-msg');
+
+    if (discountInfoBox && discountMsgEl) {
+        if (discount > 0) {
+            discountMsgEl.innerHTML = `<p style="margin:0; color: #10b981;">🎉 <strong>Quantity Discount:</strong> Saving ${formatPrice(discount)} (1% off per item qty)</p>`;
+            discountMsgEl.style.background = 'linear-gradient(135deg, #d1fae5 0%, #ecfdf5 100%)';
+            discountMsgEl.style.borderLeft = '4px solid #10b981';
+            discountInfoBox.style.display = 'block';
+        } else {
+            discountInfoBox.style.display = 'none';
+        }
+    }
 
     // Calculate Promo Discount
     let promoDiscount = 0;

@@ -81,11 +81,15 @@ class Controller_Order extends Core_Controller {
             ];
         }
 
-        // Tiered bulk discount calculation
+        // Calculate bulk discount: 1% discount per item (e.g. 2 items = 2%, 5 items = 5%)
         $discount = 0;
-        if ($subtotal >= 1000) $discount = $subtotal * 0.15;
-        elseif ($subtotal >= 500) $discount = $subtotal * 0.10;
-        elseif ($subtotal >= 100) $discount = $subtotal * 0.05;
+        foreach ($items as $item) {
+            $qty = (int)$item['quantity'];
+            if ($qty > 0) {
+                $itemTotal = $item['product']['price'] * $qty;
+                $discount += $itemTotal * ($qty / 100);
+            }
+        }
         
         $promoDiscount = 0; // Promo logic placeholder
         $discountedSubtotal = $subtotal - $discount - $promoDiscount;
@@ -279,11 +283,15 @@ class Controller_Order extends Core_Controller {
                 $subtotal = $totals['subtotal'];
             }
 
-            // Calculation Logic
+            // Calculate bulk discount: 1% discount per item (e.g. 2 items = 2%, 5 items = 5%)
             $discount = 0;
-            if ($subtotal >= 1000) $discount = $subtotal * 0.15;
-            elseif ($subtotal >= 500) $discount = $subtotal * 0.10;
-            elseif ($subtotal >= 100) $discount = $subtotal * 0.05;
+            foreach ($items as $item) {
+                $qty = (int)$item['quantity'];
+                if ($qty > 0) {
+                    $itemTotal = $item['product']['price'] * $qty;
+                    $discount += $itemTotal * ($qty / 100);
+                }
+            }
 
             // Dynamic shipping calculation matching new rules
             $shippingMethod = $_POST['shipping_method'] ?? 'standard';

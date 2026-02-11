@@ -151,6 +151,26 @@
                         🔒 <strong>Secure Checkout:</strong> All transactions are protected
                     </p>
                 </div>
+
+                <!-- Bulk Discount Info -->
+                <?php
+                $currentDiscount = $data['discount'];
+                ?>
+                
+                <?php if ($currentDiscount > 0): ?>
+                    <div class="secure-info-box" style="background: linear-gradient(135deg, #d1fae5 0%, #ecfdf5 100%); border-left-color: #10b981;">
+                        <p class="secure-text" style="color: #10b981;">
+                            🎉 <strong>Quantity Discount Active:</strong> You're saving <?php echo formatPrice($currentDiscount); ?>
+                            <br><small style="font-size: 12px; opacity: 0.8;">You get 1% off for every unit of a product in your cart!</small>
+                        </p>
+                    </div>
+                <?php else: ?>
+                    <div class="secure-info-box" style="background: linear-gradient(135deg, #f0f7ff 0%, #ffffff 100%); border-left-color: #2563eb;">
+                        <p class="secure-text" style="color: #2563eb;">
+                            💡 <strong>Smart Tip:</strong> The more quantity you buy of a single product, the higher your discount! (1% per item)
+                        </p>
+                    </div>
+                <?php endif; ?>
             </div>
         </div>
     <?php else: ?>

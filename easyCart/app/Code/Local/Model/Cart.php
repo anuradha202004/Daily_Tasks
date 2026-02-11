@@ -105,14 +105,15 @@ class Model_Cart extends Core_Model {
             $subtotal += $itemTotal;
         }
         
-        // Tiered bulk discount based on order subtotal
+        // Calculate bulk discount: 1% discount per item (e.g. 2 items = 2%, 5 items = 5%)
         $discount = 0;
-        if ($subtotal >= 1000) {
-            $discount = $subtotal * 0.15; // 15% off for orders $1000+
-        } elseif ($subtotal >= 500) {
-            $discount = $subtotal * 0.10; // 10% off for orders $500+
-        } elseif ($subtotal >= 100) {
-            $discount = $subtotal * 0.05; // 5% off for orders $100+
+        foreach ($items as $item) {
+            $qty = (int)$item['quantity'];
+            if ($qty > 0) {
+                // Discount is itemTotal * (qty / 100)
+                $itemTotal = $item['product']['price'] * $qty;
+                $discount += $itemTotal * ($qty / 100);
+            }
         }
         
         return [

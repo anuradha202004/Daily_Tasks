@@ -348,6 +348,13 @@
                         </div>
                     </div>
 
+                    <!-- Discount Status Info -->
+                    <div id="checkout-discount-info" class="promo-section" style="margin-top: 10px; border-top: 1px solid #eee; padding-top: 15px; display: none;">
+                        <div id="discount-tier-msg" class="secure-info-box" style="padding: 12px; margin-top: 0; font-size: 13px;">
+                            <!-- Dynamically populated by JS -->
+                        </div>
+                    </div>
+
                     <!-- Totals -->
                     <div class="summary-totals">
                         <div class="total-row">
