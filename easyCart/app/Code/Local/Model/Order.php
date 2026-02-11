@@ -113,6 +113,15 @@ class Model_Order extends Core_Model {
         return $order;
     }
     
+    public function getLatestOrderByUserId($userId) {
+        $sql = "SELECT increment_id FROM sales_order WHERE user_id = :uid ORDER BY created_at DESC LIMIT 1";
+        $row = $this->db->fetchOne($sql, ['uid' => $userId]);
+        if ($row) {
+            return $this->loadByIncrementId($row['increment_id']);
+        }
+        return null;
+    }
+    
     public function getCollection() {
         // Return collection object for orders
         // return new Model_Order_Collection();
@@ -121,5 +130,10 @@ class Model_Order extends Core_Model {
     public function getOrdersByUserId($userId) {
         $sql = "SELECT * FROM sales_order WHERE user_id = :uid ORDER BY created_at DESC";
         return $this->db->fetchAll($sql, ['uid' => $userId]);
+    }
+
+    public function cancelOrder($orderId) {
+        $sql = "UPDATE sales_order SET status = 'cancelled' WHERE id = :id";
+        return $this->db->query($sql, ['id' => $orderId]);
     }
 }

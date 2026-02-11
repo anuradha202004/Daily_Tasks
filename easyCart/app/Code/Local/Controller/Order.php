@@ -94,27 +94,31 @@ class Controller_Order extends Core_Controller {
         $shippingOptions = [
             'standard' => [
                 'name' => 'Standard Shipping',
-                'cost' => 15.00,
+                'cost' => 40.00,
                 'icon' => '📦',
-                'description' => 'Delivery in 3-5 business days'
+                'description' => '5-7 Business Days',
+                'label' => 'Flat $40'
             ],
             'express' => [
                 'name' => 'Express Shipping',
-                'cost' => 35.00,
+                'cost' => min(80.00, $subtotal * 0.10),
                 'icon' => '🚀',
-                'description' => 'Delivery in 1-2 business days'
+                'description' => '1-2 Business Days',
+                'label' => 'Flat $80 OR 10% of subtotal (whichever is lower)'
             ],
             'whiteglove' => [
                 'name' => 'White Glove Delivery',
-                'cost' => 150.00,
+                'cost' => min(150.00, $subtotal * 0.05),
                 'icon' => '🤵',
-                'description' => 'Professional setup and assembly'
+                'description' => 'Scheduled Appointment',
+                'label' => 'Flat $150 OR 5% of subtotal (whichever is lower)'
             ],
             'freight' => [
                 'name' => 'Freight Delivery',
-                'cost' => 450.00,
+                'cost' => max(200.00, $subtotal * 0.03),
                 'icon' => '🚛',
-                'description' => 'Specialized LTL shipping for bulky items'
+                'description' => '7-14 Business Days',
+                'label' => '3% of subtotal or Minimum $200'
             ]
         ];
 
@@ -156,15 +160,14 @@ class Controller_Order extends Core_Controller {
         // Handle Actions (like Cancel Order)
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $action = $_POST['action'] ?? '';
-            $orderNumber = $_GET['id'] ?? null;
+            $orderNumber = $_POST['order_id'] ?? $_GET['id'] ?? null;
             
             if ($action === 'cancel_order' && $orderNumber) {
                 $orderModel = new Model_Order();
                 $order = $orderModel->loadByIncrementId($orderNumber);
-                if ($order) {
-                    // Update order status in DB
-                    $this->db->query("UPDATE sales_order SET status = 'cancelled' WHERE id = :id", ['id' => $order['id']]);
-                    $_SESSION['cancellation_success'] = "Order has been successfully cancelled.";
+                if ($order && $order['status'] !== 'cancelled') {
+                    $orderModel->cancelOrder($order['id']);
+                    $_SESSION['cancellation_success'] = "Order #{$orderNumber} has been successfully cancelled.";
                 }
             }
             $this->redirect('order-confirmation?id=' . $orderNumber);
@@ -282,10 +285,23 @@ class Controller_Order extends Core_Controller {
             elseif ($subtotal >= 500) $discount = $subtotal * 0.10;
             elseif ($subtotal >= 100) $discount = $subtotal * 0.05;
 
-            // Get shipping cost from predefined map
-            $shippingMap = ['standard' => 15.0, 'express' => 35.0, 'whiteglove' => 150.0, 'freight' => 450.0];
+            // Dynamic shipping calculation matching new rules
             $shippingMethod = $_POST['shipping_method'] ?? 'standard';
-            $shippingCost = $shippingMap[$shippingMethod] ?? 15.00;
+            switch ($shippingMethod) {
+                case 'express':
+                    $shippingCost = min(80.00, $subtotal * 0.10);
+                    break;
+                case 'whiteglove':
+                    $shippingCost = min(150.00, $subtotal * 0.05);
+                    break;
+                case 'freight':
+                    $shippingCost = max(200.00, $subtotal * 0.03);
+                    break;
+                case 'standard':
+                default:
+                    $shippingCost = 40.00;
+                    break;
+            }
             
             // Tax (18% as per view)
             $tax = ($subtotal - $discount + $shippingCost) * 0.18;
@@ -385,11 +401,66 @@ class Controller_Order extends Core_Controller {
     }
     
     public function invoice() {
+        if (!isLoggedIn()) {
+            $this->redirect('signin');
+            return;
+        }
+
         $id = $_GET['id'] ?? '';
+        $latest = $_GET['latest'] ?? '';
         $orderModel = new Model_Order();
-        $order = $orderModel->loadByIncrementId($id);
+        
+        if ($latest === 'true') {
+            $userId = getCurrentUser()['id'];
+            $order = $orderModel->getLatestOrderByUserId($userId);
+        } else {
+            $order = $orderModel->loadByIncrementId($id);
+        }
+
+        if (!$order) {
+            die("Order not found");
+        }
+
+        // Security check: ensure order belongs to current user (unless admin)
+        if (getCurrentUser()['role'] !== 'admin' && $order['user_id'] != getCurrentUser()['id']) {
+            $this->redirect('profile');
+            return;
+        }
+
+        // Map data for view compatibility
+        $mappedOrder = [
+            'order_number' => $order['increment_id'],
+            'date' => $order['created_at'],
+            'customer' => [
+                'first_name' => $order['shipping_address']['firstname'] ?? '',
+                'last_name' => $order['shipping_address']['lastname'] ?? '',
+                'email' => $order['shipping_address']['email'] ?? '',
+                'address' => $order['shipping_address']['street'] ?? '',
+                'city' => $order['shipping_address']['city'] ?? '',
+                'state' => $order['shipping_address']['region'] ?? '',
+                'zip' => $order['shipping_address']['postcode'] ?? '',
+                'phone' => $order['shipping_address']['telephone'] ?? ''
+            ],
+            'items' => array_map(function($item) {
+                return [
+                    'quantity' => $item['qty_ordered'],
+                    'itemTotal' => $item['row_total'],
+                    'product' => [
+                        'name' => $item['name'],
+                        'sku' => $item['sku'],
+                        'price' => $item['price']
+                    ]
+                ];
+            }, $order['items'] ?? []),
+            'subtotal' => $order['subtotal'],
+            'tax' => $order['tax_amount'],
+            'shipping' => $order['shipping_amount'],
+            'discount' => $order['discount_amount'],
+            'total' => $order['grand_total']
+        ];
+
         $view = new View_Product('order/invoice');
-        $view->assign('order', $order);
+        $view->assign('order', $mappedOrder);
         echo $view->toHtml();
     }
 }

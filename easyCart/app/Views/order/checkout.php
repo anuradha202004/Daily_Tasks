@@ -224,6 +224,9 @@
                                                     <?php if (isset($option['calculation'])): ?>
                                                         <small class="shipping-calc"><?php echo $option['calculation']; ?></small>
                                                     <?php endif; ?>
+                                                    <?php if (isset($option['label'])): ?>
+                                                        <small class="shipping-info-label" style="display: block; font-size: 0.75rem; color: #6b7280; margin-top: 4px;"><?php echo $option['label']; ?></small>
+                                                    <?php endif; ?>
                                                 </div>
                                             </div>
                                             <div class="shipping-option-price">

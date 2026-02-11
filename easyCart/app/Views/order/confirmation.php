@@ -244,21 +244,25 @@
                 </div>
 
                 <!-- Action Buttons -->
-                <div class="action-buttons">
-                    <?php if ($data['order']['status'] === 'Processing'): ?>
-                        <button onclick="openCancelModal()" class="btn-cancel">
+                <div class="action-buttons-vertical">
+                    <a href="profile" class="btn btn-primary btn-dashboard-v">
+                        Go to Dashboard
+                    </a>
+                    
+                    <a href="invoice?id=<?php echo $data['order']['order_number']; ?>" target="_blank" class="btn btn-download-v">
+                        📄 Download Invoice
+                    </a>
+
+                    <a href="products" class="btn btn-shopping-v">
+                        Continue Shopping
+                    </a>
+
+                    <?php if (in_array($data['order']['status'], ['Pending', 'Processing'])): ?>
+                        <button onclick="openCancelModal()" class="btn btn-cancel-v">
                             ❌ Cancel Order
                         </button>
                     <?php endif; ?>
-                    <a href="profile" class="btn btn-primary btn-dashboard">
-                        Go to Dashboard
-                    </a>
-                    <a href="invoice?latest=true" target="_blank" class="btn btn-download">
-                        📄 Download Invoice
-                    </a>
-                    <a href="products" class="btn-shopping">
-                        Continue Shopping
-                    </a>
+
                     <?php if ($data['order']['status'] === 'Cancelled'): ?>
                         <button onclick="window.location.href='products'" class="btn-buy-again">
                             🔄 Buy Again
@@ -268,6 +272,24 @@
             </div>
         </div>
     </div>
+    
+    <script>
+        function openCancelModal() {
+            document.getElementById('cancelModal').style.display = 'flex';
+        }
+
+        function closeCancelModal() {
+            document.getElementById('cancelModal').style.display = 'none';
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('cancelModal');
+            if (event.target == modal) {
+                closeCancelModal();
+            }
+        }
+    </script>
 
     <!-- Info Section -->
     <div class="help-section">
@@ -291,8 +313,9 @@
             Are you sure you want to cancel this order? This action cannot be undone. Your refund will be processed within 5-7 business days.
         </p>
         
-        <form method="POST" class="modal-actions" action="order-confirmation">
+        <form method="POST" class="modal-actions" action="order-confirmation?id=<?php echo $data['order']['order_number']; ?>">
             <input type="hidden" name="action" value="cancel_order">
+            <input type="hidden" name="order_id" value="<?php echo $data['order']['order_number']; ?>">
             <button type="submit" class="btn-confirm-cancel">
                 Yes, Cancel Order
             </button>

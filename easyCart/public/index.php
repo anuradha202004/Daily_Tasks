@@ -1,4 +1,23 @@
 <?php
+// // ============================================
+// // PASSWORD PROTECTION
+// // Username: anu | Password: 1234
+// // ============================================
+// if (!isset($_SERVER['PHP_AUTH_USER']) || !isset($_SERVER['PHP_AUTH_PW'])) {
+//     header('WWW-Authenticate: Basic realm="Restricted Access"');
+//     header('HTTP/1.0 401 Unauthorized');
+//     echo 'Authentication required';
+//     exit;
+// }
+
+// if ($_SERVER['PHP_AUTH_USER'] !== 'anu' || $_SERVER['PHP_AUTH_PW'] !== '1234') {
+//     header('WWW-Authenticate: Basic realm="Restricted Access"');
+//     header('HTTP/1.0 401 Unauthorized');
+//     echo 'Invalid credentials';
+//     exit;
+// }
+// // ============================================
+
 $log = "Request URI: " . $_SERVER['REQUEST_URI'] . "\nGET url: " . ($_GET['url'] ?? 'NOT SET') . "\n";
 file_put_contents(__DIR__ . '/../debug_log.txt', $log, FILE_APPEND);
 
