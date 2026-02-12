@@ -1,5 +1,5 @@
 <?php
-class core_models_request{
+class Core_Models_Request{
     
 }
 ?>

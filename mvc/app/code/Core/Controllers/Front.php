@@ -1,8 +1,12 @@
 <?php
-class core_controllers_front{
-   protected $_request;
-   public function __construct(){
-   
-   }
+
+class Core_Controllers_Front{
+    protected $__request;
+
+    public function __construct(){
+    }
+    public function indexAction(){
+        echo "Front Controller Index Action";
+    }
 }
 ?>

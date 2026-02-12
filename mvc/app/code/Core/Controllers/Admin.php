@@ -1,5 +1,6 @@
 <?php
-class core_controllers_Admin{
-    
+
+class Core_Controllers_Admin{
+
 }
 ?>

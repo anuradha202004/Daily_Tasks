@@ -1,13 +1,16 @@
 <?php
-class Sdp {
+class Sdp{
     public static function run(){
-    
-     $front = new core_controllers_front();
-     $admin = new core_controllers_Admin();
-    // echo "<pre>";
-    // print_r($front);
-    echo "<pre>";
-    print_r($admin);
+
+        $request = new Core_Model_Request();
+        $className = sprintf("%s_Controllers_%s", 
+        ucfirst($request->getModuleName()),
+        ucfirst($request->getControllerName()));
+
+        $action = $request->getActionName()."Action";
+        $classObj = new $className();
+        $classObj->$action();
+
     }
 }
 ?>
