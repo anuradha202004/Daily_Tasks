@@ -5,8 +5,6 @@ spl_autoload_register(function($class){
     $file = str_replace("_", "/", $class);
     $file = sprintf("%s.php", $base . "/" . $file);
     
-    if (file_exists($file)) {
-        require_once $file;
-    }
+    require_once $file;
 });
 ?>
