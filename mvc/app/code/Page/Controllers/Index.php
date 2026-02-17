@@ -2,8 +2,6 @@
 
 class Page_Controllers_Index
 {
-
-
     public function indexAction()
     {   
         $root = Sdp ::getBlock("page/root");

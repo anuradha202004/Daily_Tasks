@@ -12,9 +12,10 @@ class Core_Controllers_Front{
         // $request = new Core_Model_Request();
         $request = Sdp :: getModel("core/request");
 
-        $className = sprintf("%s_Controllers_%s", 
-        ucfirst($request->getModuleName()),
-        ucfirst($request->getControllerName()));
+        $module = ucfirst($request->getModuleName());
+        $controller = implode("_", array_map("ucfirst", explode("_", $request->getControllerName())));
+        
+        $className = sprintf("%s_Controllers_%s", $module, $controller);
 
         $action = $request->getActionName()."Action";
         $classObj = new $className();

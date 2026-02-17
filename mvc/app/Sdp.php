@@ -5,20 +5,20 @@ class Sdp{
         $front -> run();
     }
     public static function getModel($modelName){
-
-        $model = array_map("ucfirst", explode("/", $modelName));
-        $model = sprintf("%s_Model_%s", $model[0], $model[1]);
-        // $class = str_replace("_", "/", $className);
-        $modelObj =new $model();
+        $parts = explode("/", $modelName);
+        $module = ucfirst($parts[0]);
+        $model = implode("_", array_map("ucfirst", explode("_", $parts[1])));
+        $className = sprintf("%s_Model_%s", $module, $model);
+        $modelObj = new $className();
         return $modelObj;
-
     }
 
     public static function getBlock($blockName){
-        $block = array_map("ucfirst", explode("/", $blockName));
-        $block = sprintf("%s_Block_%s", $block[0], $block[1]);
-        // $class = str_replace("_", "/", $className);
-        $blockObj =new $block();
+        $parts = explode("/", $blockName);
+        $module = ucfirst($parts[0]);
+        $block = implode("_", array_map("ucfirst", explode("_", $parts[1])));
+        $className = sprintf("%s_Block_%s", $module, $block);
+        $blockObj = new $className();
         return $blockObj;
     }
 
