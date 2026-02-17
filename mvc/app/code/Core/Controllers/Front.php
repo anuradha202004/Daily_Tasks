@@ -1,6 +1,6 @@
 <?php
 
-class Core_Controllers_Front{
+class Core_Controllers_Front extends Core_Controllers_Front_Action{
     protected $__request;
 
     // public function __construct(){
@@ -9,13 +9,13 @@ class Core_Controllers_Front{
 
     public function run(){
         
-        // $request = new Core_Model_Request();
-        $request = Sdp :: getModel("core/request");
+        $request = $this->getRequest();
+        // $request = Sdp :: getModel("core/request");
 
-        $module = ucfirst($request->getModuleName());
-        $controller = implode("_", array_map("ucfirst", explode("_", $request->getControllerName())));
-        
-        $className = sprintf("%s_Controllers_%s", $module, $controller);
+
+        $className = sprintf("%s_Controllers_%s", 
+        ucfirst($request->getModuleName()),
+        ucfirst($request->getControllerName()));
 
         $action = $request->getActionName()."Action";
         $classObj = new $className();

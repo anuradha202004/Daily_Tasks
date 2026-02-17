@@ -6,20 +6,16 @@ class Sdp{
     }
     public static function getModel($modelName){
         $parts = explode("/", $modelName);
-        $module = ucfirst($parts[0]);
-        $model = implode("_", array_map("ucfirst", explode("_", $parts[1])));
-        $className = sprintf("%s_Model_%s", $module, $model);
-        $modelObj = new $className();
-        return $modelObj;
+        $parts = array_map("ucfirst", $parts);
+        $className = $parts[0] . "_Model_" . implode("_", array_slice($parts, 1));
+        return new $className();
     }
 
     public static function getBlock($blockName){
         $parts = explode("/", $blockName);
-        $module = ucfirst($parts[0]);
-        $block = implode("_", array_map("ucfirst", explode("_", $parts[1])));
-        $className = sprintf("%s_Block_%s", $module, $block);
-        $blockObj = new $className();
-        return $blockObj;
+        $parts = array_map("ucfirst", $parts);
+        $className = $parts[0] . "_Block_" . implode("_", array_slice($parts, 1));
+        return new $className();
     }
 
 

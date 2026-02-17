@@ -8,13 +8,16 @@ class Core_Model_Request{
  
         public function __construct(){
             $uri = $this->getRequestUrl();
-            $uri = str_replace($this->getBaseUrl(), "", $uri);
-            $uri = array_filter(explode("/",$uri));
+            $base = $this->getBaseUrl();
+            $uri = str_replace($base, "", $uri);
+            // Handle index.php if present in URL
+            $uri = str_replace("index.php/", "", $uri);
+            $uri = str_replace("index.php", "", $uri);
+            
+            $uri = array_values(array_filter(explode("/",$uri)));
             $this->_module      = isset($uri[0]) ? $uri[0]:"page";
             $this->_controllers = isset($uri[1]) ? $uri[1]:"index";
             $this->_action      = isset($uri[2]) ? $uri[2]:"index";
-            //echo "<pre>";
-           // print_r($uri);
         }
         
         public function getRequestUrl(){
@@ -41,7 +44,14 @@ class Core_Model_Request{
         }
  
         public function getBaseUrl(){
-            return "http://localhost/mvc/";
+            $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+            $host = $_SERVER['HTTP_HOST'];
+            $scriptName = $_SERVER['SCRIPT_NAME'];
+            $baseDir = dirname($scriptName);
+            // Ensure trailing slash
+            $baseDir = rtrim($baseDir, '/\\') . '/';
+            // If the baseDir is just /, we might want to keep it or join it
+            return $protocol . "://" . $host . $baseDir;
         }
  
         public function getControllerName(){
