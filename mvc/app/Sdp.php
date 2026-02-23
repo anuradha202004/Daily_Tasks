@@ -5,17 +5,21 @@ class Sdp{
         $front -> run();
     }
     public static function getModel($modelName){
-        $parts = explode("/", $modelName);
-        $parts = array_map("ucfirst", $parts);
-        $className = $parts[0] . "_Model_" . implode("_", array_slice($parts, 1));
-        return new $className();
+
+        $model = array_map("ucfirst", explode("/", $modelName));
+        $model = sprintf("%s_Model_%s", $model[0], $model[1]);
+        // $class = str_replace("_", "/", $className);
+        $modelObj =new $model();
+        return $modelObj;
+
     }
 
     public static function getBlock($blockName){
-        $parts = explode("/", $blockName);
-        $parts = array_map("ucfirst", $parts);
-        $className = $parts[0] . "_Block_" . implode("_", array_slice($parts, 1));
-        return new $className();
+        $block = array_map("ucfirst", explode("/", $blockName));
+        $block = sprintf("%s_Block_%s", $block[0], $block[1]);
+        // $class = str_replace("_", "/", $className);
+        $blockObj =new $block();
+        return $blockObj;
     }
 
 

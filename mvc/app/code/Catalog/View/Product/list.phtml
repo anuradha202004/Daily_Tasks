@@ -1,9 +1,5 @@
-<!DOCTYPE html>
-<html>
-    <head>
-    <title></title>
-    </head>
-    <body>
-        List Content
-    </body>
-</html>
+<?php  $js= $this->getJs(); ?>
+
+<?php foreach ($js as $_js): ?>
+ <script src="<?php echo $_js?>"></script>
+<?php endforeach ?>

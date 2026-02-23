@@ -1,11 +1,12 @@
 <?php
 
-class Core_Block_Template
+class Core_Block_Template 
 {
 
     protected $_child = [];
     protected $_parent = null;
     protected $_template = null;
+    protected $_js = [];
     public function __construct()
     {
         $this->_construct();
@@ -48,6 +49,17 @@ class Core_Block_Template
                 }
             }
         }
+    }
+
+    public function addJs($file)
+    {
+        $this->_js[] = $file;
+        return $this;
+    }
+
+    public function getJs()
+    {
+        return $this->_js;
     }
 }
 

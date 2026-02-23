@@ -1,20 +1,18 @@
-<!-- <?php $menu = $this->getMenuArray(); ?>
-
-    <?php
-    echo"<pre>";
-    print_r($menu);
-    ?> -->
+<?php $menu = $this->getMenuArray(); ?>
 
 <html>
-    <head></head>
-    <body>
-        <ul>
-            <?php foreach ($menu as $key => $value) {?>
-                <li>
-                    <a href="<?php echo $key; ?>"><?php echo $value; ?></a>
-                </li>
-        
-          <?php } ?>
-        </ul>
-    </body>
+
+<head></head>
+
+<body>
+    <ul>
+        <?php foreach ($menu as $key => $value) { ?>
+            <li>
+                <a href="<?php echo $key; ?>"><?php echo $value; ?></a>
+            </li>
+            
+        <?php } ?>
+    </ul>
+</body>
+
 </html>

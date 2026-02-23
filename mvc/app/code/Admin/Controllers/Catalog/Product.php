@@ -1,6 +1,6 @@
 <?php
 
-class Admin_Controllers_Catalog_Product extends Core_Controllers_Front
+class Admin_Controllers_Catalog_Product extends Core_Controllers_Admin
 {
     public function deleteAction()
     {
@@ -33,9 +33,14 @@ class Admin_Controllers_Catalog_Product extends Core_Controllers_Front
         $root->toHtml();
     }
 
-
-
-
+ public function saveAction()
+    {
+        $product = Sdp::getModel('catalog/product');
+        echo "<pre>";
+        $product->load(1);
+        print_r($product);
+        print_r($product->getUrl());
+    }
 
 }
 ?>
