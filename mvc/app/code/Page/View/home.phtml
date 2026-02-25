@@ -1,9 +1,6 @@
-<!DOCTYPE html>
-<html>
-    <head>
-    <title></title>
-    </head>
-    <body>
-        Home page Content
-    </body>
-</html>
+
+<div class="home-content">
+    <?php $this->getChildHtml("hero"); ?>
+    <?php $this->getChildHtml("categories"); ?>
+    <?php $this->getChildHtml("featured"); ?>
+</div>

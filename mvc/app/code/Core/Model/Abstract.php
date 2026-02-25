@@ -3,7 +3,12 @@
 class Core_Model_Abstract
 {
     protected $_data = [];
+    protected $_resource = null;
 
+    public function _init($resource)
+    {
+        $this->_resource = Sdp::getResourceModel($resource);
+    }
     public function __set($key, $value)
     {
         $this->_data[$key] = $value;
@@ -21,7 +26,7 @@ class Core_Model_Abstract
         return $this;
     }
 
-   public function __call($method, $args)
+    public function __call($method, $args)
     {
 
         if (substr($method, 0, 3) == "set") {
@@ -36,14 +41,20 @@ class Core_Model_Abstract
         }
     }
 
+    public function getResource()
+    {
+        return $this->_resource;
+    }
+
     public function load($value, $field = null)
     {
-        $mySql =Sdp::getModel("core/connection_Mysql");
-        $query = "select * from catalog_product";
-        $data = $mySql->fetchOne();
+        // $mySql =Sdp::getModel("core/connection_Mysql");
+        // $query = "select * from catalog_product";
+        // $data = $mySql->fetchOne();
+
+        $data = $this->getResource()->load($this, $value, $field);
         $this->_data = $data;
     }
 
-    
 }
 ?>
