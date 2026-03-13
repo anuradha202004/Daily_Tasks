@@ -3,7 +3,7 @@ import { Pin } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { NOTE_COLORS } from '../utils/colors';
 
-const NoteCard = ({ note, onDelete, onEdit, onPin }) => {
+const NoteCard = ({ note, onDelete, onEdit, onPin, onArchive }) => {
     const color = NOTE_COLORS.find(c => c.id === note.color) || NOTE_COLORS[0];
 
     return (
@@ -18,11 +18,27 @@ const NoteCard = ({ note, onDelete, onEdit, onPin }) => {
                 <Pin size={16} fill={note.isPinned ? 'currentColor' : 'none'} />
             </button>
 
-            <h3 className="card-title">{note.title || 'Untitled'}</h3>
-            <p className="card-text">{note.content}</p>
+            {/* Wrap the content and make it clickable to Open the note */}
+            <div
+                onClick={() => onEdit(note)}
+                style={{ cursor: 'pointer', flex: 1, display: 'flex', flexDirection: 'column' }}
+                title="Click to open note"
+            >
+                <h3 className="card-title">{note.title || 'Untitled'}</h3>
+                <p className="card-text">{note.content}</p>
+            </div>
 
-            <div className="card-footer">
+            <div className="card-footer" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontSize: '0.75rem', color: 'var(--gray)' }}>
+                    {new Date(note.createdAt).toLocaleDateString()}
+                </span>
                 <div className="card-btns">
+                    {/* Only show Archive/Unarchive if the function is available (it might not be passed down in all views) */}
+                    {onArchive && (
+                        <button className="action-text" style={{ color: 'var(--gray)' }} onClick={() => onArchive(note.id)}>
+                            {note.isArchived ? 'Unarchive' : 'Archive'}
+                        </button>
+                    )}
                     <button className="action-text" onClick={() => onEdit(note)}>Edit</button>
                     <button className="action-text" style={{ color: '#ef4444' }} onClick={() => onDelete(note.id)}>Delete</button>
                 </div>

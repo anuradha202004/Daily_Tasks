@@ -1,86 +1,36 @@
-import React, { useState, useMemo } from 'react';
-import { Plus, Search, FileText } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React from 'react';
+import { Routes, Route } from 'react-router-dom';
 import { useNotes } from './hooks/useNotes';
-import NoteCard from './components/NoteCard';
-import NoteModal from './components/NoteModal';
+
+// Import our new layout and pages
+import MainLayout from './layouts/MainLayout';
+import HomePage from './pages/HomePage';
+import PinnedPage from './pages/PinnedPage';
+import ArchivePage from './pages/ArchivePage';
+import NoteEditorPage from './pages/NoteEditorPage';
 
 function App() {
-  const { notes, addNote, updateNote, deleteNote, togglePin } = useNotes();
-  const [search, setSearch] = useState('');
-  const [isOpen, setIsOpen] = useState(false);
-  const [editNote, setEditNote] = useState(null);
-
-  const filtered = useMemo(() => {
-    return notes
-      .filter(n =>
-        n.title.toLowerCase().includes(search.toLowerCase()) ||
-        n.content.toLowerCase().includes(search.toLowerCase())
-      )
-      .sort((a, b) => {
-        if (a.isPinned === b.isPinned) return new Date(b.createdAt) - new Date(a.createdAt);
-        return a.isPinned ? -1 : 1;
-      });
-  }, [notes, search]);
-
-  const onEdit = (n) => {
-    setEditNote(n);
-    setIsOpen(true);
-  };
-
-  const onSave = (data) => {
-    editNote ? updateNote(data) : addNote(data);
-    setEditNote(null);
-  };
+  // We manage the notes state at the very top level
+  // so that all pages inside our app have access to the same notes!
+  const notesData = useNotes();
 
   return (
     <div className="app">
-      <header className="header">
-        <div className="wrap flex">
-          <div className="logo">
-            <div className="icon-bg"><FileText size={20} /></div>
-            <span>Notes App</span>
-          </div>
+      <Routes>
+        {/* The wrapper layout for the main app */}
+        <Route path="/" element={<MainLayout context={notesData} />}>
 
-          <div className="search">
-            <Search size={16} />
-            <input
-              placeholder="Search notes..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-          </div>
+          {/* Outlet sub-pages */}
+          <Route element={<HomePage />} index />
+          <Route path="pinned" element={<PinnedPage />} />
+          <Route path="archived" element={<ArchivePage />} />
 
-          <button className="btn btn-blue" onClick={() => { setEditNote(null); setIsOpen(true); }}>
-            <Plus size={18} /> New Note
-          </button>
-        </div>
-      </header>
+          {/* New specific pages to handle Creating and Editing */}
+          <Route path="create" element={<NoteEditorPage />} />
+          <Route path="note/:id" element={<NoteEditorPage />} />
 
-      <main className="wrap">
-        {filtered.length > 0 ? (
-          <div className="grid">
-            <AnimatePresence mode="popLayout">
-              {filtered.map(n => (
-                <NoteCard key={n.id} note={n} onDelete={deleteNote} onEdit={onEdit} onPin={togglePin} />
-              ))}
-            </AnimatePresence>
-          </div>
-        ) : (
-          <div className="empty">
-            <FileText size={50} style={{ opacity: 0.3, marginBottom: '10px' }} />
-            <h2>No notes found</h2>
-            <p>Start by creating your first note.</p>
-          </div>
-        )}
-      </main>
-
-      <NoteModal
-        isOpen={isOpen}
-        onClose={() => { setIsOpen(false); setEditNote(null); }}
-        onSave={onSave}
-        data={editNote}
-      />
+        </Route>
+      </Routes>
     </div>
   );
 }
