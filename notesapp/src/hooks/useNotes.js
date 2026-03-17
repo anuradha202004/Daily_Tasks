@@ -2,9 +2,15 @@ import { useState, useEffect } from 'react';
 import CryptoJS from 'crypto-js';
 
 const SECRET_KEY = '12345';
+
 export const useNotes = () => {
+    // Determine the storage key dynamically based on the current user!
+    const userString = localStorage.getItem('currentUser');
+    const user = userString ? JSON.parse(userString) : null;
+    const storageKey = user ? `notes-app-data-${user.email}` : 'notes-app-data';
+
     const [notes, setNotes] = useState(() => {
-        const saved = localStorage.getItem('notes-app-data');
+        const saved = localStorage.getItem(storageKey);
         if (saved) {
             try {
                 const bytes = CryptoJS.AES.decrypt(saved, SECRET_KEY);
@@ -21,10 +27,9 @@ export const useNotes = () => {
     });
 
     useEffect(() => {
-
         const encryptedData = CryptoJS.AES.encrypt(JSON.stringify(notes), SECRET_KEY).toString();
-        localStorage.setItem('notes-app-data', encryptedData);
-    }, [notes]);
+        localStorage.setItem(storageKey, encryptedData);
+    }, [notes, storageKey]);
 
     const addNote = (note) => {
         const newNote = {

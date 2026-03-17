@@ -8,8 +8,21 @@ import HomePage from './pages/HomePage';
 import PinnedPage from './pages/PinnedPage';
 import ArchivePage from './pages/ArchivePage';
 import NoteEditorPage from './pages/NoteEditorPage';
+import LoginPage from './pages/LoginPage';
+import { Navigate } from 'react-router-dom';
 
 function App() {
+  // Safe check if someone is logged in!
+  let user = null;
+  try {
+    const currentUserString = localStorage.getItem('currentUser');
+    if (currentUserString) {
+      user = JSON.parse(currentUserString);
+    }
+  } catch (e) {
+    console.error("Failed to parse user", e);
+  }
+
   // We manage the notes state at the very top level
   // so that all pages inside our app have access to the same notes!
   const notesData = useNotes();
@@ -17,8 +30,11 @@ function App() {
   return (
     <div className="app">
       <Routes>
-        {/* The wrapper layout for the main app */}
-        <Route path="/" element={<MainLayout context={notesData} />}>
+        {/* PUBLIC ROUTE: The Login Page */}
+        <Route path="/login" element={user ? <Navigate to="/" /> : <LoginPage />} />
+
+        {/* PROTECTED ROUTES: Only show MainLayout if 'user' exists, else redirect to Login */}
+        <Route path="/" element={user ? <MainLayout context={notesData} /> : <Navigate to="/login" />}>
 
           {/* Outlet sub-pages */}
           <Route element={<HomePage />} index />
